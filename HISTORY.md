@@ -1,7 +1,372 @@
 # Changelog
 
 
-## 5.9.8 (2026-11-15)
+## 5.9.9 (2026-11-17)
+
+#### Other
+
+* Test: the fake download client takes the new retry parameter. 
+  _flutter analyze failed in CI: _DownloadClient.download no longer matched
+DioHttpClient.download after it gained retry. Also sorts imports and drops
+a redundant DateTime argument the analyzer flagged._
+
+* Feat(crash-report): the core ends a trace session by itself. 
+  _The end of a trace session and the level before it go to the core with
+the settings (log-level-until, log-level-after), so the core goes back
+at the end also while the app is closed and the VPN still runs; the
+app's own timer ended it only while the app ran.
+
+A session starts with its end before the level and ends with the level
+before the end, so each changes the core's settings once: one reconnect,
+not a second change the reconnect's 100 ms throttle could drop._
+
+* Add new translations and update existing ones for Uzbek, Simplified Chinese, and Traditional Chinese. 
+  _- Added new phrases related to proxy status and user notifications in Uzbek (uz.i18n.json).
+- Updated existing translations and added new phrases in Simplified Chinese (zh-CN.i18n.json).
+- Updated existing translations and added new phrases in Traditional Chinese (zh-TW.i18n.json)._
+
+* Feat(profile): a failed subscription download says why and what to try. 
+  _Adding a profile whose server did not answer kept "Adding profile…" for
+two minutes (four attempts of up to 30 s), then said only "Connection
+timeout" (App Review rejected 5.9.8 for it).
+
+- The core downloads the subscription first, over gRPC (FetchUrl), with
+  Chrome's TLS handshake, which some networks let through when they drop
+  Dart's; when it fails, the app downloads it, once, without retries.
+- A failure that may pass (a timeout, a cut connection, 5xx, …) is tried
+  once more; the sheet shows the attempt that failed meanwhile. A 404 or a
+  403 is not tried again.
+- When both fail, a dialog tells, in plain words, what happened, where on
+  the way from the device over the internet to the VPN provider it stopped,
+  the error number (ERROR 403, ERROR CONN_RESET, …), and what to try; the
+  technical details of both downloads are folded away, and Copy details
+  copies all of it. The link is left out: it carries the user's token.
+- English and Persian text.
+
+Needs hiddify-core with FetchUrl; the hiddify-core pointer is not bumped._
+
+* Fix(dialog): an error message in Persian or Arabic reads right to left. 
+  _The error dialog showed every message left to right, which suits a
+technical message but garbles a translated one. A message that starts in a
+right-to-left script now reads right to left; the others stay left to right._
+
+* Fix(windows): a core that dies without a Go crash says why. 
+  _39f78fe0 and hiddify-core 2a9a61a show the panic line of the core's Go crash
+output, but on Windows many deaths left none, and the app said only "exit code
+-1073741819" (hiddify-app#2517):
+- a native crash on a DLL's own thread (cronet, wintun), which Go's exception
+  handler does not see: Windows ends the process and records an Application
+  Error event, with the faulting module, the exception code and the process id;
+- a Windows exception in C code on a Go thread, which Go does report, as
+  "Exception 0xc0000005 ...", a line the app did not read as a crash;
+- another program ending the process, which shows in the exit code only.
+
+The crash headline now reads Go's Exception line. Without Go output, on Windows,
+the reason is the Application Error event of that process (read with wevtutil,
+by position, so the system's language does not matter), or what the exit code
+means (access violation, fail-fast, stack overflow, a DLL not found, ...)._
+
+* Fix(ios): the packet tunnel ends when its core stops by itself. 
+  _The packet tunnel sets the core up and, when iOS starts it (on demand, the
+Settings switch), starts it too, but never looked at it again: a core that
+stopped by itself (a start, stop or reload that failed or panicked) was seen
+only by the app, on the core's status stream. With the app closed the tunnel
+stayed up, taking the device's traffic with no core behind it.
+
+The tunnel now listens to the core (hiddify-core 33f98b6,
+MobileSetCoreStoppedListener) and ends with the core's reason as its error,
+which iOS shows; the listener is removed before the tunnel closes the core
+itself. Needs a hiddify-core build that has 33f98b6._
+
+* Fix(android): the VPN service goes down when its core stops by itself. 
+  _The service sets the core up and, when the system or the tile starts it, starts
+it too, but it never looked at the core again: when the core stopped by itself
+(a start, stop or reload that failed or panicked), only the app saw it on the
+core's status stream, and the app stops the service then (681668da). With the
+app closed, the service stayed up, its TUN taking the device's traffic with no
+core behind it, until the app was opened.
+
+The service now listens to the core (hiddify-core 33f98b6,
+Mobile.setCoreStoppedListener): a stop of a started core takes the service
+down through its teardown, with the core's reason as the alert. The listener is
+removed before the service closes the core itself. Needs a hiddify-core build
+that has 33f98b6._
+
+* Fix(android): backups leave out the core's gRPC keys. 
+  _Auto Backup was on with no rules, so a cloud backup and a transfer to a new
+device carried the app's gRPC client certificate and private key (files/grpc)
+and the core's server certificate and private key (its settings store,
+data/AppSettings.db). Both are this device's own credentials for the
+connection between the app and its core.
+
+Backup rules (Android 11 and below) and data extraction rules (12 and later)
+leave them out; the device a backup is restored to makes its own._
+
+* Fix(stats): the stats stream is opened again when its connection drops. 
+  _7bdb5e86 tied the proxy list's stream to its channel: it is opened again
+when it ends. The stats stream got only the watch of the core restart signal,
+so when gRPC ended it without a new setup (the app suspended, the Mac asleep)
+the speeds and totals stayed frozen until the next connect, and a failed event
+showed zeros. It now keeps the last numbers on a failed event and is opened
+again when it ends, waiting longer while it keeps failing, as the proxy list
+does._
+
+* Fix(profile): a subscription's long update interval no longer breaks its slider. 
+  _dc6db526 made the parser accept any positive whole number of hours in
+profile-update-interval. The profile page's slider ends at 96 hours, and an
+interval past that (a week, 168, is common) is a value past the slider's end,
+which fails its assertion; the value is valid, the slider's fixed end was the
+wrong assumption. It now reaches at least the interval it shows.
+
+A number of hours past what a Duration holds overflowed into a wrong, even
+negative, interval: the parser holds it to a year._
+
+* Fix(ui): the last CurvedAnimations made in build are gone. 
+  _c2c5b8de stopped the CurvedAnimation leak in flutter_animate and two
+AnimatedSwitcher builders. Three more sites made one on every build: the
+crash report's step marks and the trace session's step numbers (switcher
+transition builders), and the rule page's error shake, where useAnimation
+rebuilds on every frame of the shake, so it made one per frame. A
+CurvedAnimation listens to its parent until it is disposed, so each one stayed
+for the life of that animation.
+
+The transitions drive the animation with a CurveTween, which listens only while
+it is listened to, and the shake's animation is made once per controller._
+
+* Fix(ios): a working directory move that failed is finished at the next start. 
+  _90c58e7b moves the working directory out of Library/Caches once, when the new
+one does not exist yet, and then creates the new one in any case. When the move
+failed (the app and the packet tunnel moving it at the same time, a file in
+use), the new empty directory stopped every later attempt, and the profiles'
+configs stayed in Library/Caches, where iOS deletes them when storage runs low:
+the loss the move was for.
+
+What the old directory still holds is now moved item by item, into existing
+folders too, on every start until it is empty, and the old directory is then
+removed._
+
+* Fix(vpn): a VPN service that stops answering has its engine stopped too. 
+  _The app watches the VPN service on Windows and Linux and, after two status
+requests that got no answer, reported the VPN as stopped and stopped following
+the service. It did not stop the engine: a service that was only hung kept its
+TUN routing the traffic while the app said it was disconnected, and the next
+connect raced it. With hiddify-core 869ffc1 the service answers its status
+even during a reload, so no answer means it is gone or hung, and the app now
+also asks it to stop its engine (best effort) before it reports the loss._
+
+* Fix(macos): a crashed core is reported with its reason, and started again at the next setup. 
+  _39f78fe0 reports why the core's process ended through onCoreProcessExited, but
+the macOS core did not implement it: a proxy-mode connection whose core
+crashed ended as a plain Disconnected, and only because the foreground status
+stream happened to error, which it took for a stop of the core. That stream
+was then not listened to again, so a channel that only reconnected also read as
+a stop, and later statuses were lost.
+
+After three crashes in a minute, or a restart that failed, the desktop core
+gave up on the process for good, saying it would be reached after the next
+setup; on macOS the next setup returned at once, so every call failed until
+the app was relaunched.
+
+- The macOS core reports a crash in proxy mode as a failed connection with the
+  crash's reason; the foreground stream's end is no longer a stop, and it is
+  listened to again.
+- A core process given up on is started again by the next setup.
+- The engine's exit handler checks again, after reading the crash reason,
+  that the engine it forgets is still the one that exited.
+- A crash file older than the process is an earlier run's, not its reason._
+
+* Fix(connection): a desktop proxy-mode start that fails after its answer is a failed connect. 
+  _The core answers Start as soon as it has queued the start, and a start that
+fails afterwards (its port still in use at login, a config the engine refuses)
+is reported only on its status stream. In proxy mode on Windows, Linux and
+macOS the app took the answer for the outcome and published Started: the
+connect worked with no core behind it, the startup retry of 2f35d405 never saw
+the failure, and no dialog said why.
+
+startAndConfirm listens to the core's status stream before it starts, and
+returns the status that ends the start (STOPPED with the reason, or the core
+up); the proxy-mode and elevated-TUN starts use it, so their failures throw
+like any other failed start._
+
+* Fix(android): the quick settings tile no longer runs before the first unlock. 
+  _The tile was declared directBootAware (copied with the tile from sing-box's
+app, which keeps its settings in device-protected storage). This app keeps its
+settings, profiles and core files in credential-encrypted storage only, which
+does not exist before the first unlock after a boot: the tile, bound by the
+system then, read the service mode from the settings when it connected, and
+SharedPreferences throws there ("not available until after user is
+unlocked"), which ended the app's process. Nothing the tile starts can work
+before that unlock, so it is no longer direct boot aware: the system binds it
+once the user unlocked._
+
+* Fix(android): each start of the service says whether it starts the core. 
+  _Who starts the core, the app over gRPC or the service itself, was a persisted
+setting: the app cleared it before its start, and every other entry point had
+to set it. Two of them forgot (always-on in d55e0c54, the shortcut in
+2ab0d580), and the service came up without a core, on "Connecting". The
+setting was also read late, after the setup, where a start from another entry
+point could have changed it in between.
+
+The decision now travels with the start: the app's start intent says no, the
+tile, the shortcut and the boot receiver say yes, and a start without the extra
+is the system's (always-on, a restart), with no app to start the core, so the
+service starts it. A reload does what its start did._
+
+* Fix(android): the notification talks to the core in the mode the service set it up. 
+  _Whether the core's server speaks mTLS was decided twice from the presence of
+the client identity file: once when the service set the server up, and again
+on every client the notification built. When the file appeared in between
+(the app writes its identity before its own setup, while a service started by
+the tile or always-on already ran a plain server), the notification's client
+spoke TLS to a plaintext server. 72d9569f moved the client's construction into
+the retry loop, which stopped the crash on the missing server certificate but
+left the client failing every few seconds, rebuilding its keys each time.
+
+The service passes the mode it set the server up with to the notification,
+and the client is built for that mode: with mTLS the server certificate is
+there, and without it none is needed._
+
+* Fix(macos): a failed native stop no longer leaves the app on Disconnecting. 
+  _stop() set _stoppingVPN and published Stopping, and only then entered the
+try/finally that clears the flag; the native stop it called in between is
+specified to throw on a failed stop. A failure there left _stoppingVPN set for
+good, so every later connected state of the VPN was shown as Disconnecting, and
+taps on the button were ignored. Everything after Stopping is inside the try
+now.
+
+681668da stops the service of a core that failed with unawaited(core.stop()),
+outside the error handling of HiddifyCoreService.stop: a stop that threw became
+an unhandled error, recorded as an app crash. Its error is now only logged,
+and the core's failure stays the status._
+
+* Fix(android): the core's memory budget is a share of the device's RAM. 
+  _The core was given ActivityManager.memoryClass as what it may use. That is the
+per-app Java heap class, not a budget for native memory, and the core is
+native: with the memory limit on, the Go runtime was held to three quarters of
+it, about 190 MB on most phones, so the GC ran all the time near it and the
+connection lagged (#2521). The core is now given a quarter of the device's RAM.
+
+BoxService also called Libbox.setMemoryLimit before Mobile.setup; the core's
+setup and start set the limit again, so the call did nothing. The setting
+reaches the core with the start request (hiddify-core e10d8db for starts
+without one)._
+
+* Fix(android): a stop waits for the start, and a failed start takes the service down. 
+  _Start and stop of the VPN service were not ordered. A stop during Starting did
+not cancel the start, which after Mobile.setup still posted Started, could
+start the core after the stop had closed it, and started the notification's
+polling against a closed server. A failed start (stopAndAlert) only set
+Stopped and closed the notification: the core, the TUN descriptor, the network
+monitor and the service itself stayed up, and the next stop returned at once
+because the status was already Stopped.
+
+The start is now a job the stop cancels and waits for before it closes the
+core; the start checks for that after each call into the core and sets
+Started on the main thread, where the stop sets Stopping. A stop and a failed
+start end in the same teardown, which also tells the app why a start failed.
+
+The network monitor stopped before the core was closed: offline, a DNS query
+of the still running core then asked the listener for the default network with
+no listener left, and the check in the listener's actor threw, which ended the
+actor and the process. The monitor now stops after the core, and such a request
+is answered with the error instead of ending the actor._
+
+* Fix(android): the platform channel answers every call, the battery dialog included. 
+  _The platform handlers had the same result.runCatching { success(...) } shape
+as the method handlers: a failure was swallowed and the call never answered.
+The battery optimization request kept its call in a lateinit and opened the
+dialog with activity?.startActivityForResult: without an activity, or with no
+activity on the ROM that handles the request, the call was never answered,
+and the dialog's result could find the lateinit unset.
+
+The answering helper moves to utils/MethodResults.kt and both channels use it.
+The battery request answers an error when there is no activity or the dialog
+cannot open, and a request left open is answered when the next one comes._
+
+* Fix(android): a failed setup, start or stop answers the app instead of leaving it waiting. 
+  _The method channel handlers ran in result.runCatching { ... success(...) },
+which swallowed a failure without answering. In setup the failure branch was
+onFailure { error(it) }: that is Kotlin's error(), which throws, not
+Result.error, and the outer runCatching swallowed that too. A core that could
+not be set up therefore left the app awaiting the call for ever, with no error
+to show; start and stop had no failure branch at all.
+
+Every handler now answers once: with its value, or with an error when it
+throws. The app turns a failed setup into the setup's error message._
+
+* Fix(android): a DNS query the core gives up on no longer keeps its thread. 
+  _DnsResolver never calls back for a query cancelled through its
+CancellationSignal, so LocalResolver waited forever on every query the core
+cancelled or timed out. Each wait holds the core's calling thread; with remote
+DNS on local and a stream of failing queries, thousands piled up within minutes
+in the background and the process aborted (#2607). The wait now ends with the
+core's context._
+
+* Fix(profile): iOS file import shows .conf and .ovpn files. 
+  _file_picker turns each extension into a UTI on iOS and drops the ones iOS
+only has a dynamic type for, so WireGuard, AWG and OpenVPN files were grayed
+out, as they were on Android. The iOS picker now shows all files too; the
+import reads the content._
+
+* Feat(report): Report a problem offers 10 minutes of detailed logging first. 
+  _Before writing the report, the dialog offers to turn the core's log level
+to trace for 10 minutes, with three steps: logging turns on, connect again
+and make the problem happen, come back and send. A countdown shows while
+it runs, and on return a banner over the description shows the time left
+with a Stop button. The level goes back to what it was when the time is
+up, when the report is made, or on the next start if the app was closed
+meanwhile. The crash report skips the offer._
+
+* Fix(share): the app picked in the share sheet opens in its own task on Android. 
+  _After sharing a log to Telegram, the Hiddify icon brought back Telegram's
+share screen: the system started it in Hiddify's task. MainActivity adds
+FLAG_ACTIVITY_NEW_TASK to the intent inside every chooser it starts.
+
+Fixes #2602_
+
+* Fix(local-proxy): a password set in the dialog can be removed there. 
+  _The local proxy dialog's "Set password" turned local-proxy-auth on, but the
+password row then offered only Edit, so turning it off again needed the
+switch in Settings > Inbound. Editing the password now offers "Remove
+password", which stops the local port asking; the secret stays for the
+local network's port.
+
+Fixes hiddify/hiddify-app#2597_
+
+* Fix(routing): the domain suffix rule accepts full domains like noon.com. 
+  _The validator took only a single top-level suffix such as .com, so noon.com
+and .noon.com were rejected although sing-box's domain_suffix accepts them.
+
+Fixes hiddify/hiddify-app#2592_
+
+* Fix(crash-report): the Telegram and email buttons open on Android 11+ 
+  _tryLaunch asked canLaunchUrl first, and Android 11+ hides browsers,
+Telegram and mail apps from an app without manifest queries, so the
+report dialog's links opened nothing. Android and iOS now open the link
+directly; launching fails cleanly when no app takes it._
+
+* Fix(profile): Android's file import shows .conf and .ovpn files. 
+  _file_picker turns each extension into a MIME type on Android and drops the
+ones Android has no type for, so WireGuard, AWG and OpenVPN files were grayed
+out. The Android picker now shows all files; the import reads the content.
+
+Fixes #2594_
+
+* Fix(connection): a failed startup connect on desktop is retried. 
+  _The startup connect tries three times, but in VPN mode the first failure came back on the status
+stream as a failed Disconnected, which cleared startedByUser. The retry then took it for the user
+disconnecting and gave up, so the app stayed disconnected until the connect button was pressed.
+A failure no longer clears it while the startup connect is being retried; a disconnect by the user
+still stops the retries._
+
+* Fix(ci): Windows Store Sync reads and writes the release notes as UTF-8. 
+  _On the Windows runner Python's default encoding is cp1252, so reading the
+release JSON failed on non-ASCII text. pwsh also decoded gh output with the
+console code page, which would have garbled the notes written back._
+
+
+
+## v5.9.8 (2026-11-15)
 
 #### Other
 

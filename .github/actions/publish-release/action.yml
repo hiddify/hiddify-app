@@ -1,8 +1,8 @@
 name: Publish GitHub release
 description: >
-  Downloads the build artifacts of this run and publishes them as the GitHub pre-release of a
-  tag, with install.sh and the download table in the release notes. Needs the repository
-  checked out and a token with `contents: write`.
+  Downloads the build artifacts of this run (or of `run-id`) and publishes them as the GitHub
+  pre-release of a tag, with install.sh and the download table in the release notes. Needs the
+  repository checked out and a token with `contents: write` (and `actions: read` for `run-id`).
 
 inputs:
   tag:
@@ -19,6 +19,12 @@ inputs:
   token:
     description: Token that can write releases and tags.
     default: ${{ github.token }}
+  run-id:
+    description: The run whose builds to publish. Empty - this run.
+    default: ''
+  target:
+    description: The commit the tag points to. Empty - the commit of this run.
+    default: ''
 
 runs:
   using: composite
@@ -28,6 +34,8 @@ runs:
       with:
         path: out
         merge-multiple: true
+        run-id: ${{ inputs.run-id || github.run_id }}
+        github-token: ${{ inputs.token }}
 
     - name: Leave out what is not for download
       shell: bash
@@ -79,7 +87,7 @@ runs:
         token: ${{ inputs.token }}
         tag_name: ${{ inputs.tag }}
         name: ${{ inputs.tag }}
-        target_commitish: ${{ github.sha }}
+        target_commitish: ${{ inputs.target || github.sha }}
         body_path: ${{ runner.temp }}/release.md
         files: out/*
         prerelease: true

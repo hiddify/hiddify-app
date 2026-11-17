@@ -17,6 +17,10 @@ on:
         description: Upload the debug symbols to Sentry.
         type: boolean
         default: false
+      build-number:
+        description: The store build number (build.yml's codegen). Empty - the next one, found here.
+        type: string
+        default: ''
 
 env:
   CHANNEL: ${{ inputs.channel }}
@@ -59,26 +63,15 @@ jobs:
       # ---- With `release`: the signed IPA ----
 
       # App Store Connect takes each build number of a version once, so a rebuild of the same
-      # version (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build
-      # recorded for this version (the ios-build/<version>/<build> tags testflight.yml pushes): a
-      # whole number one higher lets TestFlight give it to external testers without another
-      # review. The packet tunnel must carry the app's number.
-      - name: Find the next build number
-        id: next
+      # version (a draft, a rerun) cannot reuse pubspec's. It gets the run's store build number
+      # (next-build-number: one more than the highest any store took), the one the Play bundle and
+      # the Mac App Store pkg carry too: a whole number one higher lets TestFlight give it to
+      # external testers without another review. The packet tunnel must carry the app's number.
+      - name: Give the build the store build number
         if: inputs.release
-        uses: ./.github/actions/ios-next-build-number
-
-      - name: Give the build the next build number
-        if: inputs.release
-        env:
-          BUILD: ${{ steps.next.outputs.build }}
-        run: |
-          set -euo pipefail
-          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$BUILD/" pubspec.yaml
-          perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $BUILD;/" ios/Runner.xcodeproj/project.pbxproj
-          grep -n '^version:' pubspec.yaml
-          grep -c "CURRENT_PROJECT_VERSION = $BUILD;" ios/Runner.xcodeproj/project.pbxproj
-          echo "iOS build number: $BUILD"
+        uses: ./.github/actions/set-build-number
+        with:
+          build: ${{ inputs.build-number }}
 
       - name: Build
         if: inputs.release

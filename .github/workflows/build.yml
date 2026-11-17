@@ -20,7 +20,7 @@
 #   whatever was built.
 #
 # Shared steps are in .github/actions: setup-flutter (Flutter SDK and version, make
-# install-deps and prepare), apple-signing, publish-release and ios-next-build-number.
+# install-deps and prepare), apple-signing, publish-release, next-build-number and set-build-number.
 name: Build
 
 on:
@@ -47,8 +47,17 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+    outputs:
+      build-number: ${{ steps.build-number.outputs.build }}
     steps:
       - uses: actions/checkout@v6
+
+      # One build number for the store builds of this run (Android, iOS, macOS), found here once
+      # so the platforms cannot disagree: one more than the highest number a store took.
+      - name: Find the next build number
+        id: build-number
+        if: inputs.upload-artifact
+        uses: ./.github/actions/next-build-number
 
       - name: Validate the iOS release configuration
         run: python3 .github/scripts/validate_ios_release_config.py
@@ -112,6 +121,7 @@ jobs:
       channel: ${{ inputs.channel }}
       # Debug symbols of the versions users get, not of drafts.
       upload-symbols: ${{ inputs.tag-name != 'draft' }}
+      build-number: ${{ needs.codegen.outputs.build-number }}
 
   linux:
     needs: codegen

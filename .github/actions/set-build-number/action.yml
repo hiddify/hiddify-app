@@ -1,0 +1,29 @@
+name: Set build number
+description: >
+  Gives the build a store build number: pubspec.yaml's (which Android's versionCode and the macOS
+  CFBundleVersion come from) and the iOS project's CURRENT_PROJECT_VERSION, which the packet
+  tunnel must share with the app. Every store build of a run takes the number build.yml's codegen
+  found, so Android, iOS and macOS carry the same one.
+
+inputs:
+  build:
+    description: The build number. Empty - the next one (next-build-number), for a build outside build.yml.
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - id: next
+      if: inputs.build == ''
+      uses: ./.github/actions/next-build-number
+
+    - shell: bash
+      env:
+        BUILD: ${{ inputs.build || steps.next.outputs.build }}
+      run: |
+        set -euo pipefail
+        [[ "$BUILD" =~ ^[0-9]+$ ]] || { echo "::error::build number '$BUILD' is not a whole number"; exit 1; }
+        perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$BUILD/" pubspec.yaml
+        perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $BUILD;/" ios/Runner.xcodeproj/project.pbxproj
+        grep -n '^version:' pubspec.yaml
+        echo "Build number: $BUILD"

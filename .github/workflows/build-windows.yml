@@ -20,6 +20,10 @@ on:
         description: Upload the debug symbols to Sentry.
         type: boolean
         default: false
+      build-number:
+        description: Unused here (the store builds take it); build.yml passes the same inputs to every platform.
+        type: string
+        default: ''
 
 env:
   CHANNEL: ${{ inputs.channel }}

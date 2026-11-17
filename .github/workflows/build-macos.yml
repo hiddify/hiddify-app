@@ -20,6 +20,10 @@ on:
         description: Upload the debug symbols to Sentry.
         type: boolean
         default: false
+      build-number:
+        description: The store build number (build.yml's codegen). Empty - the next one, found here.
+        type: string
+        default: ''
 
 env:
   CHANNEL: ${{ inputs.channel }}
@@ -76,6 +80,15 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
           generated-code: true
+
+      # App Store Connect takes each build number once, like for iOS: the Mac App Store build gets
+      # the run's store build number (next-build-number), the one the IPA and the Play bundle carry
+      # too. The direct download takes it as well, so both macOS builds of a run match.
+      - name: Give the build the store build number
+        if: inputs.release
+        uses: ./.github/actions/set-build-number
+        with:
+          build: ${{ inputs.build-number }}
 
       - name: Build
         run: make ${{ matrix.platform }}-release

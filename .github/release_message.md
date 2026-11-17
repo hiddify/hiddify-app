@@ -2,11 +2,11 @@
 
 <!-- CHANGELOG -->
 
+## Downloads
+
 **Download based on your OS:**
 
 **بر اساس سیستم عامل خود دانلود کنید:**
-
-## Downloads
 
 <!-- ASSET_LINKS -->
 

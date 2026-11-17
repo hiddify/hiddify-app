@@ -15,9 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Preferences whose value is a secret or names the user's own apps: the report says only whether
 /// they are set (or how many entries a list has), never what they hold.
-final _hiddenPreference = RegExp(
-  'password|secret|license|token|pairing|clean-ip|per_app_proxy_(include|exclude)_list',
-);
+final _hiddenPreference = RegExp('password|secret|license|token|pairing|clean-ip|per_app_proxy_(include|exclude)_list');
 
 /// A longer value (a rule list, a JSON blob) is cut, so one preference cannot crowd out the logs.
 const _maxPreferenceLength = 4000;

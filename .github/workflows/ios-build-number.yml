@@ -1,14 +1,9 @@
-# Shows the build number the next TestFlight upload of the iOS app gets, from the
-# ios-build/<version>/<build> tags the TestFlight upload records, without building anything.
-name: iOS next build number
+# Shows the build number the next store builds (Android, iOS, macOS) get, from the
+# android-build, ios-build and macos-build tags the store uploads record, without building anything.
+name: Next build number
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: Version to check (empty = pubspec's, without a pre-release suffix)
-        required: false
-        default: ""
 
 permissions:
   contents: read
@@ -22,13 +17,11 @@ jobs:
 
       - name: Find the next build number
         id: next
-        uses: ./.github/actions/ios-next-build-number
-        with:
-          version: ${{ inputs.version }}
+        uses: ./.github/actions/next-build-number
 
       - name: Summary
         env:
           VERSION: ${{ steps.next.outputs.version }}
           BUILD: ${{ steps.next.outputs.build }}
         run: |
-          echo "### iOS $VERSION: next build number $BUILD" >> "$GITHUB_STEP_SUMMARY"
+          echo "### $VERSION: next build number $BUILD" >> "$GITHUB_STEP_SUMMARY"

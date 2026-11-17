@@ -16,6 +16,10 @@ on:
         description: Upload the debug symbols to Sentry.
         type: boolean
         default: false
+      build-number:
+        description: The store build number (build.yml's codegen). Empty - the next one, found here.
+        type: string
+        default: ''
       targets:
         description: What to build, a JSON list of apk and aab.
         type: string
@@ -91,26 +95,14 @@ jobs:
             keyAlias "$KEY_ALIAS" > android/key.properties
 
       # Google Play takes each version code once, and every build of a version (each draft, the .dev
-      # tag, the release) has pubspec's. The bundle gets one more than the highest code recorded
-      # (the android-build/<code> tag build.yml's google-play job pushes), never less than
-      # pubspec's; the APKs keep pubspec's.
-      - name: Give the Play bundle the next version code
-        if: inputs.release && matrix.target == 'aab'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
-          [ -n "$base" ] || { echo "::error::pubspec.yaml has no 'version: <name>+<build>' line"; exit 1; }
-          highest="$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/android-build/" --jq '.[].ref' \
-            | sed -n 's|^refs/tags/android-build/\([0-9][0-9]*\)$|\1|p' | sort -n | tail -n 1)"
-          code="$base"
-          if [ -n "$highest" ] && [ $((highest + 1)) -gt "$code" ]; then
-            code=$((highest + 1))
-          fi
-          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$code/" pubspec.yaml
-          grep -n '^version:' pubspec.yaml
-          echo "Play version code: $code (pubspec $base, highest recorded ${highest:-none})"
+      # tag, the release) has pubspec's. The APKs and the bundle get the run's store build number
+      # (next-build-number: one more than the highest any store took), the one the IPA and the Mac
+      # App Store pkg carry too.
+      - name: Give the build the store build number
+        if: inputs.release
+        uses: ./.github/actions/set-build-number
+        with:
+          build: ${{ inputs.build-number }}
 
       - name: Build
         run: make android-${{ matrix.target }}-release

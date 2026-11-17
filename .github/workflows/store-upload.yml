@@ -1,5 +1,7 @@
 # Uploads the builds of an earlier Release or CI run to the stores again, without building: for a
 # store upload that failed while the builds are still there (their artifacts are kept for a day).
+# With github-release it also publishes them as the GitHub release of the run's tag (the moving
+# `draft` for a CI run), for a run whose publishing was skipped, for example by a failed test.
 # Google Play takes a version code once, also from an upload it then refused to publish: with
 # rebuild-play-bundle the bundle is built again from the run's commit, with the next code.
 name: Store upload
@@ -11,6 +13,10 @@ on:
         description: The run whose builds to upload (the number in its URL, .../actions/runs/<id>).
         type: string
         required: true
+      github-release:
+        description: The GitHub release of the run's tag (`draft` for a CI run)
+        type: boolean
+        default: false
       google-play:
         description: Google Play (the Android bundle)
         type: boolean
@@ -57,6 +63,35 @@ jobs:
           echo "tag-name=$tag" >> "$GITHUB_OUTPUT"
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+  github-release:
+    if: inputs.github-release
+    needs: find
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/publish-release
+        with:
+          tag: ${{ needs.find.outputs.tag-name }}
+          replace: ${{ needs.find.outputs.tag-name == 'draft' }}
+          attach-android-bundle: ${{ needs.find.outputs.tag-name == 'draft' }}
+          run-id: ${{ inputs.run-id }}
+          target: ${{ needs.find.outputs.sha }}
+
+  virustotal:
+    if: ${{ !cancelled() && needs.github-release.result == 'success' }}
+    needs: [find, github-release]
+    uses: ./.github/workflows/virustotal_scan.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      release_tag: ${{ needs.find.outputs.tag-name }}
 
   # Only the Play bundle, from the run's commit; its version code is the next free one.
   android:
