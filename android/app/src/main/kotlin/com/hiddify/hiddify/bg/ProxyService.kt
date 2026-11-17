@@ -15,7 +15,7 @@ class ProxyService :
         super.onCreate()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = service.onStartCommand()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = service.onStartCommand(intent)
 
     override fun onBind(intent: Intent) = service.onBind(intent)
 

@@ -123,7 +123,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                             }
                             Status.Stopped, null -> {}
                         }
-                        Settings.startCoreAfterStartingService = false
 
                         // Answers after the permission dialogs, so the caller's wait for the
                         // service starts only once it can start.

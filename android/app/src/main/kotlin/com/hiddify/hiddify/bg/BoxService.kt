@@ -103,12 +103,22 @@ class BoxService(
             return
         }
 
-        fun start() {
+        /**
+         * The start intent's extra: whether the service starts the core itself. A start says it
+         * for itself: it was a persisted setting that every entry point had to set (the app
+         * cleared it, the tile, the shortcut and always-on set it), and a start that forgot left
+         * the service without a core, on "Connecting". A start without the extra is the system's
+         * (always-on, a restart), with no app to start the core: the service starts it.
+         */
+        const val EXTRA_START_CORE = "com.hiddify.app.START_CORE"
+
+        /** Starts the service; [startCore] when no app UI starts the core over gRPC. */
+        fun start(startCore: Boolean) {
             val intent = runBlocking {
                 withContext(Dispatchers.IO) {
                     Intent(Application.application, Settings.serviceClass())
                 }
-            }
+            }.putExtra(EXTRA_START_CORE, startCore)
             // Android 12+ refuses a foreground start from the background with an exception; the
             // callers (boot receiver, tile, shortcut) have nobody to report it to.
             try {
@@ -170,7 +180,7 @@ class BoxService(
      * cancels it, and it checks for that after each call into the core, so a stop during Starting
      * no longer gets Started, a started core and a polling notification after it.
      */
-    private suspend fun startService(): StartFailure? {
+    private suspend fun startService(startCore: Boolean): StartFailure? {
         try {
             // Starting is set by who started this (onStartCommand, a reload), on the main thread:
             // posted from here it could land after a stop's Stopping
@@ -220,7 +230,7 @@ class BoxService(
             }
             coroutineContext.ensureActive()
 
-            if (Settings.startCoreAfterStartingService){
+            if (startCore) {
                 Mobile.start("","")
                 coroutineContext.ensureActive()
             }
@@ -245,6 +255,9 @@ class BoxService(
         }
     }
 
+    /** Whether the running start started the core itself: a reload does the same. */
+    private var startedCore = false
+
     suspend fun serviceReload0() {
         notification.close()
         status.postValue(Status.Starting)
@@ -265,7 +278,7 @@ class BoxService(
 //        }
         Mobile.stop()
 //        boxService = null
-        startService()?.let { teardown(it) }
+        startService(startedCore)?.let { teardown(it) }
     }
 
     fun getSystemProxyStatus(): SystemProxyStatus {
@@ -354,7 +367,8 @@ class BoxService(
 
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("SameReturnValue")
-    internal fun onStartCommand(): Int {
+    internal fun onStartCommand(intent: Intent?): Int {
+        val startCore = intent?.getBooleanExtra(EXTRA_START_CORE, true) ?: true
         // Already up, and in the foreground: ignore duplicate start intents.
         if (status.value == Status.Started) {
             return Service.START_NOT_STICKY
@@ -382,7 +396,7 @@ class BoxService(
                     delay(200)
                     i++
                 }
-                if (status.value == Status.Stopped) start()
+                if (status.value == Status.Stopped) start(startCore)
             }
             return Service.START_NOT_STICKY
         }
@@ -401,7 +415,8 @@ class BoxService(
         startJob = GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()
-            startService()?.let { teardown(it) }
+            startedCore = startCore
+            startService(startCore)?.let { teardown(it) }
         }
         return Service.START_NOT_STICKY
     }

@@ -34,14 +34,12 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Always-on VPN: Android starts the service by itself (at boot, or after the process was
-        // killed), with no app to start the core over gRPC. The flag is whatever the last start
-        // left, and a connect from the app clears it, so the service came up without the core
-        // and the app stayed on "Connecting".
+        // killed), with no app to start the core over gRPC; its intent has no EXTRA_START_CORE,
+        // which is a start of the core (see BoxService.EXTRA_START_CORE).
         if (intent?.action == VpnService.SERVICE_INTERFACE) {
             Log.i(TAG, "started by always-on VPN")
-            Settings.startCoreAfterStartingService = true
         }
-        return service.onStartCommand()
+        return service.onStartCommand(intent)
     }
 
     override fun onBind(intent: Intent): IBinder {

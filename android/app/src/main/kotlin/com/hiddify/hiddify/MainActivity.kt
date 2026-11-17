@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import com.hiddify.hiddify.bg.BoxService
 import com.hiddify.hiddify.bg.ServiceConnection
 import com.hiddify.hiddify.bg.ServiceNotification
 import com.hiddify.hiddify.constant.Alert
@@ -105,7 +106,9 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                     return@launch
                 }
             }
+            // the app starts the core itself, over gRPC, once the service is up
             val intent = Intent(Application.application, Settings.serviceClass())
+                .putExtra(BoxService.EXTRA_START_CORE, false)
             withContext(Dispatchers.Main) {
                 val started = runCatching { ContextCompat.startForegroundService(this@MainActivity, intent) }
                     .onFailure { onServiceAlert(Alert.StartService, it.message) }

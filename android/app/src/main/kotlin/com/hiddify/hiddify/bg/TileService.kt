@@ -52,8 +52,7 @@ class TileService : TileService(), ServiceConnection.Callback {
     private fun toggleService() {
         when (connection.status) {
             Status.Stopped -> {
-                Settings.startCoreAfterStartingService = true
-                BoxService.start()
+                BoxService.start(startCore = true)
                 qsTile?.apply {
                     state = Tile.STATE_ACTIVE
                     updateTile()
