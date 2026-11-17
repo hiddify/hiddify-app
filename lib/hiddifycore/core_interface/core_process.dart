@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:hiddify/hiddifycore/core_interface/windows_crash.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:path/path.dart' as p;
@@ -180,9 +181,14 @@ class CoreProcess {
   static const _stderrTailLines = 50;
   static const _maxReasonLength = 300;
 
-  /// Why the core crashed, from its Go crash output: the `panic:` or `fatal error:` line, or null.
-  /// Read it right after the exit: a restarted core moves the file into its crash reports.
-  Future<String?> crashReason() => crashReasonOf(_crashFile, _stderrTail, _startedAt);
+  /// Why the core crashed, from its Go crash output: the `panic:`, `fatal error:` or Windows
+  /// `Exception` line. Without one, on Windows, what Windows recorded (see [WindowsCrash]); else
+  /// null. Read it right after the exit: a restarted core moves the file into its crash reports.
+  Future<String?> crashReason() async {
+    final fromOutput = await crashReasonOf(_crashFile, _stderrTail, _startedAt);
+    if (fromOutput != null || !Platform.isWindows) return fromOutput;
+    return WindowsCrash.reason(processId, await exitCode);
+  }
 
   /// The file is this run's only when it was written after [startedAt]: a core that dies before its
   /// setup re-creates it showed the panic of an earlier crash as its own.
@@ -206,7 +212,11 @@ class CoreProcess {
     final lines = const LineSplitter().convert(output).map((line) => line.trim()).toList();
     final line =
         lines.where((line) => line.startsWith('panic: ') || line.startsWith('fatal error: ')).firstOrNull ??
-        lines.where((line) => RegExp('^SIG[A-Z]+: ').hasMatch(line)).firstOrNull;
+        lines.where((line) => RegExp('^SIG[A-Z]+: ').hasMatch(line)).firstOrNull ??
+        // Go's own report of a Windows exception it did not turn into a panic (in C code on a Go
+        // thread): "Exception 0xc0000005 0x0 0x... 0x...", then the stack. It was not read, and
+        // the crash showed as an exit code only.
+        lines.where((line) => RegExp('^Exception 0x[0-9a-fA-F]+').hasMatch(line)).firstOrNull;
     if (line == null) return null;
     return line.length > _maxReasonLength ? '${line.substring(0, _maxReasonLength)}…' : line;
   }
