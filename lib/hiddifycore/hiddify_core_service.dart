@@ -712,7 +712,14 @@ class HiddifyCoreService with InfraLogger {
                   loggy.warning("core stopped with an error while its service is up: ${failed.message}");
                   _coreFailure = failed;
                   statusController.add(currentState = failed);
-                  unawaited(core.stop());
+                  // the failure stays the status: a stop that fails too is only logged, not
+                  // left as an unhandled error (reported as an app crash)
+                  unawaited(
+                    core.stop().then<void>(
+                      (_) {},
+                      onError: (Object error) => loggy.warning("stopping the service of a failed core: $error"),
+                    ),
+                  );
                 }
             }
           },

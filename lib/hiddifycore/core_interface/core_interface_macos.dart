@@ -379,38 +379,42 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       _stoppingVPN = true;
       _status.add(const CoreStatus.stopping());
     }
-    // Clear before native stop so _receiveState(disconnected) does not publish Stopped
-    // during quiet stop-before-start (that flashed "tap to connect" and stuck SingleCall).
-    final stopEngine = !quiet && _tunnelServiceAvailable && _extensionChannel != null;
-    _usingVPN = false;
-    bgClient = fgClient;
-
-    // Stop over AdminBg gRPC first. If that works, tell Swift to skip spawning
-    // another `Hiddify --tunnel disconnect` (the double-stop was the long hang).
-    var engineStopped = false;
-    if (stopEngine) {
-      engineStopped = await _stopAdminBgEngine();
-    } else {
-      loggy.warning(
-        'macOS stop: skip AdminBg.Stop (quiet=$quiet tunnel=$_tunnelServiceAvailable '
-        'channel=${_extensionChannel != null})',
-      );
-    }
-
-    // A saved on-demand VPN can be disconnected when the app reopens. Stop its
-    // native configuration even when this app instance has never used the VPN.
-    // Quiet + already idle: skip the serial Swift queue (stop-before-start after disconnect).
-    final needsNativeStop =
-        (_vpnAvailable || _tunnelServiceAvailable) &&
-        (!quiet || _nativeStatus != 'disconnected' || _extensionChannel != null);
-    if (needsNativeStop) {
-      final nativeSw = Stopwatch()..start();
-      final state = await _methods.invokeMapMethod<String, dynamic>('stop', {if (engineStopped) 'engineStopped': true});
-      loggy.warning('macOS stop: native stop in ${nativeSw.elapsedMilliseconds}ms (engineStopped=$engineStopped)');
-      if (state != null) _receiveState(state);
-    }
-
+    // Everything after Stopping is inside the try: a native stop that throws (specified to on a
+    // failed stop) left _stoppingVPN set for good, and every later status ignored.
     try {
+      // Clear before native stop so _receiveState(disconnected) does not publish Stopped
+      // during quiet stop-before-start (that flashed "tap to connect" and stuck SingleCall).
+      final stopEngine = !quiet && _tunnelServiceAvailable && _extensionChannel != null;
+      _usingVPN = false;
+      bgClient = fgClient;
+
+      // Stop over AdminBg gRPC first. If that works, tell Swift to skip spawning
+      // another `Hiddify --tunnel disconnect` (the double-stop was the long hang).
+      var engineStopped = false;
+      if (stopEngine) {
+        engineStopped = await _stopAdminBgEngine();
+      } else {
+        loggy.warning(
+          'macOS stop: skip AdminBg.Stop (quiet=$quiet tunnel=$_tunnelServiceAvailable '
+          'channel=${_extensionChannel != null})',
+        );
+      }
+
+      // A saved on-demand VPN can be disconnected when the app reopens. Stop its
+      // native configuration even when this app instance has never used the VPN.
+      // Quiet + already idle: skip the serial Swift queue (stop-before-start after disconnect).
+      final needsNativeStop =
+          (_vpnAvailable || _tunnelServiceAvailable) &&
+          (!quiet || _nativeStatus != 'disconnected' || _extensionChannel != null);
+      if (needsNativeStop) {
+        final nativeSw = Stopwatch()..start();
+        final state = await _methods.invokeMapMethod<String, dynamic>('stop', {
+          if (engineStopped) 'engineStopped': true,
+        });
+        loggy.warning('macOS stop: native stop in ${nativeSw.elapsedMilliseconds}ms (engineStopped=$engineStopped)');
+        if (state != null) _receiveState(state);
+      }
+
       if (quiet) {
         // Keep the channel for the immediate reconnect; detach only (bgClient already fg).
         final fgSw = Stopwatch()..start();
