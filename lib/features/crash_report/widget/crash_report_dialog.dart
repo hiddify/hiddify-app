@@ -131,8 +131,9 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
   /// On the first page: detailed logging, offered or counting down.
   late var _offer = widget.offerTrace && ref.read(traceSessionProvider) == null;
 
-  /// Kept for dispose, where ref can no longer be read.
-  late final _trace = ref.read(traceSessionProvider.notifier);
+  /// Kept for dispose, where ref can no longer be read: read in initState, since a late field is
+  /// only read at its first use, which was dispose.
+  late final TraceSessionNotifier _trace;
 
   /// On the second page: the report is being made, or is made.
   var _sending = false;
@@ -165,6 +166,12 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
       tv: await ref.read(isAndroidTvProvider.future),
       release: info.release,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _trace = ref.read(traceSessionProvider.notifier);
   }
 
   @override
