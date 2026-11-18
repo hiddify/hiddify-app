@@ -351,6 +351,7 @@ const OutboundInfo$json = {
     {'1': 'sort_delay', '3': 26, '4': 1, '5': 5, '10': 'sortDelay'},
     {'1': 'resting', '3': 27, '4': 1, '5': 8, '10': 'resting'},
     {'1': 'insecure_reason', '3': 28, '4': 1, '5': 9, '10': 'insecureReason'},
+    {'1': 'deep_search_available', '3': 29, '4': 1, '5': 8, '10': 'deepSearchAvailable'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -379,8 +380,9 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
     'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXkSGAoHcmVzdGluZx'
     'gbIAEoCFIHcmVzdGluZxInCg9pbnNlY3VyZV9yZWFzb24YHCABKAlSDmluc2VjdXJlUmVhc29u'
-    'QgkKB19pcGluZm9CFQoTX2dyb3VwX3NlbGVjdGVkX3RhZ0IdChtfZ3JvdXBfc2VsZWN0ZWRfdG'
-    'FnX2Rpc3BsYXk=');
+    'EjIKFWRlZXBfc2VhcmNoX2F2YWlsYWJsZRgdIAEoCFITZGVlcFNlYXJjaEF2YWlsYWJsZUIJCg'
+    'dfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3VwX3NlbGVjdGVkX3RhZ19k'
+    'aXNwbGF5');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
@@ -598,6 +600,18 @@ const SelectOutboundRequest$json = {
 final $typed_data.Uint8List selectOutboundRequestDescriptor = $convert.base64Decode(
     'ChVTZWxlY3RPdXRib3VuZFJlcXVlc3QSGwoJZ3JvdXBfdGFnGAEgASgJUghncm91cFRhZxIhCg'
     'xvdXRib3VuZF90YWcYAiABKAlSC291dGJvdW5kVGFn');
+
+@$core.Deprecated('Use deepSearchRequestDescriptor instead')
+const DeepSearchRequest$json = {
+  '1': 'DeepSearchRequest',
+  '2': [
+    {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
+  ],
+};
+
+/// Descriptor for `DeepSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deepSearchRequestDescriptor = $convert.base64Decode(
+    'ChFEZWVwU2VhcmNoUmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZw==');
 
 @$core.Deprecated('Use urlTestRequestDescriptor instead')
 const UrlTestRequest$json = {

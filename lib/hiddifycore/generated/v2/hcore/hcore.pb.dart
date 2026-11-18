@@ -665,6 +665,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.int? sortDelay,
     $core.bool? resting,
     $core.String? insecureReason,
+    $core.bool? deepSearchAvailable,
   }) {
     final $result = create();
     if (tag != null) {
@@ -751,6 +752,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (insecureReason != null) {
       $result.insecureReason = insecureReason;
     }
+    if (deepSearchAvailable != null) {
+      $result.deepSearchAvailable = deepSearchAvailable;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -786,6 +790,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
     ..aOB(27, _omitFieldNames ? '' : 'resting')
     ..aOS(28, _omitFieldNames ? '' : 'insecureReason')
+    ..aOB(29, _omitFieldNames ? '' : 'deepSearchAvailable')
     ..hasRequiredFields = false
   ;
 
@@ -1065,6 +1070,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasInsecureReason() => $_has(27);
   @$pb.TagNumber(28)
   void clearInsecureReason() => clearField(28);
+
+  @$pb.TagNumber(29)
+  $core.bool get deepSearchAvailable => $_getBF(28);
+  @$pb.TagNumber(29)
+  set deepSearchAvailable($core.bool v) { $_setBool(28, v); }
+  @$pb.TagNumber(29)
+  $core.bool hasDeepSearchAvailable() => $_has(28);
+  @$pb.TagNumber(29)
+  void clearDeepSearchAvailable() => clearField(29);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -2157,6 +2171,56 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
   $core.bool hasOutboundTag() => $_has(1);
   @$pb.TagNumber(2)
   void clearOutboundTag() => clearField(2);
+}
+
+class DeepSearchRequest extends $pb.GeneratedMessage {
+  factory DeepSearchRequest({
+    $core.String? tag,
+  }) {
+    final $result = create();
+    if (tag != null) {
+      $result.tag = tag;
+    }
+    return $result;
+  }
+  DeepSearchRequest._() : super();
+  factory DeepSearchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DeepSearchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeepSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'tag')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DeepSearchRequest clone() => DeepSearchRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DeepSearchRequest copyWith(void Function(DeepSearchRequest) updates) => super.copyWith((message) => updates(message as DeepSearchRequest)) as DeepSearchRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DeepSearchRequest create() => DeepSearchRequest._();
+  DeepSearchRequest createEmptyInstance() => create();
+  static $pb.PbList<DeepSearchRequest> createRepeated() => $pb.PbList<DeepSearchRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DeepSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeepSearchRequest>(create);
+  static DeepSearchRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get tag => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set tag($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTag() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTag() => clearField(1);
 }
 
 class UrlTestRequest extends $pb.GeneratedMessage {

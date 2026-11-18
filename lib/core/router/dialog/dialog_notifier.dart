@@ -5,6 +5,7 @@ import 'package:hiddify/core/router/dialog/widgets/admin_bg_service_dialogs.dart
 import 'package:hiddify/core/router/dialog/widgets/chain_license_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/confirmation_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/custom_alert_dialog.dart';
+import 'package:hiddify/core/router/dialog/widgets/deep_search_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/experimental_feature_notice.dart';
 import 'package:hiddify/core/router/dialog/widgets/free_profile_consent_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/new_version_dialog.dart';
@@ -230,6 +231,11 @@ class DialogNotifier extends _$DialogNotifier {
   /// saved and to start, or null when dismissed.
   Future<SpeedTestTarget?> showPickerSpeedTest({required int shown, required int chosen}) async {
     return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen, limited: false));
+  }
+
+  /// Whether the user wants a deep search on [name], whose search for a way through gave up.
+  Future<bool> showDeepSearch({required String name}) async {
+    return await _show<bool?>(DeepSearchDialog(name: name)) ?? false;
   }
 
   Future<void> showProxyInfo({required OutboundInfo outboundInfo}) async {

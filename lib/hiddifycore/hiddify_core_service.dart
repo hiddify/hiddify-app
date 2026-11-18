@@ -546,6 +546,24 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
+  /// Starts a deep search on [tag], a proxy whose search for a way through (WARP endpoint
+  /// scanner, Psiphon CDN edge scanner) found nothing in its time (deepSearchAvailable): it
+  /// searches on with no time limit and more workers, possibly for hours.
+  TaskEither<String, Unit> startDeepSearch(String tag) {
+    return TaskEither(() async {
+      loggy.debug("starting deep search");
+      try {
+        final res = await core.bgClient.startDeepSearch(DeepSearchRequest(tag: tag));
+        if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+
+        return right(unit);
+      } catch (e) {
+        loggy.error("error starting deep search: $e");
+        rethrow;
+      }
+    });
+  }
+
   /// Measures the upload ([download] false) or download speed of [tag], a proxy or each proxy of a
   /// group, moving [bytes] through each; the speeds come with the proxies (upload_speed,
   /// download_speed). No tag: the proxy the selection uses.

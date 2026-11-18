@@ -4,6 +4,7 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/proxy/deep_search/deep_search_prompt.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -28,6 +29,9 @@ class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppL
         await ref.read(dialogNotifierProvider.notifier).showLocalProxy(onPick: true);
       }
     });
+
+    // a proxy whose search for a way through gave up is offered a deep search
+    ref.listen(deepSearchPromptProvider, (_, _) {});
 
     ref.listen(configOptionNotifierProvider, (previous, next) async {
       if (next case AsyncData(value: true)) {

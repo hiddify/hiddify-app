@@ -118,6 +118,13 @@
       "switchFailed": "Couldn’t switch to this proxy. Try again.",
       "notResponding": "Not responding",
       "noneResponding": "No proxy is responding",
+      "deepSearch": {
+        "title": "Keep searching?",
+        "message": "${name} looked for a way through (a WARP endpoint or a Psiphon route) for a few minutes and found none. A deep search keeps looking with no time limit. It may take hours and use a lot of battery and CPU.",
+        "start": "Deep search",
+        "notNow": "Not now",
+        "failed": "Couldn’t start the deep search."
+      },
       "sortOptions": {
         "unsorted": "Default",
         "name": "Alphabetically",

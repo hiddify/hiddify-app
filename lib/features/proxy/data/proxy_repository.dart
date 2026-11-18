@@ -20,6 +20,10 @@ abstract interface class ProxyRepository {
   TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes);
   TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes);
   TaskEither<ProxyFailure, Unit> clearSpeedTests();
+
+  /// Asks the search of [tag] (WARP endpoint, Psiphon route), which found nothing in its time, to
+  /// search on with no time limit.
+  TaskEither<ProxyFailure, Unit> startDeepSearch(String tag);
 }
 
 class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRepository {
@@ -88,6 +92,14 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   TaskEither<ProxyFailure, Unit> clearSpeedTests() {
     return exceptionHandler(
       () => singbox.clearSpeedTests().mapLeft(ProxyUnexpectedFailure.new).run(),
+      ProxyUnexpectedFailure.new,
+    );
+  }
+
+  @override
+  TaskEither<ProxyFailure, Unit> startDeepSearch(String tag) {
+    return exceptionHandler(
+      () => singbox.startDeepSearch(tag).mapLeft(ProxyUnexpectedFailure.new).run(),
       ProxyUnexpectedFailure.new,
     );
   }
