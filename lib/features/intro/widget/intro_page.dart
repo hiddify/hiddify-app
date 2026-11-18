@@ -209,7 +209,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                   Focus(
                     focusNode: focusNodes[IntroConst.licenseKey],
                     onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.licenseKey),
-                    child: const Gap(88),
+                    child: const Gap(16),
                   ),
                 ],
               ),
@@ -217,24 +217,36 @@ class IntroPage extends HookConsumerWidget with PresLogger {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: isStarting.value
-            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
-            : const Icon(Icons.rocket_launch),
-        label: Text(t.common.start, style: theme.textTheme.titleMedium),
-        onPressed: () async {
-          if (isStarting.value) return;
-          isStarting.value = true;
-          if (!ref.read(analyticsControllerProvider).requireValue) {
-            loggy.info("disabling analytics per user request");
-            try {
-              await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
-            } catch (error, stackTrace) {
-              loggy.error("could not disable analytics", error, stackTrace);
-            }
-          }
-          await ref.read(Preferences.introCompleted.notifier).update(true);
-        },
+      // In the bottom bar, not floating over the body: on a short screen (Android 7 at 360x640 dp) a
+      // floating button covered the footer text, which the body can only scroll clear of by hand.
+      // The body is now the space above the button.
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            heightFactor: 1,
+            child: FloatingActionButton.extended(
+              icon: isStarting.value
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
+                  : const Icon(Icons.rocket_launch),
+              label: Text(t.common.start, style: theme.textTheme.titleMedium),
+              onPressed: () async {
+                if (isStarting.value) return;
+                isStarting.value = true;
+                if (!ref.read(analyticsControllerProvider).requireValue) {
+                  loggy.info("disabling analytics per user request");
+                  try {
+                    await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
+                  } catch (error, stackTrace) {
+                    loggy.error("could not disable analytics", error, stackTrace);
+                  }
+                }
+                await ref.read(Preferences.introCompleted.notifier).update(true);
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
