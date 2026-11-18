@@ -401,7 +401,14 @@
       "buffer": "Buffer",
       "diagnostics": "Diagnostics report",
       "diagnosticsMsg": "Send or save crash reports, logs, connection state and your settings without servers or passwords",
-      "fullReport": "Full report"
+      "fullReport": "Full report",
+      "toPhone": {
+        "title": "Download on your phone",
+        "scan": "Scan this code with your phone's camera to download $name.",
+        "sameNetwork": "Your phone and this TV must be on the same Wi-Fi network.",
+        "noNetwork": "This TV is not on a local network. Connect it to Wi-Fi to download the file on your phone.",
+        "downloaded": "Downloaded to your phone"
+      }
     },
     "about": {
       "title": "About",

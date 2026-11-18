@@ -11,10 +11,13 @@ import 'package:hiddify/core/logger/sinks/file_sink.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/data/log_path_resolver.dart';
+import 'package:hiddify/features/log/overview/download_to_phone_dialog.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
+import 'package:hiddify/features/profile/add/phone_import/phone_import_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hiddify/utils/uri_utils.dart';
@@ -217,7 +220,7 @@ Future<void> _exportLines(
   await saveFileAs(target, t: t, notifications: notifications);
 }
 
-/// Desktop gets a save dialog; a phone gets the share sheet, which is what
+/// Desktop gets a save dialog; a phone gets the share sheet; a TV a QR code (DownloadToPhoneDialog), which is what
 /// "save this somewhere" means there. Whether the file was saved (or shared):
 /// false when the save dialog was closed or the copy failed.
 Future<bool> saveFileAs(
@@ -225,6 +228,18 @@ Future<bool> saveFileAs(
   required Translations t,
   required InAppNotificationController notifications,
 }) async {
+  // a TV has no share sheet to speak of: a phone on the same Wi-Fi downloads it from a QR code
+  if (await isAndroidTelevision()) {
+    final context = rootNavKey.currentContext;
+    if (context == null || !context.mounted) return false;
+    return await Navigator.of(context).push<bool>(
+          DialogRoute(
+            context: context,
+            builder: (_) => DownloadToPhoneDialog(file: file),
+          ),
+        ) ??
+        false;
+  }
   if (!PlatformUtils.isDesktop) {
     return UriUtils.tryShareOrLaunchFile(Uri.parse(file.path));
   }
