@@ -33,6 +33,17 @@ categories:
 
 startup_notify: true
 
+# fastforge's RPM maker has no startup_wm_class option (its .deb maker has), so the desktop entry
+# has no StartupWMClass. The window's app id is app.hiddify.com (linux/CMakeLists.txt), which does
+# not match hiddify.desktop, so GNOME and KDE showed the generic icon in the dock and the task
+# list. %post adds the line; it is safe to repeat and leaves an entry that has one alone.
+postinstall_scripts:
+  - |
+    desktop=/usr/share/applications/hiddify.desktop
+    if [ -f "$desktop" ] && ! grep -q '^StartupWMClass=' "$desktop"; then
+      sed -i '/^StartupNotify=/a StartupWMClass=app.hiddify.com' "$desktop"
+    fi
+
 # app_links setup for Linux
 # https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
 supported_mime_type:
