@@ -33,15 +33,27 @@ categories:
 
 startup_notify: true
 
-# fastforge's RPM maker has no startup_wm_class option (its .deb maker has), so the desktop entry
-# has no StartupWMClass. The window's app id is app.hiddify.com (linux/CMakeLists.txt), which does
-# not match hiddify.desktop, so GNOME and KDE showed the generic icon in the dock and the task
-# list. %post adds the line; it is safe to repeat and leaves an entry that has one alone.
+# %post runs on every install and upgrade, so both steps are safe to repeat.
+# - fastforge's RPM maker has no startup_wm_class option (its .deb maker has), so the desktop
+#   entry has no StartupWMClass. The window's app id is app.hiddify.com (linux/CMakeLists.txt),
+#   which does not match hiddify.desktop, so GNOME showed the generic icon for the window and in
+#   the dock. The line is added unless the entry has one.
+# - As in the .deb: the per-user launchers the AppImage wrote (marked X-AppImage-Name) have the
+#   same desktop id and would hide this one, and start the AppImage instead. They are dropped;
+#   every other user file is left alone.
 postinstall_scripts:
   - |
     desktop=/usr/share/applications/hiddify.desktop
     if [ -f "$desktop" ] && ! grep -q '^StartupWMClass=' "$desktop"; then
       sed -i '/^StartupNotify=/a StartupWMClass=app.hiddify.com' "$desktop"
+    fi
+    for user_desktop in /home/*/.local/share/applications/hiddify.desktop /root/.local/share/applications/hiddify.desktop; do
+      if [ -f "$user_desktop" ] && grep -q '^X-AppImage-Name=' "$user_desktop"; then
+        rm -f "$user_desktop"
+      fi
+    done
+    if command -v update-desktop-database >/dev/null 2>&1; then
+      update-desktop-database -q /usr/share/applications || true
     fi
 
 # app_links setup for Linux
