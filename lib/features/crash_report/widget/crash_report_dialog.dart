@@ -158,12 +158,17 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
   late final Future<Uri> _telegramLink = _makeTelegramLink();
 
   Future<Uri> _makeTelegramLink() async {
-    final info = await ref.read(appInfoProvider.future);
+    // every ref read before the first await: the dialog can be closed while it waits
+    final infoFuture = ref.read(appInfoProvider.future);
+    final tvFuture = ref.read(isAndroidTvProvider.future);
+    final language = ref.read(localePreferencesProvider).languageCode;
+    final crash = widget.crashName != null;
+    final info = await infoFuture;
     return telegramReportLinkFor(
-      crash: widget.crashName != null,
+      crash: crash,
       build: info.buildNumber,
-      language: ref.read(localePreferencesProvider).languageCode,
-      tv: await ref.read(isAndroidTvProvider.future),
+      language: language,
+      tv: await tvFuture,
       release: info.release,
     );
   }
@@ -232,11 +237,13 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
   /// The same report with the sensitive part in the clear, made only when asked for: to look
   /// inside it. It never leaves the device by the app.
   Future<void> _saveUnencrypted(Translations t) async {
+    // read before the export: the dialog can be closed while it runs
+    final notifications = ref.read(inAppNotificationControllerProvider);
     try {
       final copy = await ref
           .read(diagnosticsExporterProvider)
           .export(description: _description.text, unencrypted: true);
-      await saveFileAs(copy.file, t: t, notifications: ref.read(inAppNotificationControllerProvider));
+      await saveFileAs(copy.file, t: t, notifications: notifications);
     } catch (e, stack) {
       _log.error('preparing the unencrypted copy failed: $e', e, stack);
     }
