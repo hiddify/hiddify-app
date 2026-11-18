@@ -1124,7 +1124,8 @@
       "tapToTest": "Tap to test",
       "error": "Why it failed",
       "keepLoaded": "Pin proxy",
-      "keepLoadedBody": "It stays loaded and tested beside the fastest ones, whatever its ping."
+      "keepLoadedBody": "It stays loaded and tested beside the fastest ones, whatever its ping.",
+      "changeCountry": "Change country"
     },
     "windowClosing": {
       "askEachTime": "Ask each time",

@@ -18,7 +18,10 @@ import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/insecure_proxy.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -53,6 +56,57 @@ class _KeepLoaded extends HookConsumerWidget {
                   if (context.mounted) busy.value = false;
                 }
               },
+      ),
+    );
+  }
+}
+
+/// With the active chain hop running Psiphon, as extra security or unblocker: the country Psiphon
+/// exits from, changed in place. The change reconnects, as it does from the chain settings.
+class _PsiphonCountry extends ConsumerWidget {
+  const _PsiphonCountry(this.proxy);
+
+  final OutboundInfo proxy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final chain = ref.watch(ConfigOptions.chainStatus);
+    if (!chain.isUnblocker() && !chain.isExtraSecurity()) return const SizedBox.shrink();
+    final unblocker = chain.isUnblocker();
+    final mode = ref.watch(unblocker ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode);
+    if (mode != ChainMode.psiphon) return const SizedBox.shrink();
+    final isHop = ref.watch(
+      mainOutboundsNotifierProvider.select((list) {
+        final main = list.valueOrNull;
+        return main != null && main.hasChainHop() && main.chainHop.tag == proxy.tag;
+      }),
+    );
+    if (!isHop) return const SizedBox.shrink();
+    final pref = unblocker ? ConfigOptions.unblockerPsiphonRegion : ConfigOptions.extraSecurityPsiphonRegion;
+    final region = ref.watch(pref);
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: ListTile(
+        contentPadding: const EdgeInsetsDirectional.only(start: 4, end: 4),
+        leading: const Icon(Icons.place_rounded),
+        title: Text(t.dialogs.proxyInfo.changeCountry),
+        subtitle: Text(region.present(t)),
+        trailing: ChoicePreferenceWidget.flagByTitle(region.present(t), size: 36),
+        onTap: () async {
+          final selection = await ref
+              .read(dialogNotifierProvider.notifier)
+              .showSettingPicker<PsiphonRegion>(
+                title: t.pages.settings.chain.psiphon.selectServerRegion,
+                showFlag: true,
+                selected: region,
+                options: PsiphonRegion.values,
+                getTitle: (e) => e.present(t),
+                onReset: ref.read(pref.notifier).reset,
+              );
+          if (selection == null || selection == region) return;
+          await ref.read(pref.notifier).update(selection);
+        },
       ),
     );
   }
@@ -97,6 +151,7 @@ class ProxyInfoDialog extends ConsumerWidget with PresLogger {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               OutboundInfoWidget(outboundInfo: proxy),
+              _PsiphonCountry(proxy),
               if (_canShare(proxy)) _KeepLoaded(proxy),
             ],
           ),
