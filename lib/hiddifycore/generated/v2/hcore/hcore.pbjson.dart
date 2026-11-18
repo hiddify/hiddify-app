@@ -350,6 +350,7 @@ const OutboundInfo$json = {
     {'1': 'error', '3': 25, '4': 1, '5': 9, '10': 'error'},
     {'1': 'sort_delay', '3': 26, '4': 1, '5': 5, '10': 'sortDelay'},
     {'1': 'resting', '3': 27, '4': 1, '5': 8, '10': 'resting'},
+    {'1': 'insecure_reason', '3': 28, '4': 1, '5': 9, '10': 'insecureReason'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -377,8 +378,9 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'bmcSLgoTdXBsb2FkX3NwZWVkX2NhY2hlZBgXIAEoCFIRdXBsb2FkU3BlZWRDYWNoZWQSMgoVZG'
     '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
     'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXkSGAoHcmVzdGluZx'
-    'gbIAEoCFIHcmVzdGluZ0IJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dy'
-    'b3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
+    'gbIAEoCFIHcmVzdGluZxInCg9pbnNlY3VyZV9yZWFzb24YHCABKAlSDmluc2VjdXJlUmVhc29u'
+    'QgkKB19pcGluZm9CFQoTX2dyb3VwX3NlbGVjdGVkX3RhZ0IdChtfZ3JvdXBfc2VsZWN0ZWRfdG'
+    'FnX2Rpc3BsYXk=');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {

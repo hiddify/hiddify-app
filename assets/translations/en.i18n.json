@@ -224,6 +224,16 @@
         "editConfirm": "Copy and edit",
         "savedAsProfile": "Copied to the new profile “${name}”",
         "failed": "Couldn't read this proxy's configuration"
+      },
+      "insecure": {
+        "badge": "Not secure",
+        "title": "This proxy is not secure",
+        "plaintext": "Nothing encrypts the traffic between this device and the proxy server: it uses no TLS and has no encryption of its own. Your network, your ISP or anyone filtering it can read and change what you send and receive.",
+        "noCipher": "The encryption of this proxy is turned off (method \"none\") and no TLS takes its place. Your network, your ISP or anyone filtering it can read and change what you send and receive.",
+        "weakCipher": "This proxy only scrambles the traffic with a weak method (such as table, rc4 or xor) that anyone on the way can undo, so it can be read and changed.",
+        "tlsInsecure": "This proxy uses TLS in insecure mode without a pinned certificate: it accepts any certificate, so anyone on the way can stand in for the server and read or change your traffic.",
+        "unknown": "The core marked this proxy as not secure ($reason).",
+        "advice": "Sites with HTTPS stay protected, but everything else, including DNS and the sites you visit, can be seen. Prefer a proxy with TLS, REALITY or its own encryption, or ask your provider for a secure config."
       }
     },
     "profiles": {

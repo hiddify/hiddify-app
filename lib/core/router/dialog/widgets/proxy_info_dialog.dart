@@ -16,6 +16,7 @@ import 'package:hiddify/features/proxy/data/single_proxy_config.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/insecure_proxy.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -302,6 +303,7 @@ class OutboundInfoWidget extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (proxy.error.isNotEmpty) ...[_FailureReason(title: info.error, reason: proxy.error), const Gap(12)],
+        if (proxy.isNotSecure) ...[InsecureProxyNote(proxy), const Gap(12)],
         if (rows.isNotEmpty) ...[
           DecoratedBox(
             decoration: BoxDecoration(

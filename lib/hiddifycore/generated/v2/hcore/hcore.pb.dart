@@ -664,6 +664,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.String? error,
     $core.int? sortDelay,
     $core.bool? resting,
+    $core.String? insecureReason,
   }) {
     final $result = create();
     if (tag != null) {
@@ -747,6 +748,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (resting != null) {
       $result.resting = resting;
     }
+    if (insecureReason != null) {
+      $result.insecureReason = insecureReason;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -781,6 +785,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOS(25, _omitFieldNames ? '' : 'error')
     ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
     ..aOB(27, _omitFieldNames ? '' : 'resting')
+    ..aOS(28, _omitFieldNames ? '' : 'insecureReason')
     ..hasRequiredFields = false
   ;
 
@@ -1051,6 +1056,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasResting() => $_has(26);
   @$pb.TagNumber(27)
   void clearResting() => clearField(27);
+
+  @$pb.TagNumber(28)
+  $core.String get insecureReason => $_getSZ(27);
+  @$pb.TagNumber(28)
+  set insecureReason($core.String v) { $_setString(27, v); }
+  @$pb.TagNumber(28)
+  $core.bool hasInsecureReason() => $_has(27);
+  @$pb.TagNumber(28)
+  void clearInsecureReason() => clearField(28);
 }
 
 class IpInfo extends $pb.GeneratedMessage {

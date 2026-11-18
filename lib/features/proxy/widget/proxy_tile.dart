@@ -14,6 +14,7 @@ import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/insecure_proxy.dart';
 import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -136,6 +137,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       // the state word stays whole; a long type gives way first
       subtitle: Row(
         children: [
+          // a proxy anyone on the way can read: the mark comes first, and a tap on it says why
+          if (proxy.isNotSecure) InsecureProxyBadge(proxy, faded: faded),
           Flexible(
             child: ProxyTypeLabel(
               proxy.typeWithoutStatus,
