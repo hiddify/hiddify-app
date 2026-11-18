@@ -6,10 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -25,6 +28,25 @@ ProfileEntity _profile({String? header, int? keepTop, UserOverride? userOverride
   populatedHeaders: header == null ? null : {'keep-top': header},
   userOverride: userOverride ?? UserOverride(keepTop: keepTop),
 );
+
+class _Profile extends ActiveProfile {
+  _Profile(this.profile);
+  final ProfileEntity profile;
+
+  @override
+  Stream<ProfileEntity?> build() => Stream.value(profile);
+}
+
+/// Keeps the tags it is asked to test, and tests none.
+class _Proxies extends ProxiesOverviewNotifier {
+  final tested = <List<String>>[];
+
+  @override
+  Stream<OutboundGroup?> build() => Stream.value(OutboundGroup(tag: 'select'));
+
+  @override
+  Future<void> urlTestProxies(List<String> tags) async => tested.add(tags);
+}
 
 void main() {
   test('counts the proxies the core keeps top of', () {
@@ -284,5 +306,46 @@ void main() {
     expect(fasterOutsideRegions(proxies, ['DE']), 2);
     expect(fasterOutsideRegions(proxies, []), 0);
     expect(fasterOutsideRegions([proxy('de1', country: 'DE'), ...proxies.skip(2)], ['de']), 0);
+  });
+
+  testWidgets('"test again" tests every proxy, the ones at rest too, and waits for their results', (tester) async {
+    final proxies = _Proxies();
+    final items = [
+      OutboundInfo(tag: 'a', urlTestDelay: 100),
+      OutboundInfo(tag: 'b', resting: true),
+      OutboundInfo(tag: 'c', resting: true),
+      OutboundInfo(tag: 'auto', isGroup: true),
+    ];
+    Widget footer(List<OutboundInfo> items) => ProviderScope(
+      overrides: [
+        translationsProvider.overrideWith((ref) => AppLocale.en.buildSync()),
+        activeProfileProvider.overrideWith(() => _Profile(_profile(keepTop: 1))),
+        profileProxyCountProvider('id').overrideWith((ref) => Future.value(3)),
+        proxiesOverviewNotifierProvider.overrideWith(() => proxies),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: KeepTopFooter(listed: 1, picking: false, proxies: items)),
+        ),
+      ),
+    );
+    await tester.pumpWidget(footer(items));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Test again'));
+    await tester.pump();
+    expect(proxies.tested, [
+      ['a', 'b', 'c'],
+    ]);
+    expect(find.text('Testing… 3 left'), findsOneWidget);
+
+    // results come in: one is left
+    OutboundInfo tested(OutboundInfo p) => p.deepCopy()..urlTestTime = Timestamp.fromDateTime(DateTime.utc(2026));
+    await tester.pumpWidget(footer([tested(items[0]), tested(items[1]), items[2], items[3]]));
+    expect(find.text('Testing… 1 left'), findsOneWidget);
+    await tester.pumpWidget(footer([...items.take(3).map(tested), items[3]]));
+    await tester.pump();
+    expect(find.text('Test again'), findsOneWidget);
+    // the timer that gives up on the results
+    await tester.pump(const Duration(minutes: 3));
   });
 }

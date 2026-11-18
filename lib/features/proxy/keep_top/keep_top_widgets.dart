@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/keep_top/country_names.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
@@ -362,6 +364,14 @@ class KeepTopFooter extends HookConsumerWidget {
     final available = useState(const <(String, int)>[]);
     // the countries ticked in the open menu: applied when it closes
     final ticked = useState<Set<String>?>(null);
+    // "test again": each proxy asked for, with the time of its test then; it is done once that
+    // time changed. One that never answers stops being waited for after _retestWait
+    final retest = useState(const <String, int>{});
+    useEffect(() {
+      if (retest.value.isEmpty) return null;
+      final timer = Timer(_retestWait, () => retest.value = const {});
+      return timer.cancel;
+    }, [retest.value]);
     final profile = ref.watch(activeProfileProvider).valueOrNull;
     if (profile == null) return const SizedBox.shrink();
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
@@ -464,6 +474,25 @@ class KeepTopFooter extends HookConsumerWidget {
     // the big figure: while testing, how many are left to test; then how many run
     final shown = picking ? max(0, total - tested.working - tested.failing) : running;
     final good = theme.brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
+    // a full test of every proxy, the ones at rest too, which the core loads a few at a time for
+    // it: not the quick one of the pick, which stops at the ones slower the last time. One at rest
+    // that answers faster than the slowest one running, or while there is room, takes its place
+    final times = {for (final p in proxies) p.tag: p.urlTestTime.seconds.toInt()};
+    final retesting = retest.value.entries.where((e) => times[e.key] == e.value).length;
+    Future<void> testAgain() async {
+      final tags = [
+        for (final p in proxies)
+          if (!p.isGroup) p.tag,
+      ];
+      if (tags.isEmpty) return;
+      retest.value = {for (final tag in tags) tag: times[tag]!};
+      try {
+        await ref.read(proxiesOverviewNotifierProvider.notifier).urlTestProxies(tags);
+      } catch (_) {
+        if (context.mounted) retest.value = const {};
+      }
+    }
+
     // each fact on a chip of its own: which ones run, and where they are
     final facts = [
       mode,
@@ -599,7 +628,10 @@ class KeepTopFooter extends HookConsumerWidget {
               const Gap(12),
               _FasterElsewhere(n: faster, onAnyRegion: enabled ? () => setRegions(const {}) : null),
             ],
-            if (paused > 0 && !picking) ...[const Gap(12), _RestingNote(paused: paused)],
+            if (paused > 0 && !picking) ...[
+              const Gap(12),
+              _RestingNote(paused: paused, testing: retesting, onRetest: enabled ? testAgain : null),
+            ],
             if (!keeping) ...[
               const Gap(10),
               Text(
@@ -649,12 +681,18 @@ class _FasterElsewhere extends ConsumerWidget {
   }
 }
 
+/// How long "test again" waits for the proxies' results before it is offered again.
+const _retestWait = Duration(minutes: 2);
+
 /// Under the keep top card's chips: why [paused] proxies rest, in plain words, and that any of them
-/// wakes with a tap.
+/// wakes with a tap. Its button tests every proxy again, a full test ([onRetest]); [testing] of
+/// them are still being tested.
 class _RestingNote extends ConsumerWidget {
-  const _RestingNote({required this.paused});
+  const _RestingNote({required this.paused, required this.testing, required this.onRetest});
 
   final int paused;
+  final int testing;
+  final VoidCallback? onRetest;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -690,6 +728,22 @@ class _RestingNote extends ConsumerWidget {
                 Text(
                   text.restingWhy,
                   style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant, height: 1.35),
+                ),
+                const Gap(6),
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    foregroundColor: s.tertiary,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                  ),
+                  onPressed: testing > 0 ? null : onRetest,
+                  icon: testing > 0
+                      ? SizedBox.square(
+                          dimension: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: s.onSurfaceVariant),
+                        )
+                      : const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(testing > 0 ? text.retesting(n: testing) : text.retest),
                 ),
               ],
             ),

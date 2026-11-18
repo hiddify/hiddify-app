@@ -171,6 +171,8 @@
         "restingHint": "A sleeping proxy is not loaded. Tap one to wake it: it is loaded and tested. Long press it to pin it.",
         "restingTitle": "$n proxies are taking a nap",
         "restingWhy": "Only the fastest stay awake, so your device stays quick and saves battery and data. Tap any of them to wake it up.",
+        "retest": "Test again",
+        "retesting": "Testing… $n left",
         "fasterElsewhere": "$n proxies in other regions are faster",
         "anyRegion": "Show all regions",
         "running": "running",
