@@ -18,6 +18,8 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -247,18 +249,41 @@ class AddProfilePageNotifier extends _$AddProfilePageNotifier {
 enum AddProfilePages { options, manual }
 
 @riverpod
-class FreeProfilesNotifier extends _$FreeProfilesNotifier {
+class FreeProfilesNotifier extends _$FreeProfilesNotifier with AppLogger {
+  static const _url = 'https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs';
+
   @override
   Future<List<FreeProfile>> build() async {
     final httpClient = ref.watch(httpClientProvider);
-    final res = await httpClient.get(
-      'https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs',
-    );
-    if (res.statusCode == 200) {
-      return FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>).profiles;
+    final core = ref.watch(hiddifyCoreServiceProvider);
+
+    // The core first, as for a subscription: it trusts the roots it ships, which an old Android
+    // (7.0 has no ISRG Root X1) lacks, and it does not take a filter's reset of Dart's handshake.
+    try {
+      final rs = await core.fetchUrl(_url, userAgent: httpClient.userAgent, timeout: const Duration(seconds: 30));
+      if (rs.error == FetchUrlError.FETCH_URL_ERROR_NONE && rs.statusCode == 200) {
+        return _parse(utf8.decode(rs.body));
+      }
+      loggy.warning(
+        'core download of the free profiles failed: ${rs.error == FetchUrlError.FETCH_URL_ERROR_NONE ? 'HTTP ${rs.statusCode}' : '${rs.error.name} ${rs.errorDetail}'}',
+      );
+    } catch (e, st) {
+      loggy.warning('core download of the free profiles failed', e, st);
+    }
+
+    try {
+      final res = await httpClient.get(_url);
+      if (res.statusCode == 200) return _parse(res.data.toString());
+      loggy.error('download of the free profiles failed: HTTP ${res.statusCode}');
+    } catch (e, st) {
+      loggy.error('download of the free profiles failed', e, st);
+      rethrow;
     }
     return <FreeProfile>[];
   }
+
+  List<FreeProfile> _parse(String body) =>
+      FreeProfilesModel.fromJson(jsonDecode(body) as Map<String, dynamic>).profiles;
 }
 
 @riverpod
