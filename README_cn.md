@@ -89,7 +89,7 @@ Hiddify 应用是一款免费、开源、无广告的代理和 VPN 客户端，�
         <tr>
             <td>Linux</td>
             <td>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64-AppImage.AppImage"><img src="https://img.shields.io/badge/AppImage-x64-f84e29.svg?logo=linux"></a><br>
+                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage"><img src="https://img.shields.io/badge/AppImage-x64-f84e29.svg?logo=linux"></a><br>
                 <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Debian-x64.deb"><img src="https://img.shields.io/badge/Deb_Package-x64-FF9966.svg?logo=debian"></a>
             </td>
         </tr>
