@@ -61,6 +61,9 @@ abstract class Preferences {
   /// The newest crash report the user was offered, by name, so each crash is offered once.
   static final lastSeenCrashReport = PreferencesNotifier.create<String, String>("last_seen_crash_report", "");
 
+  /// The app version that last looked at the crash reports: a crash from an older version is dropped.
+  static final crashReportsVersion = PreferencesNotifier.create<String, String>("crash_reports_version", "");
+
   static final windowPosition = PreferencesNotifier.create<Offset?, String?>(
     "window_position",
     null,

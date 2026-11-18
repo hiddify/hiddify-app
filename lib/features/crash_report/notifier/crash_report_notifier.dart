@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
@@ -9,6 +11,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path/path.dart' as p;
 
 final _log = appLogger('CrashReport');
 
@@ -47,7 +50,9 @@ class CrashReportNotifier extends Notifier<CrashReport?> {
     if (_checked) return;
     _checked = true;
     if (!ref.read(Preferences.introCompleted)) return;
-    final app = appCrashReports(ref.read(appDirectoriesProvider).requireValue.workingDir);
+    final workingDir = ref.read(appDirectoriesProvider).requireValue.workingDir;
+    await _dropStaleCrashes(workingDir);
+    final app = appCrashReports(workingDir);
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
         final reports = await ref.read(hiddifyCoreServiceProvider).core.fgClient.listCrashReports(Empty());
@@ -62,11 +67,46 @@ class CrashReportNotifier extends Notifier<CrashReport?> {
     await _offer(app);
   }
 
+  /// A crash from an older version, or more than a day old, is not offered: the cause is likely
+  /// fixed, and the user would be asked about it again after every upgrade. The app's own crash
+  /// files are deleted; the core's are only skipped, as _offer ignores what is old.
+  Future<void> _dropStaleCrashes(Directory workingDir) async {
+    final info = await ref.read(appInfoProvider.future);
+    final version = '${info.version}+${info.buildNumber}';
+    final upgraded = ref.read(Preferences.crashReportsVersion) != version;
+    final now = DateTime.now().toUtc();
+    for (final file in appCrashFiles(workingDir)) {
+      final time = DateTime.tryParse(
+        appCrashReports(workingDir).where((r) => r.name == p.basename(file.path)).firstOrNull?.crashedAt ?? '',
+      );
+      if (upgraded || (time != null && _isOld(time, now))) {
+        try {
+          file.deleteSync();
+        } catch (_) {}
+      }
+    }
+    if (upgraded) {
+      // what the core archived before this version is stale as well
+      _staleBefore = now;
+      await ref.read(Preferences.crashReportsVersion.notifier).update(version);
+    }
+  }
+
+  DateTime? _staleBefore;
+
+  static bool _isOld(DateTime time, DateTime now) => now.difference(time) > const Duration(days: 1);
+
   Future<void> _offer(List<CrashReport> reports) async {
     // one dialog at a time: a crash while it is open is offered after it, by the next check
     if (_offering) return;
-    final crashes = reports.where((report) => report.isCrash).toList()
-      ..sort((a, b) => a.crashedAt.compareTo(b.crashedAt));
+    final now = DateTime.now().toUtc();
+    final crashes = reports.where((report) {
+      if (!report.isCrash) return false;
+      final time = DateTime.tryParse(report.crashedAt)?.toUtc();
+      if (time == null) return true;
+      final before = _staleBefore;
+      return !_isOld(time, now) && (before == null || time.isAfter(before));
+    }).toList()..sort((a, b) => a.crashedAt.compareTo(b.crashedAt));
     if (crashes.isEmpty) return;
     final newest = crashes.last;
     final key = _seenKey(newest);
