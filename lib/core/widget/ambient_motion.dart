@@ -16,7 +16,7 @@ import 'package:hiddify/core/widget/frame_load.dart';
 /// jumped with the traffic once a second, looked as if the app had hung.
 ///
 /// Never while a desktop window has no focus, or while the battery
-/// is low or saving power. Desktop windows without focus keep updating (connection state, proxies,
+/// is under 5%. Desktop windows without focus keep updating (connection state, proxies,
 /// logs), so TickerMode stays on for them; only these loops stop.
 final ValueNotifier<bool> ambientMotion = ValueNotifier(false);
 

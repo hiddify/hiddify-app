@@ -146,7 +146,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     }, const []);
     final animate = useValueListenable(appSeen);
     final focused = useValueListenable(windowFocused);
-    // a low battery, or battery saver, stops it too
+    // a battery under 5% stops it too
     final lowBattery = useLowBattery();
     final decorate =
         animate && !lowBattery && !(PlatformUtils.isDesktop && (lifecycle == AppLifecycleState.inactive || !focused));
