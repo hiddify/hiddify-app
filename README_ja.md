@@ -126,6 +126,39 @@ Hiddify アプリは、**Android、iOS、Windows、macOS、Linux** に対応し�
 - [Clash](https://github.com/Dreamacro/clash)
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
 - [FClash](https://github.com/Fclash/Fclash)
+- 私たちの sing-box フォーク [hiddify-sing-box](https://github.com/hiddify/hiddify-sing-box)。以下のプロジェクトの成果を取り入れています（[全リスト](https://github.com/hiddify/hiddify-sing-box#credits)）：
+  - [shtorm-7/sing-box-extended](https://github.com/shtorm-7/sing-box-extended) with [connect-ip-go](https://github.com/shtorm-7/connect-ip-go), [sing-dns](https://github.com/shtorm-7/sing-dns) and [dnscrypt](https://github.com/shtorm-7/dnscrypt): AmneziaWG, WARP, Mieru, XHTTP, SDNS, mKCP, Sudoku, Bond
+  - [Leadaxe/sing-box-lx](https://github.com/Leadaxe/sing-box-lx) and [utls-lx](https://github.com/Leadaxe/utls-lx)
+  - [reF1nd/sing-box](https://github.com/reF1nd/sing-box)
+  - [kyochikuto/sing-box-plus](https://github.com/kyochikuto/sing-box-plus): WARP scanner, TLS fragment
+  - [starifly/sing-vmess](https://github.com/starifly/sing-vmess): VLESS encryption
+  - [Diniboy1123/usque](https://github.com/Diniboy1123/usque) and [connect-ip-go](https://github.com/Diniboy1123/connect-ip-go): WARP MASQUE
+  - [amnezia-vpn/amneziawg-go](https://github.com/amnezia-vpn/amneziawg-go): AmneziaWG
+  - [WireGuard](https://git.zx2c4.com/wireguard-go)
+  - [refraction-networking/utls](https://github.com/refraction-networking/utls) and [metacubex/utls](https://github.com/metacubex/utls): uTLS
+  - [Psiphon-Labs/psiphon-tunnel-core](https://github.com/Psiphon-Labs/psiphon-tunnel-core) and [CluvexStudio/psiphon-tunnel-core](https://github.com/CluvexStudio/psiphon-tunnel-core): Psiphon
+  - [CluvexStudio/Aether](https://github.com/CluvexStudio/Aether): Psiphon protocol choices
+  - [patterniha/MITM-DomainFronting](https://github.com/patterniha/MITM-DomainFronting): CDN edge server names
+  - [dnstt](https://www.bamsoftware.com/software/dnstt/) and [net2share/vaydns](https://github.com/net2share/vaydns): DNSTT, VayDNS
+  - [masterking32/MasterDnsVPN](https://github.com/masterking32/MasterDnsVPN): MasterDNS
+  - [getlantern/soar](https://github.com/getlantern/soar): Soar
+  - [kianmhz/GooseRelayVPN](https://github.com/kianmhz/GooseRelayVPN): GooseRelay
+  - [enfein/mieru](https://github.com/enfein/mieru): Mieru
+  - [SUDOKU-ASCII/sudoku](https://github.com/SUDOKU-ASCII/sudoku): Sudoku
+  - [TrustTunnel](https://github.com/TrustTunnel/TrustTunnel) and [xchacha20-poly1305/sing-trusttunnel](https://github.com/xchacha20-poly1305/sing-trusttunnel): TrustTunnel
+  - [Tailscale](https://github.com/tailscale/tailscale)
+  - [cretz/bine](https://github.com/cretz/bine): Tor
+  - [xtaci/kcp-go](https://github.com/xtaci/kcp-go): mKCP
+  - [quic-go](https://github.com/quic-go/quic-go)
+  - [gVisor](https://github.com/google/gvisor)
+  - [Pion](https://github.com/pion) and [kulikov0/headless-client](https://github.com/kulikov0/headless-client): call tunnel
+  - [ameshkov/dnscrypt](https://github.com/ameshkov/dnscrypt): DNSCrypt
+  - [pires/go-proxyproto](https://github.com/pires/go-proxyproto): PROXY protocol
+  - [shadowsocks/simple-obfs](https://github.com/shadowsocks/simple-obfs): simple-obfs
+  - [miekg/dns](https://github.com/miekg/dns): DNS
+  - [GFW-knocker](https://github.com/GFW-knocker): WireGuard noise
+  - [patterniha/Xray-core](https://github.com/patterniha/xray-core): finalmask `merge`, `oob`
+  - [PoriyaVali/mirage](https://github.com/PoriyaVali/mirage): finalmask `mirage`
 - [Saber Rastikerdar による Vazirmatn フォント](https://github.com/rastikerdar/vazirmatn)
 - [その他](./pubspec.yaml)
 
