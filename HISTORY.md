@@ -1,7 +1,90 @@
 # Changelog
 
 
-## 5.9.11 (2026-11-17)
+## 5.9.15 (2026-11-19)
+
+#### Other
+
+* Perf(ui): endless animations stop only under 5% battery, not in battery saver. 
+
+* Feat: update hiddify-sing-box submodule to latest commit. 
+
+* Docs: the Linux AppImage link points at the file's current name. 
+
+* Fix(crash-report): the report dialog reads what it needs before waiting, so closing it meanwhile does not throw. 
+
+* Feat(logs): on Android TV a shared log or diagnostics zip downloads on the phone from a QR code. 
+  _A TV has no share sheet worth the name, so saving a file there shows a QR code instead: the file is served on the local network at a secret address while the dialog is open, and a phone on the same Wi-Fi scans it to download._
+
+* Feat(proxies): change the Psiphon hop's country from its details on the home page. 
+  _When Psiphon runs as extra security or unblocker, the hop's proxy details
+show a Change country row with the current country and its flag. Picking
+another one saves it and reconnects, as from the chain settings._
+
+* Feat(proxies): offer a deep search when a WARP or Psiphon search gives up. 
+  _The core now says when a proxy's search for a way through (WARP's
+endpoint scanner, Psiphon's CDN edge scanner as the unblocker) found
+nothing within its search time (OutboundInfo.deep_search_available),
+and starts a deep search on request (StartDeepSearch). A deep search
+has no time limit and may take hours and use a lot of battery and CPU,
+so the app asks first: when the unblocker hop offers one, or when no
+proxy answers and one of them offers it. It asks once per proxy and
+connection.
+
+The Dart stubs of hcore.proto and hcore_service.proto are generated
+again for the new field and RPC only. Strings in English and Persian._
+
+* Feat(proxies): "Test again" on the sleeping proxies card runs a full test. 
+  _The card that says how many proxies are taking a nap gets a button that
+tests every proxy of the list, the sleeping ones too, instead of the
+quick test of the pick, which stops at the ones that were slower last
+time. The core loads the sleeping ones a few at a time for it, and one
+that answers takes a free place or the place of the slowest running
+one. While the results come in the button says how many are left; it
+stops waiting after two minutes._
+
+* Test(intro): the Start button does not cover the page on an Android 7 phone. 
+
+* Fix(linux): the RPM drops the launchers the AppImage wrote, so its own entry is the one shown. 
+  _The AppImage writes ~/.local/share/applications/hiddify.desktop (marked
+X-AppImage-Name), which has the same desktop id as the RPM entry and hides it:
+after moving from the AppImage to the RPM, the dock kept the AppImage launcher,
+without StartupWMClass, and the generic icon. %post now removes those, as the
+.deb already does, and leaves every other user file alone._
+
+* Feat(proxies): mark the proxies that are not secure, and say why. 
+  _A proxy anyone on the way can read looked like any other in the list: SOCKS, VLESS or Trojan
+without TLS, Shadowsocks with method none, TLS in insecure mode without a pinned certificate.
+The core now sends the reason in OutboundInfo.insecure_reason. Such a row wears a red
+"Not secure" mark; a tap on it explains the reason in plain words, and the proxy's details show
+the same note. A core without the field marks nothing._
+
+* Fix(intro): the Start button is in the bottom bar, not floating over the footer. 
+  _On a short screen (Android 7 at 360x640 dp) the floating button covered the footer
+text, which the page could only be scrolled clear of by hand. The body is now the
+space above the button._
+
+* Fix(linux): the RPM's desktop entry names the window class, so the dock shows the icon. 
+  _fastforge's RPM maker has no startup_wm_class option, so hiddify.desktop had no
+StartupWMClass. The window's app id is app.hiddify.com, which GNOME and KDE could
+not match to it, and showed a generic icon. %post adds the line (the .deb already
+has it); it is safe to repeat._
+
+* Fix(crash-report): the report dialog reads its trace notifier before dispose. 
+  _The notifier was a late field, read for the first time in dispose, where
+ref can no longer be used: closing the dialog after a report was made threw
+'Cannot use ref after the widget was disposed'. Read it in initState._
+
+* Fix(profile): the free profile list downloads in the core first and logs its failures. 
+  _The core trusts the roots it ships, which Android 7.0 lacks for Let's Encrypt; the download
+fell back to Dart without a word in the log when it failed._
+
+* Fix(crash-report): an old crash is not offered again after an upgrade. 
+  _A crash from an older version, or more than a day old, is dropped: the app's own crash files are deleted and the core's archived reports are skipped._
+
+
+
+## v5.9.11 (2026-11-17)
 
 #### Other
 
