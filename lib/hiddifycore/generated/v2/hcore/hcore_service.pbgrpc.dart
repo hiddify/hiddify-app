@@ -142,6 +142,14 @@ class CoreClient extends $grpc.Client {
       '/hcore.Core/ExportDiagnostics',
       ($0.ExportDiagnosticsRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.ExportDiagnosticsResponse.fromBuffer(value));
+  static final _$fetchUrl = $grpc.ClientMethod<$0.FetchUrlRequest, $0.FetchUrlResponse>(
+      '/hcore.Core/FetchUrl',
+      ($0.FetchUrlRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.FetchUrlResponse.fromBuffer(value));
+  static final _$startDeepSearch = $grpc.ClientMethod<$0.DeepSearchRequest, $1.Response>(
+      '/hcore.Core/StartDeepSearch',
+      ($0.DeepSearchRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.Response.fromBuffer(value));
 
   CoreClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -267,6 +275,14 @@ class CoreClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$0.ExportDiagnosticsResponse> exportDiagnostics($0.ExportDiagnosticsRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$exportDiagnostics, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.FetchUrlResponse> fetchUrl($0.FetchUrlRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$fetchUrl, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.Response> startDeepSearch($0.DeepSearchRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$startDeepSearch, request, options: options);
   }
 }
 
@@ -485,6 +501,20 @@ abstract class CoreServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.ExportDiagnosticsRequest.fromBuffer(value),
         ($0.ExportDiagnosticsResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.FetchUrlRequest, $0.FetchUrlResponse>(
+        'FetchUrl',
+        fetchUrl_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.FetchUrlRequest.fromBuffer(value),
+        ($0.FetchUrlResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.DeepSearchRequest, $1.Response>(
+        'StartDeepSearch',
+        startDeepSearch_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.DeepSearchRequest.fromBuffer(value),
+        ($1.Response value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.CoreInfoResponse> start_Pre($grpc.ServiceCall call, $async.Future<$0.StartRequest> request) async {
@@ -607,6 +637,14 @@ abstract class CoreServiceBase extends $grpc.Service {
     return exportDiagnostics(call, await request);
   }
 
+  $async.Future<$0.FetchUrlResponse> fetchUrl_Pre($grpc.ServiceCall call, $async.Future<$0.FetchUrlRequest> request) async {
+    return fetchUrl(call, await request);
+  }
+
+  $async.Future<$1.Response> startDeepSearch_Pre($grpc.ServiceCall call, $async.Future<$0.DeepSearchRequest> request) async {
+    return startDeepSearch(call, await request);
+  }
+
   $async.Future<$0.CoreInfoResponse> start($grpc.ServiceCall call, $0.StartRequest request);
   $async.Stream<$0.CoreInfoResponse> coreInfoListener($grpc.ServiceCall call, $1.Empty request);
   $async.Stream<$0.OutboundGroupList> outboundsInfo($grpc.ServiceCall call, $1.Empty request);
@@ -637,4 +675,6 @@ abstract class CoreServiceBase extends $grpc.Service {
   $async.Stream<$0.EnsureAdminBgServiceEvent> ensureAdminBgService($grpc.ServiceCall call, $0.EnsureAdminBgServiceRequest request);
   $async.Future<$0.CrashReportList> listCrashReports($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.ExportDiagnosticsResponse> exportDiagnostics($grpc.ServiceCall call, $0.ExportDiagnosticsRequest request);
+  $async.Future<$0.FetchUrlResponse> fetchUrl($grpc.ServiceCall call, $0.FetchUrlRequest request);
+  $async.Future<$1.Response> startDeepSearch($grpc.ServiceCall call, $0.DeepSearchRequest request);
 }

@@ -1,7 +1,1966 @@
 # Changelog
 
 
-## 5.5.5 (2026-11-04)
+## 5.9.15 (2026-11-19)
+
+#### Other
+
+* Perf(ui): endless animations stop only under 5% battery, not in battery saver. 
+
+* Feat: update hiddify-sing-box submodule to latest commit. 
+
+* Docs: the Linux AppImage link points at the file's current name. 
+
+* Fix(crash-report): the report dialog reads what it needs before waiting, so closing it meanwhile does not throw. 
+
+* Feat(logs): on Android TV a shared log or diagnostics zip downloads on the phone from a QR code. 
+  _A TV has no share sheet worth the name, so saving a file there shows a QR code instead: the file is served on the local network at a secret address while the dialog is open, and a phone on the same Wi-Fi scans it to download._
+
+* Feat(proxies): change the Psiphon hop's country from its details on the home page. 
+  _When Psiphon runs as extra security or unblocker, the hop's proxy details
+show a Change country row with the current country and its flag. Picking
+another one saves it and reconnects, as from the chain settings._
+
+* Feat(proxies): offer a deep search when a WARP or Psiphon search gives up. 
+  _The core now says when a proxy's search for a way through (WARP's
+endpoint scanner, Psiphon's CDN edge scanner as the unblocker) found
+nothing within its search time (OutboundInfo.deep_search_available),
+and starts a deep search on request (StartDeepSearch). A deep search
+has no time limit and may take hours and use a lot of battery and CPU,
+so the app asks first: when the unblocker hop offers one, or when no
+proxy answers and one of them offers it. It asks once per proxy and
+connection.
+
+The Dart stubs of hcore.proto and hcore_service.proto are generated
+again for the new field and RPC only. Strings in English and Persian._
+
+* Feat(proxies): "Test again" on the sleeping proxies card runs a full test. 
+  _The card that says how many proxies are taking a nap gets a button that
+tests every proxy of the list, the sleeping ones too, instead of the
+quick test of the pick, which stops at the ones that were slower last
+time. The core loads the sleeping ones a few at a time for it, and one
+that answers takes a free place or the place of the slowest running
+one. While the results come in the button says how many are left; it
+stops waiting after two minutes._
+
+* Test(intro): the Start button does not cover the page on an Android 7 phone. 
+
+* Fix(linux): the RPM drops the launchers the AppImage wrote, so its own entry is the one shown. 
+  _The AppImage writes ~/.local/share/applications/hiddify.desktop (marked
+X-AppImage-Name), which has the same desktop id as the RPM entry and hides it:
+after moving from the AppImage to the RPM, the dock kept the AppImage launcher,
+without StartupWMClass, and the generic icon. %post now removes those, as the
+.deb already does, and leaves every other user file alone._
+
+* Feat(proxies): mark the proxies that are not secure, and say why. 
+  _A proxy anyone on the way can read looked like any other in the list: SOCKS, VLESS or Trojan
+without TLS, Shadowsocks with method none, TLS in insecure mode without a pinned certificate.
+The core now sends the reason in OutboundInfo.insecure_reason. Such a row wears a red
+"Not secure" mark; a tap on it explains the reason in plain words, and the proxy's details show
+the same note. A core without the field marks nothing._
+
+* Fix(intro): the Start button is in the bottom bar, not floating over the footer. 
+  _On a short screen (Android 7 at 360x640 dp) the floating button covered the footer
+text, which the page could only be scrolled clear of by hand. The body is now the
+space above the button._
+
+* Fix(linux): the RPM's desktop entry names the window class, so the dock shows the icon. 
+  _fastforge's RPM maker has no startup_wm_class option, so hiddify.desktop had no
+StartupWMClass. The window's app id is app.hiddify.com, which GNOME and KDE could
+not match to it, and showed a generic icon. %post adds the line (the .deb already
+has it); it is safe to repeat._
+
+* Fix(crash-report): the report dialog reads its trace notifier before dispose. 
+  _The notifier was a late field, read for the first time in dispose, where
+ref can no longer be used: closing the dialog after a report was made threw
+'Cannot use ref after the widget was disposed'. Read it in initState._
+
+* Fix(profile): the free profile list downloads in the core first and logs its failures. 
+  _The core trusts the roots it ships, which Android 7.0 lacks for Let's Encrypt; the download
+fell back to Dart without a word in the log when it failed._
+
+* Fix(crash-report): an old crash is not offered again after an upgrade. 
+  _A crash from an older version, or more than a day old, is dropped: the app's own crash files are deleted and the core's archived reports are skipped._
+
+
+
+## v5.9.11 (2026-11-17)
+
+#### Other
+
+* Feat(chain): the unblocker icon at rest shows its door open with the traffic waiting. 
+  _Shut and empty, it was a bare line._
+
+
+
+## v5.9.9 (2026-11-17)
+
+#### Other
+
+* Test: the fake download client takes the new retry parameter. 
+  _flutter analyze failed in CI: _DownloadClient.download no longer matched
+DioHttpClient.download after it gained retry. Also sorts imports and drops
+a redundant DateTime argument the analyzer flagged._
+
+* Feat(crash-report): the core ends a trace session by itself. 
+  _The end of a trace session and the level before it go to the core with
+the settings (log-level-until, log-level-after), so the core goes back
+at the end also while the app is closed and the VPN still runs; the
+app's own timer ended it only while the app ran.
+
+A session starts with its end before the level and ends with the level
+before the end, so each changes the core's settings once: one reconnect,
+not a second change the reconnect's 100 ms throttle could drop._
+
+* Add new translations and update existing ones for Uzbek, Simplified Chinese, and Traditional Chinese. 
+  _- Added new phrases related to proxy status and user notifications in Uzbek (uz.i18n.json).
+- Updated existing translations and added new phrases in Simplified Chinese (zh-CN.i18n.json).
+- Updated existing translations and added new phrases in Traditional Chinese (zh-TW.i18n.json)._
+
+* Feat(profile): a failed subscription download says why and what to try. 
+  _Adding a profile whose server did not answer kept "Adding profile…" for
+two minutes (four attempts of up to 30 s), then said only "Connection
+timeout" (App Review rejected 5.9.8 for it).
+
+- The core downloads the subscription first, over gRPC (FetchUrl), with
+  Chrome's TLS handshake, which some networks let through when they drop
+  Dart's; when it fails, the app downloads it, once, without retries.
+- A failure that may pass (a timeout, a cut connection, 5xx, …) is tried
+  once more; the sheet shows the attempt that failed meanwhile. A 404 or a
+  403 is not tried again.
+- When both fail, a dialog tells, in plain words, what happened, where on
+  the way from the device over the internet to the VPN provider it stopped,
+  the error number (ERROR 403, ERROR CONN_RESET, …), and what to try; the
+  technical details of both downloads are folded away, and Copy details
+  copies all of it. The link is left out: it carries the user's token.
+- English and Persian text.
+
+Needs hiddify-core with FetchUrl; the hiddify-core pointer is not bumped._
+
+* Fix(dialog): an error message in Persian or Arabic reads right to left. 
+  _The error dialog showed every message left to right, which suits a
+technical message but garbles a translated one. A message that starts in a
+right-to-left script now reads right to left; the others stay left to right._
+
+* Fix(windows): a core that dies without a Go crash says why. 
+  _39f78fe0 and hiddify-core 2a9a61a show the panic line of the core's Go crash
+output, but on Windows many deaths left none, and the app said only "exit code
+-1073741819" (hiddify-app#2517):
+- a native crash on a DLL's own thread (cronet, wintun), which Go's exception
+  handler does not see: Windows ends the process and records an Application
+  Error event, with the faulting module, the exception code and the process id;
+- a Windows exception in C code on a Go thread, which Go does report, as
+  "Exception 0xc0000005 ...", a line the app did not read as a crash;
+- another program ending the process, which shows in the exit code only.
+
+The crash headline now reads Go's Exception line. Without Go output, on Windows,
+the reason is the Application Error event of that process (read with wevtutil,
+by position, so the system's language does not matter), or what the exit code
+means (access violation, fail-fast, stack overflow, a DLL not found, ...)._
+
+* Fix(ios): the packet tunnel ends when its core stops by itself. 
+  _The packet tunnel sets the core up and, when iOS starts it (on demand, the
+Settings switch), starts it too, but never looked at it again: a core that
+stopped by itself (a start, stop or reload that failed or panicked) was seen
+only by the app, on the core's status stream. With the app closed the tunnel
+stayed up, taking the device's traffic with no core behind it.
+
+The tunnel now listens to the core (hiddify-core 33f98b6,
+MobileSetCoreStoppedListener) and ends with the core's reason as its error,
+which iOS shows; the listener is removed before the tunnel closes the core
+itself. Needs a hiddify-core build that has 33f98b6._
+
+* Fix(android): the VPN service goes down when its core stops by itself. 
+  _The service sets the core up and, when the system or the tile starts it, starts
+it too, but it never looked at the core again: when the core stopped by itself
+(a start, stop or reload that failed or panicked), only the app saw it on the
+core's status stream, and the app stops the service then (681668da). With the
+app closed, the service stayed up, its TUN taking the device's traffic with no
+core behind it, until the app was opened.
+
+The service now listens to the core (hiddify-core 33f98b6,
+Mobile.setCoreStoppedListener): a stop of a started core takes the service
+down through its teardown, with the core's reason as the alert. The listener is
+removed before the service closes the core itself. Needs a hiddify-core build
+that has 33f98b6._
+
+* Fix(android): backups leave out the core's gRPC keys. 
+  _Auto Backup was on with no rules, so a cloud backup and a transfer to a new
+device carried the app's gRPC client certificate and private key (files/grpc)
+and the core's server certificate and private key (its settings store,
+data/AppSettings.db). Both are this device's own credentials for the
+connection between the app and its core.
+
+Backup rules (Android 11 and below) and data extraction rules (12 and later)
+leave them out; the device a backup is restored to makes its own._
+
+* Fix(stats): the stats stream is opened again when its connection drops. 
+  _7bdb5e86 tied the proxy list's stream to its channel: it is opened again
+when it ends. The stats stream got only the watch of the core restart signal,
+so when gRPC ended it without a new setup (the app suspended, the Mac asleep)
+the speeds and totals stayed frozen until the next connect, and a failed event
+showed zeros. It now keeps the last numbers on a failed event and is opened
+again when it ends, waiting longer while it keeps failing, as the proxy list
+does._
+
+* Fix(profile): a subscription's long update interval no longer breaks its slider. 
+  _dc6db526 made the parser accept any positive whole number of hours in
+profile-update-interval. The profile page's slider ends at 96 hours, and an
+interval past that (a week, 168, is common) is a value past the slider's end,
+which fails its assertion; the value is valid, the slider's fixed end was the
+wrong assumption. It now reaches at least the interval it shows.
+
+A number of hours past what a Duration holds overflowed into a wrong, even
+negative, interval: the parser holds it to a year._
+
+* Fix(ui): the last CurvedAnimations made in build are gone. 
+  _c2c5b8de stopped the CurvedAnimation leak in flutter_animate and two
+AnimatedSwitcher builders. Three more sites made one on every build: the
+crash report's step marks and the trace session's step numbers (switcher
+transition builders), and the rule page's error shake, where useAnimation
+rebuilds on every frame of the shake, so it made one per frame. A
+CurvedAnimation listens to its parent until it is disposed, so each one stayed
+for the life of that animation.
+
+The transitions drive the animation with a CurveTween, which listens only while
+it is listened to, and the shake's animation is made once per controller._
+
+* Fix(ios): a working directory move that failed is finished at the next start. 
+  _90c58e7b moves the working directory out of Library/Caches once, when the new
+one does not exist yet, and then creates the new one in any case. When the move
+failed (the app and the packet tunnel moving it at the same time, a file in
+use), the new empty directory stopped every later attempt, and the profiles'
+configs stayed in Library/Caches, where iOS deletes them when storage runs low:
+the loss the move was for.
+
+What the old directory still holds is now moved item by item, into existing
+folders too, on every start until it is empty, and the old directory is then
+removed._
+
+* Fix(vpn): a VPN service that stops answering has its engine stopped too. 
+  _The app watches the VPN service on Windows and Linux and, after two status
+requests that got no answer, reported the VPN as stopped and stopped following
+the service. It did not stop the engine: a service that was only hung kept its
+TUN routing the traffic while the app said it was disconnected, and the next
+connect raced it. With hiddify-core 869ffc1 the service answers its status
+even during a reload, so no answer means it is gone or hung, and the app now
+also asks it to stop its engine (best effort) before it reports the loss._
+
+* Fix(macos): a crashed core is reported with its reason, and started again at the next setup. 
+  _39f78fe0 reports why the core's process ended through onCoreProcessExited, but
+the macOS core did not implement it: a proxy-mode connection whose core
+crashed ended as a plain Disconnected, and only because the foreground status
+stream happened to error, which it took for a stop of the core. That stream
+was then not listened to again, so a channel that only reconnected also read as
+a stop, and later statuses were lost.
+
+After three crashes in a minute, or a restart that failed, the desktop core
+gave up on the process for good, saying it would be reached after the next
+setup; on macOS the next setup returned at once, so every call failed until
+the app was relaunched.
+
+- The macOS core reports a crash in proxy mode as a failed connection with the
+  crash's reason; the foreground stream's end is no longer a stop, and it is
+  listened to again.
+- A core process given up on is started again by the next setup.
+- The engine's exit handler checks again, after reading the crash reason,
+  that the engine it forgets is still the one that exited.
+- A crash file older than the process is an earlier run's, not its reason._
+
+* Fix(connection): a desktop proxy-mode start that fails after its answer is a failed connect. 
+  _The core answers Start as soon as it has queued the start, and a start that
+fails afterwards (its port still in use at login, a config the engine refuses)
+is reported only on its status stream. In proxy mode on Windows, Linux and
+macOS the app took the answer for the outcome and published Started: the
+connect worked with no core behind it, the startup retry of 2f35d405 never saw
+the failure, and no dialog said why.
+
+startAndConfirm listens to the core's status stream before it starts, and
+returns the status that ends the start (STOPPED with the reason, or the core
+up); the proxy-mode and elevated-TUN starts use it, so their failures throw
+like any other failed start._
+
+* Fix(android): the quick settings tile no longer runs before the first unlock. 
+  _The tile was declared directBootAware (copied with the tile from sing-box's
+app, which keeps its settings in device-protected storage). This app keeps its
+settings, profiles and core files in credential-encrypted storage only, which
+does not exist before the first unlock after a boot: the tile, bound by the
+system then, read the service mode from the settings when it connected, and
+SharedPreferences throws there ("not available until after user is
+unlocked"), which ended the app's process. Nothing the tile starts can work
+before that unlock, so it is no longer direct boot aware: the system binds it
+once the user unlocked._
+
+* Fix(android): each start of the service says whether it starts the core. 
+  _Who starts the core, the app over gRPC or the service itself, was a persisted
+setting: the app cleared it before its start, and every other entry point had
+to set it. Two of them forgot (always-on in d55e0c54, the shortcut in
+2ab0d580), and the service came up without a core, on "Connecting". The
+setting was also read late, after the setup, where a start from another entry
+point could have changed it in between.
+
+The decision now travels with the start: the app's start intent says no, the
+tile, the shortcut and the boot receiver say yes, and a start without the extra
+is the system's (always-on, a restart), with no app to start the core, so the
+service starts it. A reload does what its start did._
+
+* Fix(android): the notification talks to the core in the mode the service set it up. 
+  _Whether the core's server speaks mTLS was decided twice from the presence of
+the client identity file: once when the service set the server up, and again
+on every client the notification built. When the file appeared in between
+(the app writes its identity before its own setup, while a service started by
+the tile or always-on already ran a plain server), the notification's client
+spoke TLS to a plaintext server. 72d9569f moved the client's construction into
+the retry loop, which stopped the crash on the missing server certificate but
+left the client failing every few seconds, rebuilding its keys each time.
+
+The service passes the mode it set the server up with to the notification,
+and the client is built for that mode: with mTLS the server certificate is
+there, and without it none is needed._
+
+* Fix(macos): a failed native stop no longer leaves the app on Disconnecting. 
+  _stop() set _stoppingVPN and published Stopping, and only then entered the
+try/finally that clears the flag; the native stop it called in between is
+specified to throw on a failed stop. A failure there left _stoppingVPN set for
+good, so every later connected state of the VPN was shown as Disconnecting, and
+taps on the button were ignored. Everything after Stopping is inside the try
+now.
+
+681668da stops the service of a core that failed with unawaited(core.stop()),
+outside the error handling of HiddifyCoreService.stop: a stop that threw became
+an unhandled error, recorded as an app crash. Its error is now only logged,
+and the core's failure stays the status._
+
+* Fix(android): the core's memory budget is a share of the device's RAM. 
+  _The core was given ActivityManager.memoryClass as what it may use. That is the
+per-app Java heap class, not a budget for native memory, and the core is
+native: with the memory limit on, the Go runtime was held to three quarters of
+it, about 190 MB on most phones, so the GC ran all the time near it and the
+connection lagged (#2521). The core is now given a quarter of the device's RAM.
+
+BoxService also called Libbox.setMemoryLimit before Mobile.setup; the core's
+setup and start set the limit again, so the call did nothing. The setting
+reaches the core with the start request (hiddify-core e10d8db for starts
+without one)._
+
+* Fix(android): a stop waits for the start, and a failed start takes the service down. 
+  _Start and stop of the VPN service were not ordered. A stop during Starting did
+not cancel the start, which after Mobile.setup still posted Started, could
+start the core after the stop had closed it, and started the notification's
+polling against a closed server. A failed start (stopAndAlert) only set
+Stopped and closed the notification: the core, the TUN descriptor, the network
+monitor and the service itself stayed up, and the next stop returned at once
+because the status was already Stopped.
+
+The start is now a job the stop cancels and waits for before it closes the
+core; the start checks for that after each call into the core and sets
+Started on the main thread, where the stop sets Stopping. A stop and a failed
+start end in the same teardown, which also tells the app why a start failed.
+
+The network monitor stopped before the core was closed: offline, a DNS query
+of the still running core then asked the listener for the default network with
+no listener left, and the check in the listener's actor threw, which ended the
+actor and the process. The monitor now stops after the core, and such a request
+is answered with the error instead of ending the actor._
+
+* Fix(android): the platform channel answers every call, the battery dialog included. 
+  _The platform handlers had the same result.runCatching { success(...) } shape
+as the method handlers: a failure was swallowed and the call never answered.
+The battery optimization request kept its call in a lateinit and opened the
+dialog with activity?.startActivityForResult: without an activity, or with no
+activity on the ROM that handles the request, the call was never answered,
+and the dialog's result could find the lateinit unset.
+
+The answering helper moves to utils/MethodResults.kt and both channels use it.
+The battery request answers an error when there is no activity or the dialog
+cannot open, and a request left open is answered when the next one comes._
+
+* Fix(android): a failed setup, start or stop answers the app instead of leaving it waiting. 
+  _The method channel handlers ran in result.runCatching { ... success(...) },
+which swallowed a failure without answering. In setup the failure branch was
+onFailure { error(it) }: that is Kotlin's error(), which throws, not
+Result.error, and the outer runCatching swallowed that too. A core that could
+not be set up therefore left the app awaiting the call for ever, with no error
+to show; start and stop had no failure branch at all.
+
+Every handler now answers once: with its value, or with an error when it
+throws. The app turns a failed setup into the setup's error message._
+
+* Fix(android): a DNS query the core gives up on no longer keeps its thread. 
+  _DnsResolver never calls back for a query cancelled through its
+CancellationSignal, so LocalResolver waited forever on every query the core
+cancelled or timed out. Each wait holds the core's calling thread; with remote
+DNS on local and a stream of failing queries, thousands piled up within minutes
+in the background and the process aborted (#2607). The wait now ends with the
+core's context._
+
+* Fix(profile): iOS file import shows .conf and .ovpn files. 
+  _file_picker turns each extension into a UTI on iOS and drops the ones iOS
+only has a dynamic type for, so WireGuard, AWG and OpenVPN files were grayed
+out, as they were on Android. The iOS picker now shows all files too; the
+import reads the content._
+
+* Feat(report): Report a problem offers 10 minutes of detailed logging first. 
+  _Before writing the report, the dialog offers to turn the core's log level
+to trace for 10 minutes, with three steps: logging turns on, connect again
+and make the problem happen, come back and send. A countdown shows while
+it runs, and on return a banner over the description shows the time left
+with a Stop button. The level goes back to what it was when the time is
+up, when the report is made, or on the next start if the app was closed
+meanwhile. The crash report skips the offer._
+
+* Fix(share): the app picked in the share sheet opens in its own task on Android. 
+  _After sharing a log to Telegram, the Hiddify icon brought back Telegram's
+share screen: the system started it in Hiddify's task. MainActivity adds
+FLAG_ACTIVITY_NEW_TASK to the intent inside every chooser it starts.
+
+Fixes #2602_
+
+* Fix(local-proxy): a password set in the dialog can be removed there. 
+  _The local proxy dialog's "Set password" turned local-proxy-auth on, but the
+password row then offered only Edit, so turning it off again needed the
+switch in Settings > Inbound. Editing the password now offers "Remove
+password", which stops the local port asking; the secret stays for the
+local network's port.
+
+Fixes hiddify/hiddify-app#2597_
+
+* Fix(routing): the domain suffix rule accepts full domains like noon.com. 
+  _The validator took only a single top-level suffix such as .com, so noon.com
+and .noon.com were rejected although sing-box's domain_suffix accepts them.
+
+Fixes hiddify/hiddify-app#2592_
+
+* Fix(crash-report): the Telegram and email buttons open on Android 11+ 
+  _tryLaunch asked canLaunchUrl first, and Android 11+ hides browsers,
+Telegram and mail apps from an app without manifest queries, so the
+report dialog's links opened nothing. Android and iOS now open the link
+directly; launching fails cleanly when no app takes it._
+
+* Fix(profile): Android's file import shows .conf and .ovpn files. 
+  _file_picker turns each extension into a MIME type on Android and drops the
+ones Android has no type for, so WireGuard, AWG and OpenVPN files were grayed
+out. The Android picker now shows all files; the import reads the content.
+
+Fixes #2594_
+
+* Fix(connection): a failed startup connect on desktop is retried. 
+  _The startup connect tries three times, but in VPN mode the first failure came back on the status
+stream as a failed Disconnected, which cleared startedByUser. The retry then took it for the user
+disconnecting and gave up, so the app stayed disconnected until the connect button was pressed.
+A failure no longer clears it while the startup connect is being retried; a disconnect by the user
+still stops the retries._
+
+* Fix(ci): Windows Store Sync reads and writes the release notes as UTF-8. 
+  _On the Windows runner Python's default encoding is cp1252, so reading the
+release JSON failed on non-ASCII text. pwsh also decoded gh output with the
+console code page, which would have garbled the notes written back._
+
+
+
+## v5.9.8 (2026-11-15)
+
+#### Other
+
+* Fix(a11y): screen readers can reach the desktop sidebar. 
+  _Every page route draws a modal barrier whose BlockSemantics drops all
+semantics painted before it, up to the nearest container. The sidebar
+rail is painted before the page in the same Row, so it vanished from
+the semantics tree and NVDA could not read any of its items. Give the
+pages their own semantics container (flutter/flutter#135656).
+
+Fixes #2097_
+
+* Fix(windows): the app runs the core's console launcher as HiddifyCore.exe. 
+  _hiddify-core renames HiddifyCli.exe to HiddifyCore.exe. The app installs whichever one the core
+ships, under its own name, because the core's DLL looks for it by that name, and uses
+HiddifyCore.exe when it is there. Setup removes a HiddifyCli.exe left by an older version.
+
+Refs hiddify/hiddify-core#176_
+
+* Fix(intro): choosing a language on the first-start screen sets its region. 
+  _Only the time-zone guess set the region, so picking Persian left it at Other.
+The language now sets its region (Persian keeps Afghanistan), even over the
+guess; a region the user picks stays. Picking a region also resets the direct
+DNS again.
+
+Fixes #2581_
+
+* Fix(windows): the installer can be set up in Persian, Arabic and Chinese. 
+  _Arabic was listed in make_config.yaml but had no line in the Inno script, so it was
+dropped; Persian and Chinese were not listed. Farsi and ChineseSimplified are only
+unofficial translations in Inno Setup 6.7, so their .isl files are kept in the repo.
+English is listed first, as the fallback when Windows' language matches none.
+
+Fixes #2578_
+
+* Fix(vpn): the administrator wait shows again, and no polkit agent reads plainly. 
+  _startManaged stops the last connection first, and that stop cleared the
+waiting dialog and the administrator choice the connect had just set, so
+the dialog never showed while Windows or Linux asked for the password.
+The AppImage, without a polkit agent, says to start Hiddify from the
+applications menu instead of pkexec's error.
+
+Fixes #2582_
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2565 from Hollicsh/main. 
+  _Update RU locale_
+
+* Update ru.i18n.json. 
+
+* Fix(windows): the app exits when a setup or the session end asks it to. 
+  _A setup run over an open app closes it through the Restart Manager, which sends
+WM_ENDSESSION and waits. The app ignored it and stayed in the tray, so the setup
+waited until the app was killed, or the user closed it by hand. The app now
+exits as from the tray's Exit, and quits anyway after 5 s.
+
+Fixes #2573_
+
+* Fix(ui): nothing animates while the app cannot be seen. 
+  _Flutter draws no frame while the app is hidden or in the background,
+and what stopped the animations waited for a build: they stopped only
+once the app came back. Meanwhile the clock of the endless decoration
+went on ticking 20 to 30 times a second, on a phone in the background
+and wherever a desktop window was hidden without first losing the
+focus.
+
+Whether the app can be seen now changes as soon as the lifecycle does,
+and a desktop window hidden in the tray, started hidden or minimized
+counts as not seen at once, whatever the engine reports. A window that
+gets the focus back counts as seen again, however it came back. While
+the app cannot be seen the clock has no timer, tickers are off, and the
+proxy card's alternating label and the chain hints stand still.
+
+On a desktop the light also stands still while the window has no focus
+by the window's own focus events, not only by the lifecycle: on Windows
+the lifecycle does not always report it._
+
+* Fix(connection-button): the light keeps moving, as often as the device affords. 
+  _The light round the connect button stopped 10 seconds after each change
+and then jumped with the traffic once a second, which looked as if the
+app had hung. It now moves for as long as the endless decoration may
+run at all: the app seen, the desktop window focused, the battery fine.
+The other endless decoration (the chain icons, the badge's shine, the
+shimmers) still stops after 10 seconds.
+
+Each frame shows the moment it is drawn at, not the moment the timer
+asked for it, so the motion goes on evenly.
+
+The clock every endless decoration shares steps no faster than the
+device affords its frames. A frame costs too much when its build or
+raster takes most of the interval, or, on a desktop, when the app's CPU
+time for it is more than a fifth of the interval: drawing without a
+graphics card, putting the window on the screen costs most of a frame
+and the frame's timings do not show it. There it steps less often, down
+to 10 times a second; a device that keeps up never sees this. The CPU
+time helper removed with the CPU guard comes back for it._
+
+* Perf(connection-button): the light is drawn without blurring anything. 
+  _Each frame of the connected light drew its rays and flares sharp into
+three offscreen layers, blurred them and scaled them back up: most of
+what the button cost, with a graphics card and far more without one.
+
+The light, the button's shadow and its bevel are now meshes of
+triangles that carry the softness already: each soft stroke is a strip
+textured with the cross-section of a blurred stroke, worked out once,
+and each glow is rings of corners that shade from one to the next. A
+frame of the full light is a few draw calls. It looks the same, within
+a third of a step of 255 on average in light and dark.
+
+Measured: 1.7 ms of CPU a frame instead of 3.2 on a Mac with Metal;
+18 fps instead of 4 to 6 on an Android emulator without a GPU._
+
+* Fix(tray): the Windows tray menu can be used from the keyboard. 
+  _Windows sends keys to a tray menu only when its owner is the foreground
+window. tray_manager 0.5 activates the window only when asked, so a menu
+opened with Win+B and Shift+F10 left the focus on the taskbar and the
+arrow keys closed it.
+
+Fixes #2570_
+
+* Docs(crash report): the diagnostics key comes from the core's CI secret. 
+  _docs/diagnostics-encryption.md says to set the hiddify-core DIAGNOSTICS_PUBLIC_KEY secret, which
+the core's build links in; dist.sh no longer passes the diagnostics_public_key define, which
+nothing has read since the core encrypts reports._
+
+* Feat(crash report): the diagnostics report names the app's commit. 
+  _The release builds pass the commit, 7 characters as git abbreviates it, as the commit dart-define;
+app-info.json and the report's metadata.json show it as app.commit, "unknown" in a build made
+without it._
+
+
+
+## v5.9.5 (2026-11-14)
+
+#### Other
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2553 from Hollicsh/main. 
+  _Update RU locale_
+
+* Update ru.i18n.json. 
+
+* Update ru.i18n.json. 
+
+* Feat(release): the release notes start with a Change Logs section. 
+  _prepare_release_notes.py fills it from .github/release_changelog.md and
+leaves it out when that file is empty; the app's update dialog reads it._
+
+* Feat(update): the update dialog shows the release's change log. 
+  _The "Change Logs" section of the GitHub release notes (also "Changelog",
+"What's new", "Highlights" or "تغییرات") is shown under the versions,
+as Markdown in a scrolling box, without remote images._
+
+* Fix(connection-button): a light that stops keeps its shape. 
+  _Where the button's motion is off (reduce animations, the window
+without focus, a connection that has settled), the connected button
+showed two flat rings instead of its light. It now keeps the real
+light, the same rays, flares and sparks, standing still where it
+stopped, and goes on from there when it moves again: the light runs on
+a clock of its own that only advances while it moves, so it no longer
+jumps to another sky each time. A light that stands still is drawn
+once and kept, and is drawn again only when the traffic steps._
+
+* Perf(connection-button): it is rebuilt only when the speeds change. 
+  _The button watched the core's whole status for the two speeds its
+light follows. The status comes every second and something in it
+always changed, so the button was rebuilt every second. It now follows
+the download and upload speeds only._
+
+* Perf(stats): the sidebar is rebuilt only when its numbers change. 
+  _The core's status comes every second and something in it always
+changed (memory, goroutines, connections), so the sidebar's speed and
+traffic panel was rebuilt every second. It now follows only the four
+numbers it shows._
+
+* Perf(tray): the tray is set only when what it shows changed. 
+  _The tray notifier ran at every change of the active proxy, which during
+a test is every second, and each run loaded and sent the icon, the
+tooltip, the badge and the whole menu to the system again, though they
+were the same.
+
+It now watches only the ping it shows, and sets the badge, the icon,
+the tooltip and the menu only when they differ from what is shown. An
+icon that could not be set is tried again._
+
+* Perf(proxies): the list stays still while keep top picks. 
+  _During a pick over hundreds of proxies a row changes every moment: a
+ping arrives, a test begins or ends, a flag is found. Each change
+popped, cross-faded or shimmered, the card's numbers and bar animated
+toward every new value, and the page drew 13 to 20 frames a second for
+the whole pick, each about 5 ms of CPU.
+
+While a group is being picked its rows are quiet: values change in
+place, nothing pops, fades or loops, and the card's count and bar jump
+to their values. The loops that remain run on the shared ambient clock.
+The Proxies page now draws about 5 frames a second during a pick, and
+the app's CPU there went from 6.5% to 2% (median, on a release-like
+build)._
+
+* Feat(crash-report): a short first page, and the report shows what it hides. 
+  _The first page was a paragraph nobody reads. It is now one line and the description field.
+
+What keeps the report private is shown where the file is made: while it is built, the card
+ticks off "Removing IPs, domains and keys", then "Encrypting logs", and both stay checked once
+it is ready. A build without a key says so: the last step turns into an amber "Logs are not
+encrypted" warning. The file appears after at least a second, so the steps can be seen.
+
+- The "Report a problem" intro is translated in every language; most only had English.
+- The old line under the file about encryption is removed: the steps replace it.
+
+New strings are translated in every language._
+
+* Fix(update): the Android installer no longer hangs on "Starting the installer..." when it fails. 
+  _A failure to start the system installer (none on the ROM, a file it could not share), or to
+ask whether APKs may be installed, is now answered with an error instead of no answer at all._
+
+* Feat(crash-report): one send page, Telegram recommended, and a local-only way. 
+  _Every way of sending made the same zip and asked for the same save; only the last steps
+differed, yet each was its own page reached from a list. The dialog now has two pages: what
+happened, then the report and where it goes. The zip is built once, on Continue, in a card
+at the top. Tiles pick where it goes, Telegram first with a Recommended pill, and only the
+steps under them change; a save already done stays done.
+
+- Hiddify uploads on its button, no longer as soon as it is picked.
+- GitHub no longer shows a warning.
+- Local only replaces Save the file: save the report, or, when it is encrypted, an
+  unencrypted copy to look inside.
+- The dialog keeps one width: sized by its content, it grew with the file name and changed
+  width between pages. The file name is smaller.
+
+New strings are translated in every language; the ones of the old list are removed._
+
+* Fix(ios): profiles no longer stop connecting after iOS frees storage. 
+  _The profiles' configs were kept in the app group's Library/Caches, which
+iOS empties when storage runs low. Every connect then failed to open the
+config and the app stayed on Connecting until it was reinstalled.
+
+The working directory moves to Library/Application Support (out of the
+backup, as before); the app and the packet tunnel move the old one there
+on first launch. A config that is gone anyway is downloaded again for a
+remote profile, and a local one fails with a message instead of hanging.
+
+Fixes #2548_
+
+* Fix(update): a store build never joins the beta channel. 
+  _A dev build turned on Beta updates whatever its release, so a dev App Store, Play or
+Microsoft Store build carried a channel it cannot use: the store delivers its updates, and
+the About page already hides the switch there. Only a build that checks its own updates
+joins it now._
+
+* Fix(connection-button): keep the wave moving while connecting takes long. 
+  _The connecting, searching and disconnecting looks ran on the ambient
+clock, which stops 10 s after its last wake. A start that took longer,
+or coming back to home after that, froze the logo half way and the
+button looked stuck. Busy looks now move for as long as they last.
+
+Fixes hiddify/hiddify-app#2555_
+
+* Perf(proxies): rows stop shimmering once their test is done. 
+  _A row whose flag was only cached from the last run, or that had no IP yet,
+shimmered on its own ticker for as long as the page stayed open, even with
+its ping in or at rest: about 22 frames a second and a steady slice of a
+core while idle. They now shimmer only while the row is still being tested,
+and the spinners and shimmers repaint their icon alone, not the row._
+
+* Feat(keep-top): show how many proxies work, fail and are left to test. 
+  _While the test runs, the big figure counts the proxies left to test and the
+bar fills with the working and failing ones. Beside the figure, a quiet tally
+says how many answer and how many do not._
+
+* Feat(connection-check): turn the chain on or off from its row in the sheet. 
+  _The chain's row stays while the chain is off, greyed with a switch, and tapping it
+toggles the chain. With the chain off the summary no longer waits for a hop._
+
+* Fix(crash-report): offer a desktop core crash as soon as the core is back, not at the next start. 
+
+* Feat(crash-report): reports encrypted by the core, readable where they can be. 
+  _Every way of sending (Hiddify, Telegram, email, GitHub) carries the same
+hiddify-report-<time>.zip, made and encrypted by the core: the generic part
+(metadata.json, goroutines, crash reports, the app's exceptions) is readable,
+the config and the logs are in sensitive.encrypted.age, which only the
+Hiddify team opens. Save the file offers it encrypted or unencrypted, the only
+way the sensitive part leaves the app in the clear.
+
+The key lives in the core, so the app's age code, the cryptography package
+and the diagnostics_public_key define in the Makefile and the workflows are
+gone; the core answers whether a report is encrypted. The app sends its
+exceptions as generic files and the rest as extra files, asks the background
+core for its zip unencrypted (it goes inside the encrypted part), no longer
+sends the time zone, and reports the window settings' values.
+
+docs/diagnostics-encryption.md has the layout, the key setup and how to open
+a report._
+
+* Feat(update): a beta channel; GitHub pre-releases go only to beta users. 
+  _A release still marked a pre-release on GitHub was offered to every user, since only a
+suffix in the tag made a release a pre-release. Now either does, and only users who turn
+on Beta updates (About) get pre-releases. A dev build (a .dev tag or the draft release)
+turns it on once per build, so it keeps updating to the next beta._
+
+* Feat(telegram): a livelier channel invite that opens the Telegram app first. 
+  _The dialog gets a Telegram-blue header with a floating plane over soft rings and the
+channel's handle, then the message and one clear join button.
+
+Joining opens tg:// in the Telegram app and falls back to t.me when no app takes it;
+the About page link does the same._
+
+
+
+## v5.9.2 (2026-11-13)
+
+#### Other
+
+* Feat(crash-report): report a problem from the app, with every log and the crash itself. 
+  _A report can be sent from About and from the Logs page as well as after a crash:
+to Hiddify, the Telegram issues bot, email or a GitHub issue, or saved. Each way
+shows its steps in order, and the report holds the app log, the core log and its
+stderr, the app's own crashes and the core's, the app and connection state and
+the settings without secrets.
+
+- After a crash the exception is shown and filled in: the GitHub issue's title
+  and log field, the mail body, the Sentry event. App crashes are recorded too:
+  Dart errors everywhere, Java/Kotlin crashes, native crashes and ANRs on Android.
+- The Telegram link starts hiddify_issues_bot with the platform or Linux distro,
+  its version, the build, the package mode, the report type and the language.
+- A build with DIAGNOSTICS_PUBLIC_KEY encrypts the report it uploads to Sentry
+  with age, so only the private key opens it.
+- The Telegram channel is offered after a few days of use, and reduce animations
+  stills only the light round the connect button._
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Docs: animated README demo (MacBook + iPhone) and a script to rebuild it. 
+  _docs/readme-demo/make_demo.py builds docs/demo-<lang>.webp from two
+recordings of the app (desktop window and phone layout): a MacBook and an
+iPhone 6.1" running Hiddify, going from "Tap to connect" through Extra
+security to "Connected" with the live-traffic glow. Right-to-left
+languages get a mirrored layout. docs/readme-demo/README.md explains how
+to record new inputs for each release._
+
+* Fix(update): store copies never update themselves, even built without the release define. 
+  _A copy Google Play installed refuses to start the APK installer, and a sandboxed
+macOS run counts as the Mac App Store build, which never updates itself nor asks
+for root._
+
+* Fix(update): the Android update installs once the user allows it, without downloading again. 
+  _Back from the install-unknown-apps settings with the permission given, the
+installer starts with the APK already downloaded. Try again reuses it too, and a
+verified download left in the cache is not fetched again. A cancelled installer
+no longer leaves the dialog stuck on installing._
+
+* Perf(ui): endless animations run 10 seconds, on one clock, and never on a low battery. 
+  _While connected, the chain icon on the home card (the extra security shield's orbiting light, the
+unblocker's door) and the chain badge's shine each asked for a frame at every screen refresh, and
+followed only the system's reduce motion: neither the reduce animations setting nor an unfocused
+window stopped them. The app drew 76 frames a second for as long as it stayed connected, a fifth
+of a core even on a fast laptop, and on a computer without a graphics card all of it on the CPU.
+
+- Every endless decoration (the connect button's light, the shield's orbit, the door, the badge's
+  shine and breathing, the loading shimmers) steps on one shared timer, at the button's rate (30
+  fps or less), so they draw in the same frames.
+- With reduce animations off, it runs for 10 seconds when it may start (the window gets focus,
+  the app comes back, the setting is turned off, the battery recovers) and after each change of
+  the connection, then stands still; the button shows the still glow that steps with the traffic.
+- It never runs while a desktop window has no focus, with reduce animations on, or with battery
+  saver on or the battery at 20% or less on battery power (battery_plus; it adds no permission).
+- The CPU guard that turned reduce animations on for good after a costly connect is removed: the
+  10 seconds bound the cost instead._
+
+* Fix(crash-report): a report Sentry did not take says so and points to email or Telegram. 
+  _On Android, iOS and macOS the report went to the native Sentry SDK, which only queues it and
+uploads later, so a rate limit (429), no connection or a failed upload still showed "Report sent".
+The report now goes over HTTP from Dart with a client of its own on every platform, and only a 200
+counts as sent; a 429, any other status, a network error or a 3 minute timeout shows the toast
+that suggests email or Telegram. A zip over Sentry's 20 MB attachment limit, which Sentry dropped
+without a word while the event still went, is not sent and shows the same toast.
+
+The report no longer starts the app's Sentry when analytics is off: its own client is closed
+right after._
+
+* Fix(home): returning to home no longer flashes a grey box. 
+  _The connect button read TickerMode and the ambient motion with `a && b` of two hooks. With home
+under another page TickerMode is off, so the second hook was skipped and every hook after it
+shifted; each return to home threw "Type mismatch between hooks" and release builds drew a grey
+box in place of the page. Both hooks now run on every build._
+
+
+
+## v5.9.1 (2026-11-13)
+
+#### Other
+
+* Build: bump hiddify-core to 5.9.1. 
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Docs: new laptop and phone demo image of Hiddify app 5 in the README. 
+
+* Docs: restore the laptop and phone demo image in the README. 
+
+* Docs: refresh README in all languages. 
+  _Rewrite the README (English and every translation) for the current
+release: new feature list, fixed download links and file names,
+up-to-date install requirements and protocols, new screenshots from
+hiddify.com, a per-language tutorials banner linking to hiddify.com,
+and a working YouTube badge._
+
+* Fix(i18n): improve the Russian translation and update project.inlang. 
+  _Takes the changes from #2527 by Hollicsh: the new keepTop, proxy pin and
+crash report strings, the formal "Вы", and a project.inlang that lists the
+existing locale files and their real path.
+
+On top of that: the missing comma that made ru.i18n.json invalid, em dashes
+kept, one "sleep" term to match the English, "Лучшие $keep", the restingHint
+meaning, and "отчёт" spelled one way._
+
+* Merge pull request #2538 from 4n0nymou3/4n0nymou3-patch-1. 
+
+* Update free_configs. 
+
+* Free_configs. 
+  _Add Serverless_
+
+* Fix(windows): a launch at login keeps the app in the tray. 
+  _The Run key, the Startup folder shortcut and the MSIX startup task can each start the app at
+login. A second launch shows the running copy's window, as a launch by hand should, which undid a
+silent start. Every autostart entry now passes --autostart, and a launch with it leaves when a
+Hiddify window already exists. The Run key's command line is quoted (the path usually has a
+space), and an entry an older version wrote, without quotes or --autostart, is rewritten._
+
+* Fix(home): reduce animations stills only the connect button. 
+  _The setting turned off every animation in the app. It now stills the connect button alone; the
+rest of the app follows the system's reduce motion, as before the setting.
+
+With the setting on, the connected button shows a still glow in place of the light's rays, flares
+and sparks: one soft gradient for download and one for upload, sized by the traffic in steps, so
+it repaints only when the traffic changes a lot and no timer runs._
+
+* Build: bump hiddify-core. 
+  _The VPN service installs over a running one, the UAC prompt shows for a downloaded HiddifyAdmin,
+a stopped engine's system proxy is cleared, HiddifyCoreEngine.exe, and WireGuard clients no
+longer raise the Windows firewall prompt._
+
+* Feat(desktop): reduce animations when drawing them costs too much CPU. 
+  _The light around the connect button is drawn on the CPU where there is no graphics card, and kept
+the app at 25% of a VM's CPU while the core used none. For 10 seconds after each connect the app
+measures its own CPU time (GetProcessTimes on Windows, getrusage on Linux and macOS); above 10%
+of the machine it turns on the reduce animations setting, as the user would in the settings._
+
+* Refactor(windows): the engine is HiddifyCoreEngine.exe beside the app. 
+  _It was core\Hiddify.exe, in a subfolder because it had the app's own file name, so taskkill
+/im Hiddify.exe ended both. The installer removes the old core folder on upgrade._
+
+* Feat(desktop): the app's core is the library in the app; only proxies run in the engine. 
+  _On Windows and Linux the core ran in a process of its own for everything: profiles, settings,
+installing the VPN service, the system proxy, and the proxy-mode connection. A VPN runs in the
+service, so that process only sat beside it.
+
+The app now loads hiddify-core as a library for its own work, and starts the core's process (the
+engine) only for a connection outside the service: proxy mode, or a TUN when the app itself runs
+as administrator. The engine gets the connection's settings, and changed settings while it runs;
+it ends with the connection. When it stops or crashes the library clears the system proxy it set,
+and on quit the app stops it and restores the system proxy it set for the service. macOS keeps
+its core process (App Nap).
+
+Tested on Windows 11: at start only the app runs, with the library loaded; VPN mode connects,
+disconnects and connects again with no engine; proxy mode starts the engine and sets the system
+proxy, and a disconnect ends it with the proxy off; killing the engine while connected leaves the
+proxy off and reports the failure._
+
+* Fix(desktop): the window shows the Hiddify logo while the app loads, not a white page. 
+
+* Fix(desktop): startup no longer waits for the system tray. 
+  _The tray rebuilds on every connection change, and a connection restored at
+startup kept it rebuilding past the 1 s limit: every start logged
+"[system tray] error initializing" (a timeout) and showed the window up to
+1 s later. The tray now starts alongside, and only its real errors are logged._
+
+* Fix(android): the strip under the bottom bar is the page color, not black. 
+  _With 3-button navigation, and with gestures on One UI (Galaxy S25 Ultra),
+Android paints a navigation bar background over the bottom of the page in
+the window's navigation bar color. Since 2d35bd0e stopped setting that
+color the strip was dark or black. The overlay style sets it to the page
+background again, as before 5.9.0.
+
+Fixes #2532_
+
+* Fix(linux): the .deb keeps user data on upgrade and removes it only on purge. 
+  _dpkg runs postrm with "upgrade" on every update, and the script deleted
+~/.local/share/hiddify unconditionally, so each upgrade wiped profiles and
+settings. It now deletes user data only on purge, and covers
+~/.local/share/app.hiddify.com too, where the app keeps it today.
+
+postinst is safe to repeat: StartupWMClass comes from the packager's
+startup_wm_class instead of a sudo sed, and only the launchers the AppImage
+wrote (X-AppImage-Name) are removed from users' ~/.local.
+
+Fixes #2535_
+
+* Fix(android): an always-on VPN start runs the core. 
+  _Android starts the VPN service by itself for always-on VPN, at boot or
+after the process was killed. The service started the core only when the
+saved flag said so, and a connect from the app clears it, so the service
+came up without the core and the app stayed on Connecting.
+
+Fixes #2534_
+
+* Fix(linux): the RPM requires the tray library by soname, not by Fedora's package name. 
+  _openSUSE ships libayatana-appindicator3.so.1 as libayatana-appindicator3-1, so the
+explicit libayatana-appindicator-gtk3 requirement left zypper unable to install the
+package. rpmbuild already adds the soname requirement, which every distribution resolves.
+
+Fixes #2537_
+
+* Fix(desktop): an unfocused window keeps updating; only the connect button's light stops. 
+  _Losing focus on desktop turned off every ticker, so state changes froze mid-transition. TickerMode now stays on there and the endless light around the connect button pauses through ambientMotion. Hidden and paused still stop everything. Also bumps hiddify-core for the Windows console-window and process-name fixes._
+
+* Ci(stores): rebuild the Play bundle with the next version code when Play has seen it. 
+  _Play takes a version code once, also from an upload it then did not publish:
+re-uploading the 5.9.0 bundle failed with "Version code 50900 has already been
+used". Store upload can now build the Play bundle again from the run's commit
+(build-android.yml takes a commit, the targets, and generates the code itself),
+and the bundle gets the next recorded code._
+
+* Ci(stores): a release to Play as a draft, the Mac upload after a failed iOS one, re-uploads without building. 
+  _Play refused to save the 5.9.0 production release unsent: this app's changes
+are sent for review automatically, so changesNotSentForReview must not be set.
+The release is then a draft on production, neither reviewed nor rolled out.
+
+The Mac App Store upload was skipped because the iOS upload before it failed
+(the IPA was uploaded already by the run whose tag could not be recorded);
+the two uploads are independent now.
+
+The Play upload is a reusable workflow (google-play.yml), and it and
+testflight.yml can take the artifacts of an earlier run: store-upload.yml
+uploads a run's builds to the stores again without building them._
+
+
+
+## v5.9.0 (2026-11-12)
+
+#### Other
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Update README.md. 
+
+* Add XRay project to contributors list in README. 
+
+* Update README with compatibility and features. 
+  _Added compatibility note for latest Xray-core and sing-box along with a list of supported protocols and features._
+
+* Merge pull request #2524 from 4n0nymou3/4n0nymou3-patch-1. 
+  _Fix typos and wording in free_configs; remove 𝕏 from Anonymous profile_
+
+* Free_configs. 
+  _fix(profiles): fix typos and wording in free_configs_
+
+* Ci: name each build job after its platform (android-apk, linux-x64, windows-x64, ...) 
+
+* Ci(android): drafts and dev builds to open testing, releases to production unsent. 
+  _A draft or a .dev tag goes to Google Play open testing and is sent for review,
+replacing a dev build still in review. A release tag goes to production,
+saved but not sent for review, or to closed testing while another release is
+in review. The upload is a script now (.github/scripts/google_play_upload.py):
+the action could not choose what happens to changes in review.
+
+Play takes each version code once, and every build of a version had
+pubspec's. As for iOS, the bundle gets one more than the highest code
+recorded as an android-build/<code> tag, never less than pubspec's; the APKs
+keep pubspec's._
+
+* Style: format the logger, trusted links and preferences utils. 
+
+* Fix(android): the splash goes straight to the first screen, without a blank gap. 
+  _Android 12 and later showed the default window background after the system
+splash, and the splash was removed over the router's blank loading page. The
+launch theme now has the splash as its window background there too, and the
+splash stays until the first frame of the real routes (or 5 seconds at most)._
+
+* Feat(proxy): show the sleeping proxies at first, then as the user left them. 
+  _The sleeping proxies keep top leaves at rest were always folded away when the
+page opened. They are shown at first, and folding or unfolding them is saved._
+
+* Fix(linux): VPN mode without pkexec, and the packages depend on it. 
+  _The deb and rpm packages now pull pkexec (pkexec | policykit-1, polkit), so
+VPN mode can ask for the administrator password on a minimal desktop. The
+AppImage, which starts its service itself, falls back to sudo with the
+desktop's password dialog, or passwordless sudo, when pkexec is missing, and
+says what to install when neither works, instead of "Bad state: ... exec:
+pkexec: executable file not found"._
+
+* Chore(core): bump hiddify-core for VPN mode without pkexec. 
+
+* Feat(android): the Hiddify logo, not a black screen, while the app starts. 
+  _Flutter swaps the launch theme for NormalTheme as soon as the activity
+starts, and NormalTheme's window was plain black (dark) or white until
+Flutter drew its first frame. The app also holds that frame until it has
+started, so an Android TV or a slow phone showed a black screen for the
+whole engine load. Both themes now show the logo on the app's own
+background (the surface of its light or dark color scheme) until the
+first frame covers it, and the Android 12 splash uses the same color, so
+nothing flashes at the hand-over. pubspec's flutter_native_splash colors
+match, for when the splash is generated again._
+
+* Feat(proxy): a pin on the flag of a proxy kept loaded, and call it "Pin proxy" 
+  _A proxy the user keeps loaded whatever its ping (keep top) now wears a
+pin badge on the top corner of its flag in the proxy list. It is drawn
+over the row's fade, in the primary color ringed in the surface color,
+so it shows on any flag and on a sleeping row; the reconnecting badge
+keeps the bottom corner. The setting in the proxy dialog is named "Pin
+proxy", and the sleeping proxies' hint says a long press pins one._
+
+* Fix(profile): adding a profile that is already there selects it. 
+  _Adding a subscription whose URL was already saved (a link, a QR code,
+the clipboard or the manual form) only updated that profile and left
+another one active, so nothing seemed to happen. Adding it now makes it
+the active profile, as adding a new one does, before the update, which
+may fail on a server that is down. Updating a profile, by hand or in the
+background, still leaves the active profile as it is.
+
+Tested: the repository tests for a profile added again (selected, also
+when its update fails; not selected by an update; the active one left
+alone) fail without the change and pass with it._
+
+* Fix(keep-top): keep the filter and card after choosing All; say asleep, not paused. 
+  _A profile of 20 proxies or fewer lost its keep-top card and filter button once
+the user chose All, so there was no way back to Working or a count. They now
+show whenever keep top was chosen by the user or the subscription.
+
+Paused proxies are now asleep: a moon replaces the pause icon, a sun the wake
+button, and the English and Persian texts follow._
+
+* Chore(core): bump hiddify-core for the WireGuard close and idle UDP fixes. 
+
+* Chore(core): bump hiddify-core for the replace forks on their upstreams. 
+
+* Fix(android): no Go memory limit by default outside iOS (#2521) 
+  _Since the core was given the device's memory, the default "Memory
+limit" held the Go runtime to 3/4 of the Java heap class on Android
+(about 192 MB on a flagship). Near it the GC runs all the time and the
+connection lags, messengers most, with nothing in the logs. Only the
+iOS Network Extension needs the limit; the default is now off on every
+other platform, on the Flutter side and on the Android service's own
+read of the setting. A choice the user made is kept._
+
+* Fix(desktop): show why the core crashed, not only its exit code. 
+  _When the core process exits unexpectedly, read its Go crash output
+(<working dir>/data/stderr<mode>.log, or stderr before it is set up) and
+add the panic or fatal error line to the message (#2517). The file is
+read before the restart moves it into the crash reports.
+
+Bumps hiddify-core for the crash output on Windows._
+
+* Fix(i18n): a flag for every language added since the language flags. 
+  _Amharic, Azerbaijani, Belarusian, Bengali, German, Hindi, Armenian,
+Italian, Kazakh, Korean, Kyrgyz, Burmese, Dutch, Pashto, Tajik, Turkmen,
+Ukrainian, Urdu and Uzbek had no flag in the language picker._
+
+* Test(proxy-info): run the dialog without an active profile. 
+  _The dialog reads the active profile for its keep-loaded switch, which
+opened the database in the test and left a timer pending._
+
+* Merge remote-tracking branch 'hiddify-app/main' into feat/crash-report-send-options. 
+
+* Merge pull request #2515 from Hiddify-Official/feat/language-flags. 
+  _feat(settings): show a flag before every language_
+
+* Feat(settings): show a flag before every language. 
+  _Only Persian had a flag in the language picker, after its name. Every
+language now shows its country's flag, from the bundled circle_flags SVGs
+so it is sharp and the same on every platform; Persian keeps the lion and
+sun. In the setting pickers the picture (the language's flag, a region's
+flag) now comes before the option's name instead of at the row's end._
+
+* Merge pull request #2510 from Hiddify-Official/fix/add-profile-buttons-overflow. 
+  _fix(profile): let the add buttons grow instead of overflowing_
+
+* Fix(profile): let the add buttons grow instead of overflowing. 
+  _The four add buttons were squares of a fixed height, so a language with
+taller letters, such as Chinese, overflowed them by a few pixels. They now
+have a minimum height and grow together.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 3f09ba246cc6d31f104030499d594fefa31af3ce)_
+
+* Merge pull request #2508 from Hiddify-Official/feat/more-languages. 
+  _feat(i18n): add 19 languages_
+
+* Fix(i18n): address the user as tu throughout the Italian translation. 
+  _Confirmation questions were in the impersonal infinitive and one warning used
+the formal form of the verb. They now speak to the user as tu, like the rest
+of the file._
+
+* Feat(i18n): add Dutch (nl) 
+  _Dutch translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker._
+
+* Feat(i18n): add Italian (it) 
+  _Italian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 804b6d5c0c4df6b2286fc9a9ea8e3cb391d15bb3)_
+
+* Feat(i18n): add German (de) 
+  _German translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit a8a6ded0a9869bd9c682a4edbbc1e73c0d436b2f)_
+
+* Feat(i18n): add Hindi (hi) 
+  _Hindi translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6bb005ee8bccd0240701b10ff11b4a316e941e26)_
+
+* Feat(i18n): add Ukrainian (uk) 
+  _Ukrainian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 7113b183660253ef6c0516485188afbeb5f41001)_
+
+* Feat(i18n): add Armenian (hy) 
+  _Armenian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 864aea97244bfcf3da26b9760ee38d1c3ab02632)_
+
+* Feat(i18n): add Tajik (tg) 
+  _Tajik translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 538efea30f6f7586ebe7893f198a2898858c22ee)_
+
+* Feat(i18n): add Kyrgyz (ky) 
+  _Kyrgyz translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 22300d6320faaa4402c53a3059c0b205b198414a)_
+
+* Feat(i18n): add Burmese (my) 
+  _Burmese translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 079c81743d4dd3f0a3dfd919e1c17f6e19f03bb7)_
+
+* Feat(i18n): add Kazakh (kk) 
+  _Kazakh translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6bf9b40d537cb77e864afd83f3c3453db802dc71)_
+
+* Feat(i18n): add Azerbaijani (az) 
+  _Azerbaijani translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit c20cc48b91a68b6bac085b5d5062070ec6608180)_
+
+* Feat(i18n): add Uzbek (uz) 
+  _Uzbek translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6d141bd17e452fc1a99b4d4dfede0ae9a2b0ffd3)_
+
+* Feat(i18n): add Bengali (bn) 
+  _Bengali translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit d3aec4bd105ed8799a060531619cc1f64559cc67)_
+
+* Feat(i18n): add Pashto (ps) 
+  _Pashto translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit b9a142a332bc4f08ef4792915ac4f9429b61411b)_
+
+* Feat(i18n): add Urdu (ur) 
+  _Urdu translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 88cb89700b5cf10ff587a84f7d9e8afe5e0d4120)_
+
+* Feat(i18n): add Amharic (am) 
+  _Amharic translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 25f43700160a559cc975557306516f3625dd297e)_
+
+* Feat(i18n): add Belarusian (be) 
+  _Belarusian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 95e27a78f994131c4ecdb39d286fe36f0814488e)_
+
+* Fix(i18n): show Flutter's own texts in English for languages it lacks. 
+  _Material widgets failed to build in a language Flutter has no texts for,
+such as Turkmen. The delegates now fall back to English for those texts.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit ce1eb9f611be60231964f0a9cdb2b3732344a426)_
+
+* Feat(i18n): add Turkmen (tk) 
+  _Turkmen translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 9d9158d02617049025815b13ed704657bee3245f)_
+
+* Feat(i18n): add Korean (ko) 
+  _Korean translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+(cherry picked from commit 070e207d5e76ae9a2dfc06296575ec7028a83015)_
+
+* Merge pull request #2509 from Hiddify-Official/fix/complete-older-translations. 
+  _fix(i18n): complete the missing translations of nine languages_
+
+* Fix(i18n): update an outdated message and drop stale keys in the older locales. 
+  _The VPN mode waiting message no longer matched the English text and lacked the
+Hiddify name, and the Russian update message ended its link with a full stop.
+Keys that the English file no longer has are removed._
+
+* Feat(i18n): complete the Traditional Chinese translation. 
+  _Translate the strings the Traditional Chinese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Simplified Chinese translation. 
+  _Translate the strings the Simplified Chinese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Turkish translation. 
+  _Translate the strings the Turkish locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Russian translation. 
+  _Translate the strings the Russian locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Brazilian Portuguese translation. 
+  _Translate the strings the Brazilian Portuguese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Indonesian translation. 
+  _Translate the strings the Indonesian locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the French translation. 
+  _Translate the strings the French locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Spanish translation. 
+  _Translate the strings the Spanish locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Arabic translation. 
+  _Translate the strings the Arabic locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Merge pull request #2511 from Hiddify-Official/fix/intro-slogan-wrap. 
+  _fix(intro): wrap the slogan instead of cutting it with an ellipsis_
+
+* Fix(intro): wrap the slogan instead of cutting it with an ellipsis. 
+  _In most languages the slogan is longer than a phone is wide, and it was cut
+with an ellipsis after one line. It now wraps and is centered._
+
+* Merge pull request #2514 from Hiddify-Official/fix/home-no-overscroll. 
+  _fix(home): keep the home page still under the finger_
+
+* Fix(home): keep the home page still under the finger. 
+  _Dragging the home page moved the profile tile and the connect button: the
+page bounced on iOS and stretched on Android although it fits the screen.
+Use clamping physics and no overscroll indicator, so it moves only when it
+does not fit (a small screen or a large font)._
+
+* Merge pull request #2504 from Hiddify-Official/fix/quick-settings-translations. 
+  _fix(settings): translate the quick settings chain toggles_
+
+* Fix(settings): translate the quick settings chain toggles. 
+  _The Extra security and Proxy unblocker rows of the quick settings, their
+Off label and the Router mode label existed only in English and Persian,
+so the other nine languages showed them in English._
+
+* Merge pull request #2505 from Hiddify-Official/feat/compact-share-sheet. 
+  _feat(profile): fit the share dialog on a phone screen without scrolling_
+
+* Feat(profile): fit the share dialog on a phone screen without scrolling. 
+  _Close moves to an X in the header, the configuration's copy, share and
+save become icon buttons on its heading row, and the QR code shrinks on
+short screens._
+
+* Merge pull request #2513 from Hiddify-Official/fix/menu-in-nested-overlay. 
+  _fix(ui): open menus above the home bottom bar when they don't fit below_
+
+* Fix(ui): open menus above the home page's bottom bar when they do not fit below. 
+  _Since afd915c9 the status and navigation bars are reported to MenuAnchor
+as display features in screen coordinates. A page of the home shell has
+its own overlay, ending above the bottom navigation, so the navigation
+bar fell below that overlay and the area it left looked taller than the
+page: the balance strategy menu opened downward and was cut off by the
+bottom navigation. Measure the bars against the menu's overlay when the
+menu opens instead._
+
+* Chore(core): bump hiddify-core for keep top in the monitor and parked outbounds. 
+
+* Feat(keep-top): run the 5 fastest by default, explain the paused ones. 
+  _Keep top now applies to every profile: the user's choice, else the
+subscription's keep-top header, else the 5 fastest. The user changes it
+from the card at the end of the proxy list; no dialog is shown on import.
+
+The card says in plain words why the other proxies are paused, and with
+regions chosen, when proxies of other regions answered faster, with a
+button to keep any region. A proxy can be kept loaded from its details,
+whatever its ping.
+
+The home card no longer shows a speed cached from an earlier run, and a
+fresh result fades back to the gauge 20 seconds after its test ends._
+
+* Fix(android): the service goes to the foreground as soon as it is started. 
+  _A start that arrived while a stop was still closing the core returned
+without calling startForeground, and the stop's stopSelf() then crashed
+the app with "Context.startForegroundService() did not then call
+Service.startForeground()". A normal start called it only after the core
+library was loaded on a background thread, which can miss Android's
+deadline on a slow or busy device.
+
+onStartCommand now calls startForeground itself, on the main thread,
+before anything else. A foreground start that Android refuses from the
+boot receiver, the tile or the shortcut is logged instead of crashing.
+
+Refs #2500_
+
+* Ci: split the build workflow into per-platform workflows and shared actions. 
+  _build.yml was one 950-line matrix job with a condition on nearly every step.
+It is now the orchestrator: codegen, test, one reusable workflow per platform
+(build-android/linux/windows/macos/ios.yml), then the publishing jobs and
+testflight.yml. The steps they share are composite actions: setup-flutter
+(Flutter SDK and version, make install-deps and prepare), apple-signing,
+publish-release (used by the version and the draft release) and
+ios-next-build-number, which now reads pubspec.yaml itself.
+
+Faster runs:
+- build_runner and slang run once, in the codegen job; the tests and every
+  build download the generated code and run make with SKIP_CODEGEN=1.
+- The builds run next to the tests instead of after them. Publishing waits
+  for the tests and every build.
+- The Mac App Store job is not started when nothing is signed.
+- Artifacts are uploaded uncompressed; the draft release no longer clones
+  the full history.
+- No Gradle cache: restoring its 5 GB took 65-185 s of every Android build.
+- prune-caches removes every cache the run did not use.
+
+Fixes:
+- Setup.exe and the MSIX are packaged in separate steps: one PowerShell step
+  reported only the last make, which hid a failed Setup.exe build.
+- A missing Play bundle no longer stops the GitHub release; Google Play is
+  its own job.
+- winget.yml used winget-releaser@2, a ref that does not exist.
+
+Hardening: secrets reach scripts through env instead of being pasted into
+them, third-party actions are pinned to commits and updated by Dependabot,
+every job has a timeout and its own permissions (except release, which keeps
+the caller's grant because of the 403 on v5.2.0)._
+
+* Feat(crash-report): send the report to Hiddify, by email or on Telegram. 
+  _The dialog after a crash had one button, which opened the share sheet (a save dialog on desktop)
+and left the user to find where to send the zip. It now offers:
+
+- Send to Hiddify: the app uploads the zip to Sentry, as the attachment of one event. The user
+  asked for this report, so it goes with analytics off too: Sentry is started for the event and
+  closed again. A build without a DSN does not show the option.
+- Send by email, to bug@hiddify.com, and Send on Telegram, to t.me/hiddify_board. Neither link can
+  carry a file, so the user attaches it: a phone opens the share sheet with the destination in
+  the text (and the mail address in the clipboard); a desktop saves the zip, then opens the mail
+  app or the group.
+
+The logs page's diagnostics report still saves or shares the zip._
+
+* Ci(ios): keep only the newest ios-build tag after each upload run. 
+  _Only the highest ios-build/<version>/<build> tag decides the next iOS
+build number, so after every draft or release run that uploads, remove
+the others._
+
+* Feat(release): one install.sh for macOS and Linux that verifies the download. 
+  _Replaces the Linux all-in-one tarballs (Hiddify-Linux-<cpu>.tar.gz and their install.sh) with an
+installer attached to each release:
+
+    bash <(curl -fsSL https://github.com/hiddify/hiddify-app/releases/download/<tag>/install.sh)
+
+CI fills the template linux/packaging/install.sh with the tag and the SHA-256 of each file it can
+install (.github/scripts/make_installer.sh). The installer finds the system and the CPU, offers
+only the formats this system can install and the release has (asking only when there is more than
+one), downloads that file and refuses it when its SHA-256 differs.
+
+- macOS: Hiddify.app from the disk image into /Applications, without the quarantine flag; a
+  running Hiddify is asked to quit first.
+- Debian/Ubuntu: the .deb or the AppImage; Fedora/RHEL/openSUSE: the .rpm or the AppImage; other
+  systems: the AppImage in ~/.local/bin, with FUSE, GTK 3 and the tray library it needs.
+
+The AppImage files are now Hiddify-Linux-<cpu>.AppImage and Hiddify-Linux-<cpu>.AppImage.tar.gz,
+and the in-app updater looks for the new name. The release table shows Windows and Android first,
+then the installer command in a copyable block, and Linux x64 and Linux ARM64 in rows of their own._
+
+* Fix(ci): record the iOS build numbers in tags instead of asking Apple. 
+  _With an Apple ID no tool on the GitHub runners can list a version's
+builds: altool --build-status takes only an upload's delivery ID in every
+Xcode the runner has, and Transporter is not installed. The TestFlight
+job now tags every build number App Store Connect took as
+ios-build/<version>/<build>, including a number it refused as already
+uploaded, and the next iOS build of that version takes one more than the
+highest tag._
+
+* Fix(ci): read the iOS uploads with Transporter to find the next build number. 
+  _Since Xcode 26.6, altool --build-status only takes the delivery ID of an
+upload, so it can no longer tell whether a build number of a version is
+taken. Transporter's statusAll mode still lists every upload of the app
+with an Apple ID and an app-specific password. Move the lookup into the
+ios-next-build-number action and add a workflow that only runs it, to see
+the next number and Transporter's reply without building._
+
+* Ci(release): update the draft release even when one platform build fails. 
+  _update-draft required every matrix build to succeed, so one failed
+platform (e.g. iOS) left the draft release stale. It now publishes the
+platforms that built, refuses to replace the draft when nothing built,
+and virustotal-draft follows update-draft's own result._
+
+* Fix(ci): find the next iOS build number with the Apple ID login. 
+  _The App Store Connect API key was rejected (HTTP 401), so the iOS build
+stopped before building. Ask altool, signed in with APPLE_UPLOAD_APPLE_ID
+and APPLE_UPLOAD_APP_PASSWORD like the TestFlight upload, for each build
+number of the version from pubspec's upward and take the first one App
+Store Connect does not have. The app's numeric ID comes from the public
+store lookup of its bundle ID._
+
+* Feat(desktop): VPN mode by default, with a clear choice when it needs administrator permission. 
+  _VPN mode is now the default service mode on every platform. On Windows, Linux
+and macOS outside the App Store, the first VPN connect asks for administrator
+permission; the dialog before that prompt now offers both modes side by side,
+in plain words: VPN mode (all apps, needs admin once, recommended) and system
+proxy (browsers and most apps, no admin). Each has a help button with a full
+explanation. Picking system proxy saves it as the mode and goes on with the
+same connect.
+
+While the system prompt is up, a waiting dialog shows the step to take there
+(click Yes on Windows, enter the password on macOS and Linux). Back, or
+refusing or dismissing that prompt, returns to the choice instead of an error:
+the core's permission-denied result, pkexec's dismissal and Stop now raise
+AdminPermissionRefused. The waiting dialog appears in VPN mode only._
+
+* Feat(release): enhance asset catalog with badge color and logo support. 
+
+* Fix(db): recover from a database that can not be opened (#2078) 
+  _The v4 to v5 migration renamed test_url onto profile_override even when an
+older app had lowered the version of a database that already had it, so the
+upgrade failed with "duplicate column name: profile_override". It now checks
+each column first, like the other steps, and a test lowers a current database
+to every older version and upgrades it again.
+
+Any database error at startup now shows a prompt with the error and a Wipe
+data button, instead of a black window. Wiping reads the profile and per-app
+proxy rows from the old file without migrating it, keeps a copy as
+db.broken.sqlite, and adds them back to a fresh database under the same ids,
+so remote and local profiles find their configs again. Configs without a
+readable row come back as local profiles. The newer-version prompt wipes the
+same way._
+
+* Fix(profile): update debug log message when adding a remote profile. 
+
+* Feat(share): send a profile's subscription link from a phone to a TV. 
+  _The Share profile dialog on Android and iOS phones gets a Send to TV button. It
+scans the code the TV shows in its add profile sheet and posts the link to that
+page, where the TV user imports it. Only a code shaped like the TV's (a local
+address, a port and a 6 digit path) is ever sent to, so other codes never count
+against the TV's lock. The scanner can now show a hint under the camera view._
+
+* Fix(profile): fix free config issue on TV screens to improve layout. 
+
+* Fix(qr): scanning a QR code from an image no longer crashes on Android 10+ 
+  _file_picker compressed the picked image into the public Pictures folder, which the app may not
+write to. The image is now read as it is._
+
+* Fix(android): the app no longer crashes when Android starts it without its Application class. 
+  _For an Auto Backup or a restore, Android runs the process with the plain android.app.Application,
+so Application.application and the Go context were never set. Every component now sets them up
+first._
+
+* Fix(android): listing installed apps no longer crashes when an app disappears during the scan. 
+  _Moves from the VB10 fork of installed_apps 1.5.2 to installed_apps 2.2.1, which reads every
+app's details in one pass and reports errors instead of crashing its worker thread._
+
+* Fix(android): the notification no longer crashes when it starts before the core's certificate exists. 
+
+* Feat(build): add script to determine next iOS build number for App Store Connect. 
+
+* Chore(deps): update tray_manager to 0.5.3. 
+  _Same API, no Flutter or Dart change. On Windows the tray icon comes back
+after the PC wakes from sleep and after Explorer restarts, replaced icon
+handles are freed, and the plugin registers only once. 0.6 and later
+need a newer Flutter and Dart than the project uses._
+
+* Fix(profile): invalid subscription-userinfo values no longer reject the profile. 
+  _A NaN or infinite value threw in toInt(), and an expiry beyond what
+DateTime holds threw in fromMillisecondsSinceEpoch, so a valid
+subscription failed to import over its traffic header. NaN, infinite
+and negative values now count as unreadable: an unreadable total is
+unlimited, an unreadable upload or download leaves the traffic info out,
+and an expiry past infiniteTimeThreshold means no expiry.
+
+Based on #2470, which dropped the whole traffic info in these cases._
+
+* Fix(android): the Quick toggle shortcut starts the core, not only the service. 
+  _The app clears startCoreAfterStartingService because it starts the core
+over gRPC itself. The home screen shortcut never set it back, so after
+any in-app connect a tap only set up the service: it reported Started
+and showed "Connected" while no tunnel ran. The shortcut now sets the
+flag before starting, like the Quick Settings tile and the boot receiver.
+
+Closes #2445_
+
+* Fix(windows): keep a silent start hidden when the window was maximized. 
+  _With "Start minimized" on, startup still restored the saved maximized
+state, and maximizing a hidden window on Windows shows it, so the app
+opened in full instead of staying in the tray. The maximized state now
+waits until the window is first shown from the tray.
+
+Closes #2459_
+
+* Fix(settings): remove "Use xray-core when possible" completely. 
+  _The switch was already hidden and forced off; now the preference, the
+config field sent to the core and its translations are gone. A
+preferences migration drops the value older versions stored, so an
+in-place update keeps no trace of it. Old settings backups that still
+carry the key import fine: unknown keys are skipped.
+
+Closes #2462_
+
+* Fix(ios): add CoreTelephony framework to multiple build configurations. 
+
+* Fix(android): one gRPC certificate per process, low-memory mode on low-RAM TVs. 
+  _On a first run the VPN service's core could make a second server
+certificate, and the app, which pins the first, failed to reach it with
+"self signed certificate" (#2473). The core now keeps one per process.
+
+The core is also given the device's memory: the "Memory limit" setting
+now holds the Go runtime to three quarters of what an app may use here,
+and a low-RAM device (isLowRamDevice, or under 2.5 GiB as 2 GB TV boxes
+report) relays in sing's low-memory way.
+
+Fixes #2473_
+
+* Fix(linux): show the real error when pkexec exits 127. 
+  _pkexec exits 127 both when authorization fails and when the program could
+not run, so every 127 was reported as a refused admin prompt and hid the
+real error. A 127 with stderr output now shows that output instead.
+
+Refs #2461_
+
+* Fix(connection): retry the startup connect up to three times. 
+  _Right after a login autostart the network, the service or the core is often
+not ready, and a single failed try left the app disconnected with a red
+button. Restoring the previous connection now tries three times, 3s and 6s
+apart, silently; it stops early if the user disconnects or the tunnel comes
+up. Only the last failure is reported, and the window is brought to the
+front first so the error dialog is seen when the app started in the tray.
+
+Fixes #2482_
+
+* Fix(build): stop AppImage packaging on intermediate failures. 
+  _The AppImage recipe went on after a failed step, could repackage a stale
+squashfs-root, and deleted the input before the new image existed. It also
+took any AppImage under dist/*/, though dist/ keeps a folder per version,
+so an older build there stopped the release or was repackaged instead.
+
+Move the post-processing into repackage.sh: it works only in
+dist/<pubspec version>/, extracts into a new staging folder, stops at the
+first failure, and removes the input only once the rebuilt image and the
+portable archive both exist._
+
+* Fix(linux): pass HiddifyCli arguments before field-code filtering. 
+  _AppRun dropped CLI arguments that looked like desktop field codes, such as
+%u. Dispatch HiddifyCli first, skip an optional --, and keep the
+core-service cleanup._
+
+* Fix(linux): register AppImage import links. 
+  _The desktop entry written by AppRun named no URI schemes and passed no URL,
+so import links did not open Hiddify. Register the schemes the AppImage
+declares, forward the link with %u, and escape the AppImage path for the
+Exec key._
+
+* Fix(connection): preserve the active connect gate after reset. 
+  _A connect that finished after a reset cleared the gate of the newer one and
+let a third connect overlap it. Only the call that owns the current
+generation clears the gate._
+
+* Fix(update): verify release SHA-256 before installing downloads. 
+  _The updater checked only the byte count, so a modified payload of the same
+length was installed. Keep GitHub's release-asset digest, refuse an asset
+without a valid sha256 digest, and hash the download before installing it;
+a mismatch is deleted._
+
+* Feat(proxies): share or edit a single proxy from its details. 
+  _The proxy details dialog has Share and Edit for a proxy of the profile
+(not for groups or the app's own outbounds).
+
+Share builds a config of that proxy alone, plus any proxy it dials
+through, to copy, share as a file, save, or scan as a QR code when it is
+small enough. Hiddify imports it like any config. It comes from the
+profile as saved, so the app's own settings stay out.
+
+Edit copies the proxy to a new local profile and opens it in the
+profile editor, after saying why: a subscription replaces its proxies
+on every update, so the proxy is not edited in place.
+
+The proxy is found by its name without the core's numbering, and
+proxies of the same name are told apart by port and server. The
+generated config's exact tag is used only as a fallback and only when
+the port agrees, since the core can renumber tags on a reload.
+
+addLocal now returns the new profile's id.
+
+Closes #2451_
+
+* Feat(profiles): remove inactive subscriptions in one step. 
+  _A new action on the profiles page lists every subscription that no
+longer works, all checked, each with why: expired (with the date), no
+traffic left, or updates failing long enough that the app stopped
+updating it on its own (with the date). Unchecked ones are kept, and the
+checked ones are deleted with one toast at the end.
+
+Unlimited subscriptions, profiles without subscription info, and local
+profiles are never listed. The active profile is deleted last, so the
+profile that becomes active is never one still to be deleted.
+
+Closes #2449_
+
+* Fix(a11y): reaching a link with Tab no longer opens it. 
+  _Tab was one of the keys that open a link on the welcome screen and in the
+WARP and Psiphon license dialogs, and the link opened on key-up. Tab's
+key-down moves focus onto the link and its key-up then lands there, so
+moving through the screen with the keyboard opened the browser.
+
+Links now open on key-down of Enter, Space or Select only. The settings
+input dialog keeps Tab to move from the field to OK.
+
+Closes #2453_
+
+* Fix(android): draw edge-to-edge without setting bar colors. 
+  _Android 15 draws apps that target SDK 35 edge-to-edge and Play flags apps
+that do not handle it. MainActivity now calls enableEdgeToEdge(), so older
+Android versions get the same transparent bars, and the Flutter side sets
+only the bar icon brightness instead of the status and navigation bar
+colors, which went through the window APIs Android 15 deprecates.
+
+Refs #2471_
+
+* Fix(db): ask before using a database from a newer version. 
+  _After a downgrade, drift ran no migration and wrote the older schema
+version over the newer one, so the app failed on columns it did not know
+(#2464). The database is now refused on open and left untouched, and
+startup shows a prompt to download the latest version or delete the
+data.
+
+The 6 to 7 step also checks for the pinned column first, so a database
+an older release lowered to version 5 upgrades again without a
+duplicate column error.
+
+Closes #2464_
+
+* Style: format the logs, connection and phone import files at 120 columns. 
+
+* Ci: leave the Mac App Store build out of the release and the draft. 
+  _The App Store pkg and dmg are for TestFlight; a user cannot install them
+from a download. Remove them before the release and draft uploads, and
+from the release notes' download table. The build still uploads them as
+an artifact for the TestFlight job._
+
+* Build(linux): one all-in-one download per CPU. 
+  _Hiddify-Linux.tar.gz held both CPUs' packages, twice the size anyone
+needs. Make Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz
+instead, each with that CPU's deb, rpm and AppImage. install.sh knows
+which CPU its files are for and names the right download when run on
+the other one._
+
+* Fix(update): install the arm64 Linux build on arm64. 
+  _The in-app update downloaded the x64 AppImage or deb on any Linux. Pick
+the file for the CPU, and on arm64 open the release page when a release
+has no arm64 Linux files, rather than install the x64 one._
+
+* Build(linux): one download for both CPUs. 
+  _Hiddify-Linux.tar.gz holds the x64 and arm64 deb, rpm and AppImage and an
+install.sh that picks the build for the CPU and the package format the
+system uses: the deb on Debian and Ubuntu, the rpm on Fedora, RHEL and
+openSUSE, else the AppImage in ~/.local/bin. A new job packs it from the
+Linux builds before the release and the draft are uploaded._
+
+* Build(linux): arm64 deb, rpm and AppImage. 
+  _Build Linux on the native ubuntu-22.04-arm runner too, with the same glibc
+baseline as x64. Flutter has no Linux arm64 SDK archive, so that job uses
+the SDK checkout its install-deps step makes. Its files are named like the
+x64 ones with arm64 in place of x64, and the release notes list them.
+
+fastforge packs an x86_64 AppImage runtime even on arm64, which cannot
+run there, so the AppImage is unpacked with unsquashfs instead of running
+it, and repacked with the appimagetool for the build machine's CPU. The
+Docker image fetches that tool for its own CPU, with the AppImage magic
+zeroed so qemu-user can run it in an arm64 build on an x64 host, and
+activates fastforge again for the synced Dart SDK._
+
+* Build: retry the core download and fail on an HTTP error. 
+  _curl -L piped a GitHub error page into tar, which failed with a message
+that did not say the download had failed, and a dropped connection
+failed the whole build. Fail on an HTTP error and retry five times._
+
+* Perf(ui): cheaper connect button light and a reduce animations setting. 
+  _The light round the connect button blurred four full-resolution layers on
+every frame, most of a CPU core on a laptop drawing in software. Draw the
+glow at half the screen's resolution, blur it there and scale it up, with
+the download's rays and flares sharing one image: 31 ms a frame at full
+traffic becomes 17 ms, with no visible change. Once a look has settled
+the button draws at 20 fps instead of 30.
+
+Add Reduce animations to the general settings. It sets reduce motion for
+the whole app, on top of the system's own: the connect button stays still
+and the decorative loops (loading shimmers, the chain badge, the shield's
+orbit, the door) stop. Indicators of work in progress keep moving.
+
+Refs #2468_
+
+* Fix(ui): stop animations while the app is not visible. 
+  _The home animation kept a CPU core busy with the window minimized. Flutter
+stops frames once the app is hidden, but on Wayland a minimized window is
+only inactive, like a window without focus, so nothing stopped. Turn
+TickerMode off for the whole app while it is hidden or paused, and on
+desktop while it is inactive too; on a phone inactive is still on screen.
+The connection button's timer already follows TickerMode, so it drops its
+own lifecycle check.
+
+Fixes #2468_
+
+* Fix(tv): add profile sheet crashed on low screens. 
+  _On Android TV in landscape the add profile buttons and the phone import
+panel can be taller than the 85% the sheet with free configs may grow to,
+so its initial size went past its maximum and DraggableScrollableSheet
+failed the 'initialChildSize <= maxChildSize' assertion. Let the sheet
+grow as far as the buttons need, capped at full height, and keep the
+initial and minimum sizes inside that.
+
+Fixes #2472_
+
+* Fix(ui): keep menus clear of the system bars. 
+  _The profile menu in the bottom sheet put its last item, Delete, under the
+Android navigation bar. MenuAnchor places the menu against the whole screen
+and only avoids display features, so report the status and navigation bars
+(and the keyboard) as display features: the menu now opens above the anchor
+when it does not fit below.
+
+Fixes #2477_
+
+* Feat(linux): router service mode for the whole network. 
+  _On Linux, the new Router service mode sends hiddify-core's `router-mode`:
+the VPN, for every device this machine routes, with incoming connections
+and port forwards still working (hiddify-core docs/router-mode.md).
+
+A change between VPN and router mode reconnects instead of hot reloading,
+as the core readies IP forwarding only when it starts. Windows, macOS and
+the tray menu offer only the modes their platform has._
+
+* Refactor(ci): update workflow to allow manual dispatch and simplify artifact upload logic. 
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2465 from Dv2Corn/fix/profile-title-base64. 
+  _fix(profile): accept a base64 profile-title without padding_
+
+* Fix(profile): accept a base64 profile-title without padding. 
+
+* Update warp name to 🟠Warp & 🔴Psiphon. 
+
+* Feat(linux): AppImage VPN, RPM package and recovery from a crashed core. 
+  _- The AppImage connects VPN through a root copy of itself started with
+  pkexec (asked once per session) instead of refusing VPN mode; AppRun
+  undoes the routing that service left if it dies.
+- While a VPN runs in the service, the app checks the service every 2s
+  and reports a service that died or restarted instead of staying
+  Connected, and restores the system proxy.
+- Resuming the app no longer points the background client at the app's
+  own core during a VPN (the "hiddify service not found" errors).
+- RPM package: make_config.yaml, a linux-rpm-release target (leaving out
+  libsentry's Ubuntu-only libcurl symbol version), and rpm in the Linux
+  CI build.
+- File log lines carry the error of a log record._
+
+* Fix(vpn): a profile update keeps a VPN through the service connected. 
+  _On Windows and Linux (and macOS builds without a Developer ID) a VPN runs in the
+admin service, whose control port refuses the core's hot reload. A profile
+update or a changed option therefore disconnected the VPN and connected it again
+through the CLI.
+
+- A changed config is sent to the service as the start sends it, a snapshot
+  without file paths, and hot reloaded there: the TUN and the connections stay.
+- A change the hot reload cannot apply restarts the engine inside the service,
+  in one call; a VPN switched to a proxy mode still starts anew.
+- After either, the listeners follow the engine again, and the system proxy
+  hand-off follows the new config.
+- A Network Extension, which has no reload, restarts without trying the call it
+  refuses._
+
+* Fix(vpn): set the system proxy of the VPN service from the app's own core. 
+  _The VPN service runs as root and cannot set the user's system proxy on Windows
+and Linux (the user's D-Bus/Wayland session and registry are out of its reach).
+It now reports where its config wanted it, the system proxy mode or a profile's
+own proxy inbound beside the TUN, and the app's core, which runs as the user,
+points the system proxy there and restores it on disconnect.
+
+A proxy mode whose profile needs administrator rights now runs the service
+without its TUN instead of silently connecting the VPN._
+
+* Feat(desktop): run the core in a process of its own. 
+  _On desktop the core ran inside the UI process. macOS puts a background UI in
+App Nap, which also throttled the core and collapsed proxied throughput on
+long-RTT links (#2343). The app now starts the core as a separate process and
+talks to it over gRPC as before:
+
+- Windows: core\Hiddify.exe, macOS: Contents/Helpers/Hiddify Core.app, both
+  named Hiddify with their own icon; Linux: HiddifyCli, shown as hiddify-core.
+  Without the launcher (tests, an older core) the core still loads in-process.
+- The core stops cleanly, restoring the system proxy, when the app quits or
+  crashes; if the core crashes, the app starts it again.
+- macOS: the helper is built and signed by embed-core-helper.sh, inheriting the
+  sandbox only in the App Store build (the others are not sandboxed); it checks
+  in as a background app for its Activity Monitor icon and holds an activity
+  against App Nap.
+- Linux: the core starts in its own folder, which HiddifyCli from older cores
+  needs to find its library._
+
+* Fix(connection): a core that fails to start is a failed connect. 
+  _On Android and macOS the app follows the core's status while the
+platform's service is up, and left stopped to the platform. But the
+service stays up when the core fails, a config sing-box refuses for
+one, so the core's error was dropped and the app stayed connecting with
+nothing behind the VPN. A stop with an error is now the outcome of the
+connect: the error is shown, the service is taken down, and the plain
+stop it then reports does not replace the error._
+
+* Fix(grpc): use android.util.Base64 for decoding private key to support older Android versions. 
+
+* Feat(profiles): name an OpenVPN profile after it. 
+  _A .ovpn file is named OpenVPN, and an ovpn:// link by its name, else
+OpenVPN, instead of its first line or the scheme._
+
+* Feat(keep-top): a clearer dialog with the working ones, regions and a quick test. 
+  _The keep top dialog asks one question: how many of the fastest keep
+running, the working ones, or all of them, picked from the keep button's
+menu, with the regions to keep proxies of beside them, searchable by name.
+A quick test, on by default, picks before every proxy is tested. The
+dialog opens from the funnel in the proxy list's bar and from the end of
+the list, no longer by itself when a big profile connects. The end of the
+list says what stays after the test and what stayed.
+
+Choosing the proxies by hand runs them all while the picker is open, and
+its region filter groups the rare countries, names them and is
+searchable. The quick test and the regions reach the core: the settings
+model dropped what it had no field for._
+
+* Fix(profile): count a failing subscription's 3 days from its last success. 
+  _A subscription that broke before the app update, or while the app was
+closed, began its 3 days only at the first failure the app saw. It now
+counts from when its update fell due: the last success plus its update
+interval, so a long broken one stops updating after its first failed run._
+
+* Fix(proxy): the proxy details show an invalid config's whole reason, wrapped and copiable. 
+  _The core folds why a config could not be read into its type, which the
+header chip cut off past the dialog edge; the chip now wraps the whole
+text and can be selected, such a proxy reads as failed, and the failure
+box has a copy button._
+
+* Fix(windows): skip url protocol registration from temp folders and when unchanged. 
+  _A handler pointing into %TEMP% breaks once the folder is cleaned and is flagged
+by AV heuristics (Sigma: Suspicious Shell Open Command Registry Modification).
+Also skip the registry writes when the handler is already registered._
+
+
+
+## v5.5.5 (2026-11-04)
 
 #### Other
 

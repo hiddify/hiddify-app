@@ -18,12 +18,38 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'profile_notifier.g.dart';
+
+/// The failure dialog of an add or an update: a download that failed explains itself in its own
+/// dialog, with its problem as the title.
+void showProfileFailure(Ref ref, TranslationsEn t, Object error, {required String action}) {
+  final dialogs = ref.read(dialogNotifierProvider.notifier);
+  if (error is ProfileDownloadFailure) {
+    dialogs.showDownloadFailure(error, action: action);
+  } else {
+    dialogs.showCustomAlertFromErr(t.presentError(error, action: action));
+  }
+}
+
+/// A download attempt that failed while the next one runs, for the add profile sheet to show why
+/// it takes longer; null while no attempt failed.
+typedef ProfileDownloadRetry = ({ProfileDownloadFailure failure, int next, int of});
+
+@riverpod
+class AddProfileRetry extends _$AddProfileRetry {
+  @override
+  ProfileDownloadRetry? build() => null;
+
+  // ignore: use_setters_to_change_properties
+  void set(ProfileDownloadRetry? retry) => state = retry;
+}
 
 @riverpod
 class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
@@ -35,6 +61,8 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
       _cancelToken?.cancel();
     });
     listenSelf((previous, next) {
+      // a failed attempt is shown only while the add it belongs to runs
+      if (previous?.isLoading != next.isLoading) ref.read(addProfileRetryProvider.notifier).set(null);
       final t = ref.read(translationsProvider).requireValue;
       final notification = ref.read(inAppNotificationControllerProvider);
       switch (next) {
@@ -46,9 +74,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
           } else if (error case ProfileCancelByUserFailure()) {
             return;
           } else {
-            ref
-                .read(dialogNotifierProvider.notifier)
-                .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.add.failure));
+            showProfileFailure(ref, t, error, action: t.pages.profiles.msg.add.failure);
           }
       }
     });
@@ -61,6 +87,10 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
   ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
   CancelToken? _cancelToken;
 
+  /// Shows the failed attempt in the sheet until the next one ends.
+  void _onRetry(ProfileDownloadFailure failure, int next, int of) =>
+      ref.read(addProfileRetryProvider.notifier).set((failure: failure, next: next, of: of));
+
   Future<void> addClipboard(String rawInput) async {
     if (state.isLoading) return;
     state = const AsyncLoading();
@@ -69,15 +99,17 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
       // final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
       final TaskEither<ProfileFailure, Unit> task;
       if (LinkParser.parse(rawInput) case (final rs)?) {
-        loggy.debug("adding profile, url: [${rs.url}]");
+        loggy.debug("adding remote profile");
         task = _profilesRepo.upsertRemote(
           rs.url,
           userOverride: rs.name.isNotEmpty ? UserOverride(name: rs.name) : null,
           cancelToken: _cancelToken = CancelToken(),
+          activate: true,
+          onRetry: _onRetry,
         );
       } else {
         loggy.debug("adding profile, content");
-        task = _profilesRepo.addLocal(safeDecodeBase64(rawInput));
+        task = _profilesRepo.addLocal(safeDecodeBase64(rawInput)).map((_) => unit);
       }
       return await task
           .match(
@@ -122,7 +154,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride);
+      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride, activate: true, onRetry: _onRetry);
       return await task
           .match(
             (err) {
@@ -184,9 +216,7 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
     // summarized in one aggregate toast by ForegroundProfilesUpdateNotifier.
     if (state case AsyncError(:final error) when !isBulk) {
       final t = ref.read(translationsProvider).requireValue;
-      ref
-          .read(dialogNotifierProvider.notifier)
-          .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.update.failure));
+      showProfileFailure(ref, t, error, action: t.pages.profiles.msg.update.failure);
     }
 
     // Hold the success/failure result for 2s so the leading can flash an icon,
@@ -219,18 +249,41 @@ class AddProfilePageNotifier extends _$AddProfilePageNotifier {
 enum AddProfilePages { options, manual }
 
 @riverpod
-class FreeProfilesNotifier extends _$FreeProfilesNotifier {
+class FreeProfilesNotifier extends _$FreeProfilesNotifier with AppLogger {
+  static const _url = 'https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs';
+
   @override
   Future<List<FreeProfile>> build() async {
     final httpClient = ref.watch(httpClientProvider);
-    final res = await httpClient.get(
-      'https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs',
-    );
-    if (res.statusCode == 200) {
-      return FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>).profiles;
+    final core = ref.watch(hiddifyCoreServiceProvider);
+
+    // The core first, as for a subscription: it trusts the roots it ships, which an old Android
+    // (7.0 has no ISRG Root X1) lacks, and it does not take a filter's reset of Dart's handshake.
+    try {
+      final rs = await core.fetchUrl(_url, userAgent: httpClient.userAgent, timeout: const Duration(seconds: 30));
+      if (rs.error == FetchUrlError.FETCH_URL_ERROR_NONE && rs.statusCode == 200) {
+        return _parse(utf8.decode(rs.body));
+      }
+      loggy.warning(
+        'core download of the free profiles failed: ${rs.error == FetchUrlError.FETCH_URL_ERROR_NONE ? 'HTTP ${rs.statusCode}' : '${rs.error.name} ${rs.errorDetail}'}',
+      );
+    } catch (e, st) {
+      loggy.warning('core download of the free profiles failed', e, st);
+    }
+
+    try {
+      final res = await httpClient.get(_url);
+      if (res.statusCode == 200) return _parse(res.data.toString());
+      loggy.error('download of the free profiles failed: HTTP ${res.statusCode}');
+    } catch (e, st) {
+      loggy.error('download of the free profiles failed', e, st);
+      rethrow;
     }
     return <FreeProfile>[];
   }
+
+  List<FreeProfile> _parse(String body) =>
+      FreeProfilesModel.fromJson(jsonDecode(body) as Map<String, dynamic>).profiles;
 }
 
 @riverpod

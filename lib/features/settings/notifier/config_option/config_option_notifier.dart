@@ -32,8 +32,11 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
       if (next != previous && next != serviceSingboxOptions) {
         if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {
           _lastUpdate = DateTime.now();
-          if (serviceSingboxOptions?.enableTun != next.enableTun) {
-            loggy.debug("tun option changed, reconnecting");
+          // router mode readies the system (IP forwarding) only when the core starts, so a change
+          // between it and VPN mode, the same TUN, is a reconnect too, never a hot reload
+          if (serviceSingboxOptions?.enableTun != next.enableTun ||
+              serviceSingboxOptions?.routerMode != next.routerMode) {
+            loggy.debug("tun or router mode changed, reconnecting");
             final connection = ref.read(connectionNotifierProvider.notifier);
             await connection.toggleConnection();
             // The first toggle returns when the stop is sent; the status becomes Disconnected a

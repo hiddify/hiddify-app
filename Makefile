@@ -61,19 +61,28 @@ else
 	TARGET=lib/main.dart
 endif
 
-BUILD_ARGS=--dart-define sentry_dsn=$(SENTRY_DSN)
-DISTRIBUTOR_ARGS=--skip-clean --build-target $(TARGET) --build-dart-define sentry_dsn=$(SENTRY_DSN)
+# the app's commit, 7 characters as git abbreviates it, for the diagnostics report (app_diagnostics.dart)
+APP_COMMIT:=$(shell git rev-parse --short=7 HEAD 2>/dev/null)
+BUILD_ARGS=--dart-define sentry_dsn=$(SENTRY_DSN) --dart-define commit=$(APP_COMMIT)
+DISTRIBUTOR_ARGS=--skip-clean --build-target $(TARGET) --build-dart-define sentry_dsn=$(SENTRY_DSN) --build-dart-define commit=$(APP_COMMIT)
 
 
 
 get:	
 	flutter pub get
 
+# CI generates the code once (job `codegen` of .github/workflows/build.yml) and gives the result
+# to every build, which then runs with SKIP_CODEGEN=1.
+ifeq ($(SKIP_CODEGEN),1)
+gen translate:
+	@echo "$@ skipped: the generated code is already there (SKIP_CODEGEN=1)"
+else
 gen:
 	dart run build_runner build --delete-conflicting-outputs
 
 translate:
 	dart run slang
+endif
 
 
 
@@ -273,7 +282,7 @@ android-apk-release:
 	  --skip-clean \
 	  --build-target=$(TARGET) \
 	  --build-target-platform=android-arm,android-arm64,android-x64 \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 	ls -R build/app/outputs
 
 android-aab-release:
@@ -282,7 +291,7 @@ android-aab-release:
 	  --targets aab \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  --build-dart-define=release=google-play
 
 # fastforge runs `flutter build windows` itself before packing, which re-copies fresh
@@ -305,7 +314,7 @@ windows-zip-release:
 	  --targets zip \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  --build-dart-define=portable=true \
 	  $(WINDOWS_PACKAGE_HOOK)
 # 	repacking needs Windows' own tar.exe: GNU tar from Git Bash ignores -a for .zip and writes a plain tar
@@ -333,7 +342,7 @@ windows-exe-release:
 	  --targets exe \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  $(WINDOWS_PACKAGE_HOOK)
 
 windows-msix-release:
@@ -342,10 +351,10 @@ windows-msix-release:
 	  --targets msix \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  $(WINDOWS_PACKAGE_HOOK)
 
-linux-release: linux-deb-release linux-appimage-release
+linux-release: linux-deb-release linux-rpm-release linux-appimage-release
 
 linux-amd64-release: linux-release
 linux-arm64-release: linux-release
@@ -359,7 +368,22 @@ linux-deb-release:
 	--targets deb \
 	--skip-clean \
 	--build-target=$(TARGET) \
-	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
+
+# Fedora, RHEL, openSUSE. The bundle's libsentry links the build host's (Ubuntu's) libcurl, whose
+# symbols carry the CURL_OPENSSL_4 version that Fedora's libcurl lacks: rpmbuild would require it
+# and dnf refuse the package, though the library loads without it. So that requirement is left out
+# (rpmbuild reads ~/.rpmmacros). fastforge's spec needs rpm < 4.20 (ubuntu-22.04 has 4.17): newer
+# rpm runs %install from BUILD/<name>-build, where the spec's relative paths are not found.
+linux-rpm-release:
+	grep -qs 'CURL_OPENSSL_4' ~/.rpmmacros || \
+	  printf '%s\n' '%__requires_exclude ^libcurl\\.so\\.4\\(CURL_OPENSSL_4\\)' >> ~/.rpmmacros
+	fastforge package \
+	--platform linux \
+	--targets rpm \
+	--skip-clean \
+	--build-target=$(TARGET) \
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 
 
 # ==============================================================================
@@ -397,37 +421,10 @@ linux-appimage-release:
 	--targets appimage \
 	--skip-clean \
 	--build-target=$(TARGET) \
-	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
-	@$(YELLOW)Post-processing AppImage$(DONE); \
-	$(BLUE)Extracting AppImage$(DONE); \
-	cd dist/* && ./*.AppImage --appimage-extract > /dev/null; \
-	$(BLUE)Replacing AppRun$(DONE); \
-	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
-	$(BLUE)Granting permissions$(DONE); \
-	chmod -R a+rX squashfs-root && chmod a+rx squashfs-root/AppRun; \
-	$(BLUE)Adding StartupWMClass to hiddify.desktop$(DONE); \
-	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
-	$(BLUE)Removing old AppImage$(DONE); \
-	rm *.AppImage; \
-	$(BLUE)Deleting bundled libstdc++ to fix Arch Linux compatibility...$(DONE); \
-	find squashfs-root/usr/lib -name "libstdc++.so.6" -delete; \
-	$(BLUE)Rebuilding AppImage$(DONE); \
-	ARCH=x86_64 appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null || exit 1; \
-	$(BLUE)Cleaning up squashfs$(DONE); \
-	rm -rf squashfs-root; \
-	$(YELLOW)Creating Portable Package$(DONE); \
-	PKG_DIR_NAME="hiddify-linux-appimage"; \
-	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
-	mkdir -p "$$PKG_DIR_NAME"; \
-	$(BLUE)Moving Hiddify.AppImage$(DONE); \
-	cp -p "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
-	$(BLUE)Creating Portable Home directory$(DONE); \
-	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
-	$(BLUE)Compressing to .tar.gz$(DONE); \
-	tar -czf "$$PKG_DIR_NAME.tar.gz" -C . "$$PKG_DIR_NAME"; \
-	$(BLUE)Removing intermediate directory$(DONE); \
-	rm -rf "$$PKG_DIR_NAME"; \
-	$(GREEN)Successful$(DONE)
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
+	@$(YELLOW)Post-processing AppImage$(DONE)
+	bash linux/packaging/appimage/repackage.sh dist
+	@$(GREEN)Successful$(DONE)
 
 DOCKER_IMAGE_NAME := hiddify-linux-builder
 DOCKER_FLUTTER_VOL := hiddify-flutter-sdk-cache
@@ -446,6 +443,8 @@ DOCKER_CMD := \
 	tar -cf - --exclude='build' --exclude='.dart_tool' --exclude='dist' --exclude='dist_docker' --exclude='android' --exclude='windows' --exclude='ios' --exclude='macos' --exclude='.git' -C /host . | tar -xf - -C /app; \
 	cd /app; \
 	make linux-flutter-sync; \
+	echo '** Re-activating fastforge for the synced Dart SDK...'; \
+	dart pub global activate fastforge > /dev/null; \
 	make linux-prepare; \
 	echo '** Building Release (linux-release)...'; \
 	make linux-release; \
@@ -493,47 +492,53 @@ ios-simulator-validate:
 
 android-libs:
 	$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
-	curl -L $(CORE_URL)/$(CORE_NAME)-android.tar.gz | tar xz -C $(ANDROID_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-android.tar.gz | tar xz -C $(ANDROID_OUT)/
 
 android-apk-libs: android-libs
 android-aab-libs: android-libs
 
 windows-libs:
 	$(MKDIR) $(DESKTOP_OUT) || echo Folder already exists. Skipping...
-	curl -L $(CORE_URL)/$(CORE_NAME)-windows-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-windows-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
 	ls $(DESKTOP_OUT) || dir $(DESKTOP_OUT)/
 	
 
 linux-amd64-libs:
 	mkdir -p $(DESKTOP_OUT)
-	curl -L $(CORE_URL)/$(CORE_NAME)-linux-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-linux-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
 
 linux-arm64-libs:
 	mkdir -p $(DESKTOP_OUT)
-	curl -L $(CORE_URL)/$(CORE_NAME)-linux-arm64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-linux-arm64.tar.gz | tar xz -C $(DESKTOP_OUT)/
 
 linux-amd64-musl-libs:
 	mkdir -p $(DESKTOP_OUT)
-	curl -L $(CORE_URL)/$(CORE_NAME)-linux-amd64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-linux-amd64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
 
 linux-arm64-musl-libs:
 	mkdir -p $(DESKTOP_OUT)
-	curl -L $(CORE_URL)/$(CORE_NAME)-linux-arm64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-linux-arm64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
 
 
 macos-libs:
 	mkdir -p $(DESKTOP_OUT) macos/Frameworks
-	curl -L $(CORE_URL)/$(CORE_NAME)-macos.tar.gz | tar xz -C $(DESKTOP_OUT)
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-macos.tar.gz | tar xz -C $(DESKTOP_OUT)
 	# Tunnel bind ships in the same tarball (built by hiddify-core `make macos`).
 	test -d $(DESKTOP_OUT)/HiddifyTunnelCore.xcframework
 	rm -rf macos/Frameworks/HiddifyTunnelCore.xcframework
 	mv $(DESKTOP_OUT)/HiddifyTunnelCore.xcframework macos/Frameworks/
 	touch macos/Frameworks/HiddifyTunnelCore.xcframework/.downloaded
+	# The core helper (macos/scripts/embed-core-helper.sh) is built from the shared C launcher. CI
+	# does not check out the submodule, so take that file from the commit the app pins.
+	test -f hiddify-core/cmd/launcher/main.c || { \
+		mkdir -p hiddify-core/cmd/launcher && \
+		curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o hiddify-core/cmd/launcher/main.c \
+			https://raw.githubusercontent.com/hiddify/hiddify-core/$$(git rev-parse HEAD:hiddify-core)/cmd/launcher/main.c; }
 
 ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
 	rm -rf $(IOS_OUT)/HiddifyCore.xcframework
-	curl -L $(CORE_URL)/$(CORE_NAME)-ios.tar.gz | tar xz -C "$(IOS_OUT)"
+	curl -fL --retry 5 --retry-delay 5 --retry-all-errors $(CORE_URL)/$(CORE_NAME)-ios.tar.gz | tar xz -C "$(IOS_OUT)"
 
 get-geo-assets:
 	echo ""

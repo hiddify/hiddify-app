@@ -44,10 +44,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
       category: ref.read(Preferences.logFilterCategory),
     );
     return initial.copyWith(
-      logs: logRing.view(
-        minLevel: initial.minLevel,
-        category: initial.category,
-      ),
+      logs: logRing.view(minLevel: initial.minLevel, category: initial.category),
     );
   }
 
@@ -62,11 +59,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
 
   List<LogRecord> _view() {
     _drawn = logRing.revision;
-    return logRing.view(
-      minLevel: state.minLevel,
-      category: state.category,
-      text: state.text,
-    );
+    return logRing.view(minLevel: state.minLevel, category: state.category, text: state.text);
   }
 
   /// Called from TickerMode, so a shell route that keeps this page mounted off
@@ -108,9 +101,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
 
   /// Saved, so the page opens on this category next time.
   Future<void> filterCategory(LogCategory? category) async {
-    state = category == null
-        ? state.copyWith(clearCategory: true)
-        : state.copyWith(category: category);
+    state = category == null ? state.copyWith(clearCategory: true) : state.copyWith(category: category);
     state = state.copyWith(logs: _view());
     await ref.read(Preferences.logFilterCategory.notifier).update(category);
   }

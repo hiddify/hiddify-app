@@ -10,7 +10,7 @@ import 'package:hiddify/features/app_based_routing/model/per_app_proxy_mode.dart
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:installed_apps/index.dart';
+import 'package:installed_apps/installed_apps.dart';
 
 /// Picks the apps of a route rule. Apps that App-based routing keeps out of the VPN never reach the rules:
 /// they can still be picked, but carry a mark, and a picked one says the rule won't apply to it.
@@ -22,8 +22,10 @@ class PackageNamesPage extends HookConsumerWidget {
   Future<List<AppPackageInfo>> _getApps(bool hideSystem) async {
     if (!PlatformUtils.isAndroid) return [];
     return (await InstalledApps.getInstalledApps(
-      hideSystem,
-      true,
+      excludeSystemApps: hideSystem,
+      excludeNonLaunchableApps: false,
+      withIcon: true,
+      detectPlatformType: false,
     )).map((e) => AppPackageInfo(packageName: e.packageName, name: e.name, icon: e.icon)).toList();
   }
 

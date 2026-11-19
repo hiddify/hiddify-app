@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,14 +22,21 @@ part 'keep_top.g.dart';
 
 // Keep top: of a profile with many proxies, the core runs only the fastest few, picked by their
 // first pings, and stops the others (hiddify-core v2/hcore/keep_top.go). How many is the profile's
-// `keep-top`: the user's choice in its user override, else the subscription's `keep-top` header;
-// -1, or neither, runs them all. The user is asked once for a big profile that has neither.
+// `keep-top`: the user's choice in its user override, else the subscription's `keep-top` header,
+// else [keepTopDefault]; -1 runs them all. The user changes it from the end of the proxy list.
 
-/// A profile with more proxies than this is big: the user is asked whether to run only the fastest.
+/// A profile with more proxies than this is big: the keep top card shows even when all run.
 const bigProfileProxies = 20;
 
-/// How many proxies "keep the fastest" keeps.
-const keepTopDefault = 10;
+/// How many proxies keep top keeps when neither the user nor the subscription says.
+const keepTopDefault = ProfileParser.keepTopDefault;
+
+/// The countries offered first to keep proxies of.
+const preferredCountries = ['DE', 'GB', 'FR', 'US', 'CA', 'NL', 'TR'];
+
+/// The keep-top that keeps every proxy answering its first ping and pauses the others
+/// (hiddify-core config.KeepTopAnswering).
+const keepTopAnswering = -2;
 
 /// The proxies of a profile's config, as the core counts them for keep top (UserProxyTags).
 int countProxies(String config) => profileProxies(config).length;
@@ -75,31 +86,130 @@ Future<List<ProfileProxy>> readProfileProxies(File file) async {
   });
 }
 
+/// How many of [proxies] (groups left out) the test has answered so far: [working] got a ping,
+/// [failing] got none or the core gave up on them. The ones not tested yet are in neither.
+({int working, int failing}) testedCounts(Iterable<OutboundInfo> proxies) {
+  var working = 0;
+  var failing = 0;
+  for (final p in proxies) {
+    if (p.isGroup) continue;
+    if (ConnectionConst.isValidDelay(p.urlTestDelay)) {
+      working++;
+    } else if (p.status == Status.FAILED || p.urlTestDelay >= ConnectionConst.maxDelay) {
+      failing++;
+    }
+  }
+  return (working: working, failing: failing);
+}
+
+/// How many of [proxies] that keep top paused for being outside [regions] answered faster than
+/// the fastest one running: by their ping, else the one cached from the last run. 0 without
+/// [regions], or before any running one answered.
+int fasterOutsideRegions(Iterable<OutboundInfo> proxies, Iterable<String> regions) {
+  final wanted = {for (final code in regions) code.toUpperCase()};
+  if (wanted.isEmpty) return 0;
+  int? delayOf(OutboundInfo p) => ConnectionConst.isValidDelay(p.urlTestDelay)
+      ? p.urlTestDelay
+      : ConnectionConst.isValidDelay(p.sortDelay)
+      ? p.sortDelay
+      : null;
+  String? regionOf(OutboundInfo p) {
+    final looked = p.ipinfo.countryCode.toUpperCase();
+    return looked.length == 2 ? looked : countryOf(p.tag);
+  }
+
+  int? fastest;
+  for (final p in proxies) {
+    if (p.resting || p.isGroup) continue;
+    if (delayOf(p) case final delay? when fastest == null || delay < fastest) fastest = delay;
+  }
+  if (fastest == null) return 0;
+  return proxies.where((p) {
+    if (!p.resting) return false;
+    final region = regionOf(p);
+    final delay = delayOf(p);
+    return region != null && !wanted.contains(region) && delay != null && delay < fastest!;
+  }).length;
+}
+
 extension KeepTopProfile on ProfileEntity {
   /// How many of its proxies run, the fastest; -1 for all.
-  int get keepTop => userOverride?.keepTop ?? keepTopHeader ?? -1;
+  int get keepTop => userOverride?.keepTop ?? keepTopHeader ?? keepTopDefault;
 
   int? get keepTopHeader => ProfileParser.keepTopHeader(populatedHeaders?['keep-top']?.toString());
 
   /// The proxies the user chose to run, and only them; none when the user chose none.
   List<String> get keepTags => userOverride?.keepTags ?? const [];
 
-  /// The user chose, or the subscription did: no need to ask.
-  bool get keepTopDecided => userOverride?.keepTop != null || keepTopHeader != null || keepTags.isNotEmpty;
+  /// The proxies the user asked to keep loaded, whatever their ping, beside the fastest.
+  List<String> get keepTopPinned => userOverride?.keepTopPinned ?? const [];
+
+  /// Whether the proxy list offers keep top for its [total] proxies: a big profile, or one whose
+  /// keep top was chosen, by the user or the subscription, even "all", so it can be changed back.
+  bool offersKeepTop(int total) =>
+      total > bigProfileProxies || userOverride?.keepTop != null || keepTags.isNotEmpty || keepTopHeader != null;
+
+  /// Keep top leaves some of the profile's proxies at rest: a count, the answering ones, or the
+  /// ones of some countries.
+  bool get keepsTop =>
+      keepTags.isEmpty &&
+      (keepTop > 0 || keepTop == keepTopAnswering || (userOverride?.keepTopCountries?.isNotEmpty ?? false));
 }
 
 @Riverpod(keepAlive: true)
 class KeepTopNotifier extends _$KeepTopNotifier with AppLogger {
-  /// Profiles being asked about now.
-  final _asking = <String>{};
-
   @override
   void build() {}
 
   /// Saves [keepTop] as the user's choice for [profile] (-1 for all its proxies), in place of the
-  /// proxies the user chose before, and applies it at once when the profile is connected.
-  Future<void> set(ProfileEntity profile, int keepTop) =>
-      _save(profile, (profile.userOverride ?? const UserOverride()).copyWith(keepTop: keepTop, keepTags: null));
+  /// proxies the user chose before, with whether a [quick] test picks them (unchanged when null),
+  /// and applies it at once when the profile is connected.
+  Future<void> set(ProfileEntity profile, int keepTop, {bool? quick, List<String>? countries}) {
+    final override = profile.userOverride ?? const UserOverride();
+    return _save(
+      profile,
+      override.copyWith(
+        keepTop: keepTop,
+        keepTags: null,
+        keepTopQuick: quick ?? override.keepTopQuick,
+        keepTopCountries: countries ?? override.keepTopCountries,
+      ),
+    );
+  }
+
+  /// The countries of [profile]'s proxies, with how many each has: where a running proxy's IP
+  /// is, else the flag in its name. The most proxies first, then in [preferredCountries]' order.
+  Future<List<(String, int)>> countries(ProfileEntity profile) async {
+    final proxies = await readProfileProxies(ref.read(profilePathResolverProvider).file(profile.id));
+    final live = {
+      for (final e in ref.read(proxiesOverviewNotifierProvider).valueOrNull?.items ?? const <OutboundInfo>[]) e.tag: e,
+    };
+    final counts = <String, int>{};
+    for (final proxy in proxies) {
+      final looked = live[proxy.tag]?.ipinfo.countryCode.toUpperCase() ?? '';
+      final code = looked.length == 2 ? looked : countryOf(proxy.tag);
+      if (code != null) counts[code] = (counts[code] ?? 0) + 1;
+    }
+    int rank(String code) {
+      final i = preferredCountries.indexOf(code);
+      return i < 0 ? preferredCountries.length : i;
+    }
+
+    return [for (final e in counts.entries) (e.key, e.value)]..sort(
+      (a, b) => a.$2 != b.$2
+          ? b.$2.compareTo(a.$2)
+          : (rank(a.$1) != rank(b.$1) ? rank(a.$1).compareTo(rank(b.$1)) : a.$1.compareTo(b.$1)),
+    );
+  }
+
+  /// Keeps the proxy [tag] of [profile] loaded whatever its ping ([keep]), or leaves it to keep
+  /// top again, and applies it at once when the profile is connected: the core takes it without
+  /// a restart.
+  Future<void> setPinned(ProfileEntity profile, String tag, {required bool keep}) {
+    final pinned = {...profile.keepTopPinned};
+    if (!(keep ? pinned.add(tag) : pinned.remove(tag))) return Future.value();
+    return _save(profile, (profile.userOverride ?? const UserOverride()).copyWith(keepTopPinned: pinned.toList()));
+  }
 
   /// Saves [tags] as the proxies of [profile] that run, and only them, and applies them at once
   /// when the profile is connected.
@@ -121,13 +231,20 @@ class KeepTopNotifier extends _$KeepTopNotifier with AppLogger {
   /// answer; one already running stays chosen. Nothing changes when the dialog is dismissed.
   Future<void> choose(ProfileEntity profile, int count) async {
     final current = profile.keepTop;
-    final keep = await ref
+    final choice = await ref
         .read(dialogNotifierProvider.notifier)
-        .showKeepTop(count: count, keep: current > 0 && current < count ? current : keepTopDefault);
-    if (keep == KeepTopDialog.pickByHand) {
+        .showKeepTop(
+          count: count,
+          keep: current == keepTopAnswering || (current > 0 && current < count) ? current : keepTopDefault,
+          quick: profile.userOverride?.keepTopQuick ?? true,
+          countries: profile.userOverride?.keepTopCountries ?? const [],
+          available: await countries(profile),
+        );
+    if (choice == null) return;
+    if (choice.keep == KeepTopDialog.pickByHand) {
       await pick(profile);
-    } else if (keep != null) {
-      await set(profile, keep);
+    } else {
+      await set(profile, choice.keep, quick: choice.quick, countries: choice.countries);
     }
   }
 
@@ -148,29 +265,4 @@ class KeepTopNotifier extends _$KeepTopNotifier with AppLogger {
 
   /// Puts back the choice [profile] had, after [wakeAll].
   Future<void> restore(ProfileEntity profile) => _save(profile, profile.userOverride ?? const UserOverride());
-
-  /// Asks, once for each profile, whether a big [profile] runs only its fastest proxies.
-  Future<void> askIfBig(ProfileEntity? profile) async {
-    if (profile == null || profile.keepTopDecided || !_asking.add(profile.id)) return;
-    try {
-      // not through profileProxyCountProvider: read, nothing keeps it alive until it is counted
-      final count = await readProxyCount(ref.read(profilePathResolverProvider).file(profile.id));
-      loggy.debug('keep top: the active profile has $count proxies');
-      if (count <= bigProfileProxies) return;
-      // the sheet a profile was added from closes first, so its pop is not taken by this dialog
-      await Future<void>.delayed(const Duration(milliseconds: 600));
-      final keep = await ref.read(dialogNotifierProvider.notifier).showKeepTop(count: count, keep: keepTopDefault);
-      // the profile may have changed meanwhile; its latest user override is the one to change
-      final latest = await ref.read(profileRepositoryProvider).requireValue.getById(profile.id).run();
-      final current = latest.toNullable() ?? profile;
-      if (current.keepTopDecided) return;
-      if (keep == KeepTopDialog.pickByHand && await pick(current)) return;
-      // dismissed, it runs them all as before; the end of the proxy list still offers the choice
-      await set(current, keep == null || keep == KeepTopDialog.pickByHand ? -1 : keep);
-    } catch (error, stackTrace) {
-      loggy.warning('keep top: could not ask about the profile', error, stackTrace);
-    } finally {
-      _asking.remove(profile.id);
-    }
-  }
 }

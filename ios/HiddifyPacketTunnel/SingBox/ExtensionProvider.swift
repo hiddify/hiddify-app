@@ -83,6 +83,10 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         if let setupError {
             throw startupError("(packet-tunnel) error: setup service: \(setupError.localizedDescription)")
         }
+        // The core tells the tunnel when it stops by itself (a start, stop or reload that failed):
+        // only the app saw that before, and with the app closed (an on-demand start, the Settings
+        // switch) the tunnel stayed up, taking the device's traffic with no core behind it.
+        MobileSetCoreStoppedListener(CoreStoppedListener(self))
         // iOS ends a packet tunnel that outgrows its memory budget, so the limit is always on here,
         // whatever the app's setting; the core turns it on at every start as well (hcore start.go)
         LibboxSetMemoryLimit(true)
@@ -102,6 +106,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     private func createRequiredDirectories() throws {
+        FilePath.prepareWorkingDirectory()
         for directory in [FilePath.sharedDirectory, FilePath.workingDirectory, FilePath.cacheDirectory] {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
         }
@@ -134,6 +139,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     func stopService() {
+        MobileSetCoreStoppedListener(nil) // the tunnel's own close is not a stop to report
         MobileClose(2) // GRPC_BACKGROUND (mTLS)
         MobileClose(4) // GRPC_BACKGROUND_INSECURE
         platformInterface?.reset()
@@ -166,5 +172,19 @@ open class ExtensionProvider: NEPacketTunnelProvider {
 
     override open func wake() {
         MobileWake()
+    }
+}
+
+/// Ends the tunnel when its core stops by itself, with the core's reason (see startTunnel).
+private final class CoreStoppedListener: NSObject, MobileCoreStoppedListenerProtocol {
+    private weak var provider: ExtensionProvider?
+
+    init(_ provider: ExtensionProvider) {
+        self.provider = provider
+    }
+
+    func onCoreStopped(_ messageType: Int32, message: String?) {
+        let reason = message.flatMap { $0.isEmpty ? nil : $0 } ?? "the core stopped (\(messageType))"
+        provider?.writeFatalError("the core stopped by itself: \(reason)")
     }
 }

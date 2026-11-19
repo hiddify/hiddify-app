@@ -21,11 +21,7 @@
 /// but NOT `t.me/hiddify/123`, `t.me/hiddify?x=1`, or the look-alike `t.me/Hiddiify`.
 abstract class TrustedLinks {
   /// TODO(pm): test seed — Hiddify only. Complete later (e.g. MahsaNET, IRCF, …).
-  static const List<String> entries = [
-    'hiddify.com',
-    'github.com/hiddify',
-    't.me/hiddify',
-  ];
+  static const List<String> entries = ['hiddify.com', 'github.com/hiddify', 't.me/hiddify'];
 
   static final Set<String> _normalizedEntries = entries.map(_normalize).whereType<String>().toSet();
 

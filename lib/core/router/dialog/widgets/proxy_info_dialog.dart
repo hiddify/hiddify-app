@@ -1,19 +1,120 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/features/profile/data/profile_data_providers.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/data/single_proxy_config.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/insecure_proxy.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// With keep top on for the active profile: whether this proxy stays loaded whatever its ping,
+/// beside the fastest. The core takes the change at once, without a restart.
+class _KeepLoaded extends HookConsumerWidget {
+  const _KeepLoaded(this.proxy);
+
+  final OutboundInfo proxy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final profile = ref.watch(activeProfileProvider).valueOrNull;
+    final busy = useState(false);
+    if (profile == null || !profile.keepsTop) return const SizedBox.shrink();
+    final info = t.dialogs.proxyInfo;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: SwitchListTile.adaptive(
+        contentPadding: const EdgeInsetsDirectional.only(start: 4),
+        title: Text(info.keepLoaded),
+        subtitle: Text(info.keepLoadedBody),
+        value: profile.keepTopPinned.contains(proxy.tag),
+        onChanged: busy.value
+            ? null
+            : (keep) async {
+                busy.value = true;
+                try {
+                  await ref.read(keepTopNotifierProvider.notifier).setPinned(profile, proxy.tag, keep: keep);
+                } finally {
+                  if (context.mounted) busy.value = false;
+                }
+              },
+      ),
+    );
+  }
+}
+
+/// With the active chain hop running Psiphon, as extra security or unblocker: the country Psiphon
+/// exits from, changed in place. The change reconnects, as it does from the chain settings.
+class _PsiphonCountry extends ConsumerWidget {
+  const _PsiphonCountry(this.proxy);
+
+  final OutboundInfo proxy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final chain = ref.watch(ConfigOptions.chainStatus);
+    if (!chain.isUnblocker() && !chain.isExtraSecurity()) return const SizedBox.shrink();
+    final unblocker = chain.isUnblocker();
+    final mode = ref.watch(unblocker ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode);
+    if (mode != ChainMode.psiphon) return const SizedBox.shrink();
+    final isHop = ref.watch(
+      mainOutboundsNotifierProvider.select((list) {
+        final main = list.valueOrNull;
+        return main != null && main.hasChainHop() && main.chainHop.tag == proxy.tag;
+      }),
+    );
+    if (!isHop) return const SizedBox.shrink();
+    final pref = unblocker ? ConfigOptions.unblockerPsiphonRegion : ConfigOptions.extraSecurityPsiphonRegion;
+    final region = ref.watch(pref);
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: ListTile(
+        contentPadding: const EdgeInsetsDirectional.only(start: 4, end: 4),
+        leading: const Icon(Icons.place_rounded),
+        title: Text(t.dialogs.proxyInfo.changeCountry),
+        subtitle: Text(region.present(t)),
+        trailing: ChoicePreferenceWidget.flagByTitle(region.present(t), size: 36),
+        onTap: () async {
+          final selection = await ref
+              .read(dialogNotifierProvider.notifier)
+              .showSettingPicker<PsiphonRegion>(
+                title: t.pages.settings.chain.psiphon.selectServerRegion,
+                showFlag: true,
+                selected: region,
+                options: PsiphonRegion.values,
+                getTitle: (e) => e.present(t),
+                onReset: ref.read(pref.notifier).reset,
+              );
+          if (selection == null || selection == region) return;
+          await ref.read(pref.notifier).update(selection);
+        },
+      ),
+    );
+  }
+}
 
 /// A proxy at a glance: who it is and where it leads, then its ping, upload and download speed,
 /// each tested on a tap. The values follow the core while the dialog is open.
-class ProxyInfoDialog extends ConsumerWidget {
+class ProxyInfoDialog extends ConsumerWidget with PresLogger {
   const ProxyInfoDialog({super.key, required this.outboundInfo});
 
   final OutboundInfo outboundInfo;
@@ -44,10 +145,106 @@ class ProxyInfoDialog extends ConsumerWidget {
       title: _Header(proxy),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
-        child: SingleChildScrollView(child: OutboundInfoWidget(outboundInfo: proxy)),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              OutboundInfoWidget(outboundInfo: proxy),
+              _PsiphonCountry(proxy),
+              if (_canShare(proxy)) _KeepLoaded(proxy),
+            ],
+          ),
+        ),
       ),
-      actions: [TextButton(onPressed: context.pop, child: Text(t.common.close))],
+      actions: [
+        if (_canShare(proxy)) ...[
+          TextButton.icon(
+            onPressed: () => _edit(context, ref, proxy),
+            icon: const Icon(Icons.edit_rounded, size: 18),
+            label: Text(t.pages.proxies.single.edit),
+          ),
+          TextButton.icon(
+            onPressed: () => _share(ref, proxy),
+            icon: const Icon(Icons.ios_share_rounded, size: 18),
+            label: Text(t.pages.proxies.single.share),
+          ),
+        ],
+        TextButton(onPressed: context.pop, child: Text(t.common.close)),
+      ],
     );
+  }
+
+  /// A proxy of the profile, not a group or one of the app's own outbounds.
+  static bool _canShare(OutboundInfo proxy) =>
+      !proxy.isGroup && !isHiddenTag(proxy.tag) && !const {'direct', 'block', 'dns'}.contains(proxy.type.toLowerCase());
+
+  static String _name(OutboundInfo proxy) => baseTag(proxy.tagDisplay.isNotEmpty ? proxy.tagDisplay : proxy.tag);
+
+  /// The config of [proxy] alone, from the active profile, which the running proxies come from.
+  static Future<String> _loadConfig(WidgetRef ref, OutboundInfo proxy) async {
+    final profile = await ref.read(activeProfileProvider.future);
+    if (profile == null) throw StateError('no active profile');
+    final repo = ref.read(profileRepositoryProvider).requireValue;
+    final raw = (await repo.getRawConfig(profile.id).run()).toNullable();
+    final config =
+        singleProxyConfig(proxy.tag, host: proxy.host, port: proxy.port, raw: raw) ??
+        singleProxyConfig(
+          proxy.tag,
+          host: proxy.host,
+          port: proxy.port,
+          generated: (await repo.generateConfig(profile.id).run()).toNullable(),
+        );
+    if (config == null) throw StateError('proxy [${proxy.tag}] not found in the profile');
+    return config;
+  }
+
+  Future<void> _share(WidgetRef ref, OutboundInfo proxy) async {
+    final t = ref.read(translationsProvider).requireValue;
+    await ref
+        .read(dialogNotifierProvider.notifier)
+        .showShareProxy(
+          name: _name(proxy),
+          loadConfig: () => _loadConfig(ref, proxy),
+          title: t.pages.proxies.single.shareTitle,
+          configHint: t.pages.proxies.single.configHint,
+        );
+  }
+
+  /// Copies [proxy] to a new local profile and opens it in the profile editor: a proxy of a
+  /// subscription is replaced on its next update, so it is not edited in place.
+  Future<void> _edit(BuildContext context, WidgetRef ref, OutboundInfo proxy) async {
+    final t = ref.read(translationsProvider).requireValue;
+    final strings = t.pages.proxies.single;
+    final notifications = ref.read(inAppNotificationControllerProvider);
+    final router = GoRouter.of(context);
+    final name = _name(proxy);
+    final confirmed = await ref
+        .read(dialogNotifierProvider.notifier)
+        .showConfirmation(
+          title: strings.editTitle,
+          message: strings.editMsg(name: name),
+          icon: Icons.edit_rounded,
+          positiveBtnTxt: strings.editConfirm,
+        );
+    if (!confirmed) return;
+    final String id;
+    try {
+      final config = await _loadConfig(ref, proxy);
+      id = await ref
+          .read(profileRepositoryProvider)
+          .requireValue
+          .addLocal(config, userOverride: UserOverride(name: name))
+          .getOrElse((failure) => throw failure)
+          .run();
+    } catch (e, stackTrace) {
+      loggy.warning('copying proxy [${proxy.tag}] to a profile failed', e, stackTrace);
+      notifications.showErrorToast(strings.failed);
+      return;
+    }
+    if (context.mounted) context.pop();
+    notifications.showSuccessToast(strings.savedAsProfile(name: name));
+    router.goNamed('profileDetails', pathParameters: {'id': id});
   }
 }
 
@@ -68,7 +265,8 @@ class _Header extends ConsumerWidget {
       Status.REGISTERING => (t.pages.proxies.status.registering, s.primary),
       Status.SEARCHING => (t.pages.proxies.status.searching, s.primary),
       Status.RECONNECTING => (t.pages.proxies.status.reconnecting, dark ? Colors.orange : Colors.deepOrange),
-      Status.FAILED => (t.pages.proxies.status.failed, s.error),
+      // an invalid config never carries traffic, though a core may still call it ready
+      _ when proxy.status == Status.FAILED || proxy.isInvalid => (t.pages.proxies.status.failed, s.error),
       _ => (t.pages.proxies.status.ready, dark ? Colors.lightGreen : Colors.green.shade700),
     };
     return Row(
@@ -121,7 +319,13 @@ class _Chip extends StatelessWidget {
             ),
             const Gap(5),
           ],
-          Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, letterSpacing: .3)),
+          // a long type, such as why a config could not be read, wraps whole and can be copied
+          Flexible(
+            child: SelectableText(
+              text,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, letterSpacing: .3),
+            ),
+          ),
         ],
       ),
     );
@@ -154,6 +358,7 @@ class OutboundInfoWidget extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (proxy.error.isNotEmpty) ...[_FailureReason(title: info.error, reason: proxy.error), const Gap(12)],
+        if (proxy.isNotSecure) ...[InsecureProxyNote(proxy), const Gap(12)],
         if (rows.isNotEmpty) ...[
           DecoratedBox(
             decoration: BoxDecoration(
@@ -187,20 +392,21 @@ class OutboundInfoWidget extends ConsumerWidget {
 }
 
 /// The error of the proxy's last URL test, or why it is not ready, as the core reports it.
-class _FailureReason extends StatelessWidget {
+class _FailureReason extends ConsumerWidget {
   const _FailureReason({required this.title, required this.reason});
 
   final String title;
   final String reason;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(color: s.errorContainer.withValues(alpha: .6), borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 4, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -208,15 +414,32 @@ class _FailureReason extends StatelessWidget {
               children: [
                 Icon(FluentIcons.error_circle_24_regular, size: 18, color: s.onErrorContainer),
                 const Gap(8),
-                Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onErrorContainer)),
+                Expanded(
+                  child: Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onErrorContainer)),
+                ),
+                IconButton(
+                  tooltip: t.common.addToClipboard,
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 18,
+                  color: s.onErrorContainer,
+                  icon: const Icon(FluentIcons.copy_24_regular),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: reason));
+                    ref
+                        .read(inAppNotificationControllerProvider)
+                        .showSuccessToast(t.common.msg.export.clipboard.success);
+                  },
+                ),
               ],
             ),
-            const Gap(6),
             // the core's own words, left to right: they are English and full of addresses
-            SelectableText(
-              reason,
-              textDirection: TextDirection.ltr,
-              style: theme.textTheme.bodySmall?.copyWith(color: s.onErrorContainer, fontFamily: 'monospace'),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: SelectableText(
+                reason,
+                textDirection: TextDirection.ltr,
+                style: theme.textTheme.bodySmall?.copyWith(color: s.onErrorContainer, fontFamily: 'monospace'),
+              ),
             ),
           ],
         ),

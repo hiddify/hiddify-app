@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart' show Bidi;
 
 class CustomAlertDialog extends HookConsumerWidget {
   const CustomAlertDialog({super.key, this.title, required this.message});
@@ -20,7 +21,15 @@ class CustomAlertDialog extends HookConsumerWidget {
     return AlertDialog(
       title: title != null ? Text(title!) : null,
       content: SingleChildScrollView(
-        child: SizedBox(width: 468, child: SelectableText(message, textDirection: TextDirection.ltr)),
+        child: SizedBox(
+          width: 468,
+          // left to right for technical text; a message that starts in Persian or Arabic is a hint to
+          // read, right to left
+          child: SelectableText(
+            message,
+            textDirection: Bidi.startsWithRtl(message) ? TextDirection.rtl : TextDirection.ltr,
+          ),
+        ),
       ),
       actions: [
         // the title and the message together, so a report carries both

@@ -16,7 +16,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
   final ChainMode mode;
 
   KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
-    if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
+    if (KeyboardConst.activate.contains(event.logicalKey) && event is KeyDownEvent) {
       final url = mode.isWarp() ? WarpConst.url[key] : PsiphonConst.url[key];
       if (url != null) {
         UriUtils.tryLaunch(Uri.parse(url));

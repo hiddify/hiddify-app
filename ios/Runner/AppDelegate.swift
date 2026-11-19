@@ -16,7 +16,7 @@ import Sentry
     }
     
     func setupFileManager() {
-        try? FileManager.default.createDirectory(at: FilePath.workingDirectory, withIntermediateDirectories: true)
+        FilePath.prepareWorkingDirectory()
         FileManager.default.changeCurrentDirectoryPath(FilePath.sharedDirectory.path)
     }
     

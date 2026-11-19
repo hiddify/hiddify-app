@@ -1,7 +1,7 @@
 name: hiddify
 description: Cross Platform Multi Protocol Proxy Frontend.
 publish_to: "none"
-version: 5.5.5+50505
+version: 5.9.15+50915
 
 environment:
   sdk: ^3.10.4
@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.5.2
   # shared_preferences_android: ^2.4.8
   dio: ^5.4.1
+  crypto: ^3.0.6
   ffi: ^2.1.2
   path_provider: ^2.1.1
   mobile_scanner: ^7.2.0
@@ -47,7 +48,7 @@ dependencies:
   flutter_native_splash: ^2.3.10
   share_plus: ^10.1.0
   window_manager: ^0.5.0
-  tray_manager: ^0.5.0
+  tray_manager: ^0.5.3
   # get list of connected monitors (on Desktops), including their size and position
   screen_retriever: ^0.2.0
 
@@ -58,6 +59,7 @@ dependencies:
   launch_at_startup: ^0.5.1
   sentry_flutter: ^8.14.0
   sentry_dart_plugin: ^2.4.1
+  sqlite3: ^2.7.5
   sqlite3_flutter_libs: ^0.5.28
 
   path: ^1.9.0
@@ -111,8 +113,7 @@ dependencies:
   file_picker: ^8.1.7
   # Used for reading the .zip files picked in the profile file import
   archive: ^4.0.4
-  installed_apps: # ^1.5.2
-    git: https://github.com/VB10/installed_apps
+  installed_apps: ^2.2.1
 
   # change case of text
   # for example camelCase to snake_case
@@ -125,6 +126,7 @@ dependencies:
   # Used for registering custom schemes in the Windows registry
   win32: ^5.12.0
   humanizer: ^3.0.1
+  battery_plus: ^7.1.2
 
 dev_dependencies:
   flutter_test:
@@ -195,12 +197,16 @@ flutter_gen:
   integrations:
     flutter_svg: true
 
+# Android: LaunchTheme and NormalTheme show res/drawable/splash_window.xml (the logo on
+# @color/splash_background) until Flutter's first frame; keep it there when regenerating.
 flutter_native_splash:
-  color: "#ffffff"
+  color: "#FBF8FF"
+  color_dark: "#121318"
   image: assets/images/source/ic_launcher_splash.png
   android_gravity: center
   android_12:
-    color: "#ffffff"
+    color: "#FBF8FF"
+    color_dark: "#121318"
     image: assets/images/source/ic_launcher_foreground.png
 
 ffigen:

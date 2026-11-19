@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
@@ -11,6 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// A new release: "update now" downloads it and starts its installer where this install can
 /// (AppUpdater), and opens the release page where it can not, or when the update failed.
+/// A GitHub release shows the "Change Logs" section of its notes under the versions.
 class NewVersionDialog extends HookConsumerWidget with PresLogger {
   NewVersionDialog(this.currentVersion, this.newVersion, {super.key, this.canIgnore = true});
 
@@ -37,50 +40,76 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
       canPop: !busy,
       child: AlertDialog(
         title: Text(text.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(text.msg),
-            const Gap(8),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: "${text.currentVersion} ", style: theme.textTheme.bodySmall),
-                  TextSpan(text: currentVersion, style: theme.textTheme.labelMedium),
-                ],
+        content: ConstrainedBox(
+          constraints: AlertDialogConst.boxConstraints,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(text.msg),
+              const Gap(8),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: "${text.currentVersion} ", style: theme.textTheme.bodySmall),
+                    TextSpan(text: currentVersion, style: theme.textTheme.labelMedium),
+                  ],
+                ),
               ),
-            ),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: "${text.newVersion} ", style: theme.textTheme.bodySmall),
-                  TextSpan(text: newVersion.presentVersion, style: theme.textTheme.labelMedium),
-                ],
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: "${text.newVersion} ", style: theme.textTheme.bodySmall),
+                    TextSpan(text: newVersion.presentVersion, style: theme.textTheme.labelMedium),
+                  ],
+                ),
               ),
-            ),
-            ...switch (updater) {
-              AppUpdaterDownloading(:final progress) => [
-                const Gap(16),
-                LinearProgressIndicator(value: progress),
-                const Gap(6),
-                Text(
-                  progress == null ? text.downloading : '${text.downloading} ${(progress * 100).round()}%',
-                  style: theme.textTheme.bodySmall,
+              if (newVersion.changelog case final changelog?) ...[
+                const Gap(12),
+                Text(text.changelog, style: theme.textTheme.titleSmall),
+                const Gap(4),
+                Flexible(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 280),
+                    child: SingleChildScrollView(
+                      child: MarkdownBody(
+                        data: changelog,
+                        // the notes come from GitHub: no remote images load before the user asks
+                        imageBuilder: (_, _, _) => const SizedBox.shrink(),
+                        onTapLink: (_, href, _) {
+                          if (href != null) UriUtils.tryLaunch(Uri.parse(href));
+                        },
+                      ),
+                    ),
+                  ),
                 ),
               ],
-              AppUpdaterInstalling() => [const Gap(16), Text(text.installing, style: theme.textTheme.bodySmall)],
-              AppUpdaterNeedsPermission() => [const Gap(16), Text(text.allowInstall, style: theme.textTheme.bodySmall)],
-              AppUpdaterFailed(:final error) => [
-                const Gap(16),
-                Text(
-                  '${text.failed}\n${t.presentShortError(error)}',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-                ),
-              ],
-              AppUpdaterIdle() => const <Widget>[],
-            },
-          ],
+              ...switch (updater) {
+                AppUpdaterDownloading(:final progress) => [
+                  const Gap(16),
+                  LinearProgressIndicator(value: progress),
+                  const Gap(6),
+                  Text(
+                    progress == null ? text.downloading : '${text.downloading} ${(progress * 100).round()}%',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+                AppUpdaterInstalling() => [const Gap(16), Text(text.installing, style: theme.textTheme.bodySmall)],
+                AppUpdaterNeedsPermission() => [
+                  const Gap(16),
+                  Text(text.allowInstall, style: theme.textTheme.bodySmall),
+                ],
+                AppUpdaterFailed(:final error) => [
+                  const Gap(16),
+                  Text(
+                    '${text.failed}\n${t.presentShortError(error)}',
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+                  ),
+                ],
+                AppUpdaterIdle() => const <Widget>[],
+              },
+            ],
+          ),
         ),
         actions: switch (updater) {
           AppUpdaterDownloading() => [

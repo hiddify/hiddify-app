@@ -766,7 +766,7 @@
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				EXCLUDED_ARCHS = armv7;
@@ -786,11 +786,13 @@
 					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 					"-framework",
 					UIKit,
 				);
@@ -822,7 +824,7 @@
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				EXCLUDED_ARCHS = armv7;
@@ -842,11 +844,13 @@
 					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 					"-framework",
 					UIKit,
 				);
@@ -877,7 +881,7 @@
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				EXCLUDED_ARCHS = armv7;
@@ -897,11 +901,13 @@
 					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 					"-framework",
 					UIKit,
 				);
@@ -1013,6 +1019,8 @@
 					"$(inherited)",
 					"-ld_classic",
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1032,7 +1040,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1044,10 +1052,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1064,10 +1074,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1081,10 +1091,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50505;
+				CURRENT_PROJECT_VERSION = 50915;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 5.5.5;
+				MARKETING_VERSION = 5.9.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1250,6 +1260,8 @@
 					"$(inherited)",
 					"-ld_classic",
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1300,6 +1312,8 @@
 					"$(inherited)",
 					"-ld_classic",
 					"-lresolv",
+					"-framework",
+					CoreTelephony,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

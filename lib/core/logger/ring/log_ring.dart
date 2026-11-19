@@ -21,8 +21,7 @@ enum LogCategory {
     // packages that never heard of our naming — neat_periodic_task and the
     // like. They are still the app talking, so they belong somewhere rather
     // than nowhere.
-    LogCategory.app =>
-      !loggerName.startsWith('boot.') && !loggerName.startsWith('core.'),
+    LogCategory.app => !loggerName.startsWith('boot.') && !loggerName.startsWith('core.'),
   };
 }
 
@@ -78,11 +77,7 @@ class LogRing {
   /// and in a file.
   ///
   /// Every filter only hides rows; nothing is removed from the ring.
-  List<LogRecord> view({
-    Level? minLevel,
-    LogCategory? category,
-    String? text,
-  }) {
+  List<LogRecord> view({Level? minLevel, LogCategory? category, String? text}) {
     final out = <LogRecord>[];
     for (final r in _records) {
       if (minLevel != null && r.level < minLevel) continue;

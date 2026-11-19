@@ -6,7 +6,8 @@ import 'dart:typed_data';
 
 import 'package:hiddify/features/profile/add/phone_import/phone_import_page.dart';
 
-export 'package:hiddify/features/profile/add/phone_import/phone_import_page.dart' show PhoneImportPageText, PhoneImportStep;
+export 'package:hiddify/features/profile/add/phone_import/phone_import_page.dart'
+    show PhoneImportPageText, PhoneImportStep;
 
 /// What a phone sent: a subscription link or a config, waiting for the TV user to import it.
 class PhoneEntry {
@@ -175,7 +176,10 @@ class PhoneImportServer {
   static void _secure(HttpResponse response) {
     response.headers
       ..set(HttpHeaders.cacheControlHeader, 'no-store')
-      ..set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'")
+      ..set(
+        'Content-Security-Policy',
+        "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'",
+      )
       ..set('X-Content-Type-Options', 'nosniff')
       ..set('X-Frame-Options', 'DENY')
       ..set('Referrer-Policy', 'no-referrer');

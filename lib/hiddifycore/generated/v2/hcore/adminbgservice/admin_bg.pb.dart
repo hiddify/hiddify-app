@@ -28,6 +28,7 @@ class AdminBgStartRequest extends $pb.GeneratedMessage {
     $core.Map<$core.String, $core.List<$core.int>>? resources,
     $core.bool? disableMemoryLimit,
     $core.int? ownerPid,
+    $core.bool? proxyOnly,
   }) {
     final $result = create();
     if (ipv6 != null) {
@@ -69,6 +70,9 @@ class AdminBgStartRequest extends $pb.GeneratedMessage {
     if (ownerPid != null) {
       $result.ownerPid = ownerPid;
     }
+    if (proxyOnly != null) {
+      $result.proxyOnly = proxyOnly;
+    }
     return $result;
   }
   AdminBgStartRequest._() : super();
@@ -89,6 +93,7 @@ class AdminBgStartRequest extends $pb.GeneratedMessage {
     ..m<$core.String, $core.List<$core.int>>(11, _omitFieldNames ? '' : 'resources', entryClassName: 'AdminBgStartRequest.ResourcesEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OY, packageName: const $pb.PackageName('adminbgservice'))
     ..aOB(12, _omitFieldNames ? '' : 'disableMemoryLimit')
     ..a<$core.int>(13, _omitFieldNames ? '' : 'ownerPid', $pb.PbFieldType.O3)
+    ..aOB(14, _omitFieldNames ? '' : 'proxyOnly')
     ..hasRequiredFields = false
   ;
 
@@ -225,15 +230,33 @@ class AdminBgStartRequest extends $pb.GeneratedMessage {
   $core.bool hasOwnerPid() => $_has(12);
   @$pb.TagNumber(13)
   void clearOwnerPid() => clearField(13);
+
+  /// Runs the engine without its TUN (a proxy mode that needs administrator rights).
+  @$pb.TagNumber(14)
+  $core.bool get proxyOnly => $_getBF(13);
+  @$pb.TagNumber(14)
+  set proxyOnly($core.bool v) { $_setBool(13, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasProxyOnly() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearProxyOnly() => clearField(14);
 }
 
 class AdminBgResponse extends $pb.GeneratedMessage {
   factory AdminBgResponse({
     $core.String? message,
+    $core.String? systemProxy,
+    $core.bool? systemProxySocks,
   }) {
     final $result = create();
     if (message != null) {
       $result.message = message;
+    }
+    if (systemProxy != null) {
+      $result.systemProxy = systemProxy;
+    }
+    if (systemProxySocks != null) {
+      $result.systemProxySocks = systemProxySocks;
     }
     return $result;
   }
@@ -243,6 +266,8 @@ class AdminBgResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AdminBgResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'adminbgservice'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'message')
+    ..aOS(2, _omitFieldNames ? '' : 'systemProxy')
+    ..aOB(3, _omitFieldNames ? '' : 'systemProxySocks')
     ..hasRequiredFields = false
   ;
 
@@ -275,6 +300,26 @@ class AdminBgResponse extends $pb.GeneratedMessage {
   $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
   void clearMessage() => clearField(1);
+
+  /// Where the running engine's system proxy points (host:port), empty when it has none. The
+  /// service runs as root and cannot set the user's system proxy: the app's own core sets it.
+  @$pb.TagNumber(2)
+  $core.String get systemProxy => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set systemProxy($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSystemProxy() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSystemProxy() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get systemProxySocks => $_getBF(2);
+  @$pb.TagNumber(3)
+  set systemProxySocks($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSystemProxySocks() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSystemProxySocks() => clearField(3);
 }
 
 

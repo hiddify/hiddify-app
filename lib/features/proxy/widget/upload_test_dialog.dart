@@ -15,13 +15,15 @@ enum SpeedTestTarget { shown, chosen }
 /// how many of the fastest proxies; with the data that takes at a glance. Saves the choices and
 /// pops the proxies it runs on (always [SpeedTestTarget.shown] without [chosen]); the button starts
 /// the test when [start], else saves. [count] is how many proxies the list shows, when known;
-/// [chosen], how many the user chose, offers to test those instead.
+/// [chosen], how many the user chose, offers to test those instead. Not [limited], it tests every
+/// one of them, and the limit, which it does not offer, stays as it is saved.
 class SpeedTestDialog extends HookConsumerWidget {
-  const SpeedTestDialog({super.key, this.count, this.chosen, this.start = true});
+  const SpeedTestDialog({super.key, this.count, this.chosen, this.start = true, this.limited = true});
 
   final int? count;
   final int? chosen;
   final bool start;
+  final bool limited;
 
   static const _limits = [5, 10, 20, 50];
 
@@ -42,7 +44,7 @@ class SpeedTestDialog extends HookConsumerWidget {
     // 0: all of them
     final limit = useState(ref.read(ConfigOptions.uploadTestLimit));
     // a limit at or above what there is to test is all of it
-    final effective = limit.value <= 0 || (count != null && limit.value >= count) ? 0 : limit.value;
+    final effective = !limited || limit.value <= 0 || (count != null && limit.value >= count) ? 0 : limit.value;
 
     final sizes = {...uploadTestSizes, size.value}.toList()..sort();
     final limits = {..._limits, if (limit.value > 0) limit.value}.where((n) => count == null || n < count).toList()
@@ -57,7 +59,7 @@ class SpeedTestDialog extends HookConsumerWidget {
     Future<void> confirm() async {
       await ref.read(ConfigOptions.speedTestDirection.notifier).update(direction.value);
       await ref.read(ConfigOptions.uploadTestSize.notifier).update(size.value);
-      await ref.read(ConfigOptions.uploadTestLimit.notifier).update(limit.value);
+      if (limited) await ref.read(ConfigOptions.uploadTestLimit.notifier).update(limit.value);
       if (context.mounted) Navigator.of(context).pop(target.value);
     }
 
@@ -137,7 +139,7 @@ class SpeedTestDialog extends HookConsumerWidget {
                   onSelectionChanged: (value) => size.value = value.first,
                 ),
               ),
-              if (count == null || count > 1) ...[
+              if (limited && (count == null || count > 1)) ...[
                 const Gap(10),
                 _Section(
                   label: text.proxies,

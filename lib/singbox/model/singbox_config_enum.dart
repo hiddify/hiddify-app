@@ -5,13 +5,16 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/environment.dart';
-import 'package:hiddify/utils/platform_utils.dart';
 
 @JsonEnum(valueField: 'key')
 enum ServiceMode {
   proxy("proxy"),
   systemProxy("system-proxy"),
-  tun("vpn")
+  tun("vpn"),
+
+  /// Linux only: the TUN for the whole network this device routes (a router or gateway), see
+  /// hiddify-core docs/router-mode.md.
+  router("router")
   // tunService("vpn-service")
   ;
 
@@ -23,12 +26,16 @@ enum ServiceMode {
   /// system proxy.
   static bool get _macAppStore => Platform.isMacOS && Release.read() == Release.appStore;
 
-  static ServiceMode get defaultMode => PlatformUtils.isDesktop && !_macAppStore ? systemProxy : tun;
+  /// VPN everywhere: on desktop it asks for administrator permission once when connecting, and
+  /// the user can switch to the system proxy from that prompt instead.
+  static ServiceMode get defaultMode => tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
-    if (Platform.isWindows || Platform.isLinux) {
+    if (Platform.isLinux) {
       return values;
+    } else if (Platform.isWindows) {
+      return [proxy, systemProxy, tun];
     } else if (_macAppStore) {
       return [proxy, tun];
     } else if (Platform.isMacOS) {
@@ -48,6 +55,7 @@ enum ServiceMode {
     proxy => t.pages.settings.inbound.serviceModes.proxy,
     systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
     tun => t.pages.settings.inbound.serviceModes.tun,
+    router => t.pages.settings.inbound.serviceModes.router,
     // tunService => t.pages.settings.inbound.serviceModes.tunService,
   };
 
@@ -55,6 +63,7 @@ enum ServiceMode {
     proxy => t.pages.settings.inbound.shortServiceModes.proxy,
     systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
     tun => t.pages.settings.inbound.shortServiceModes.tun,
+    router => t.pages.settings.inbound.shortServiceModes.router,
     // tunService => t.pages.settings.inbound.shortServiceModes.tunService,
   };
 }

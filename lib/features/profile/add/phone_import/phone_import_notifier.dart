@@ -12,7 +12,14 @@ part 'phone_import_notifier.g.dart';
 
 /// Whether this is an Android TV: the only place a phone can send a link to the app.
 @Riverpod(keepAlive: true)
-Future<bool> isAndroidTv(Ref ref) async {
+Future<bool> isAndroidTv(Ref ref) => isAndroidTelevision();
+
+/// [isAndroidTv] for code without a ref; the platform is asked once.
+Future<bool> isAndroidTelevision() => _isTelevision ??= _askIsTelevision();
+
+Future<bool>? _isTelevision;
+
+Future<bool> _askIsTelevision() async {
   if (!Platform.isAndroid) return false;
   try {
     return await const MethodChannel('com.hiddify.app/platform').invokeMethod<bool>('is_television') ?? false;

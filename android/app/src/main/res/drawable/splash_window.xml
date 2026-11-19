@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Hiddify logo on the app's background. LaunchTheme and NormalTheme both use it, so the logo
+     stays from the tap until Flutter's first frame covers it: a slow device or an Android TV
+     showed a black window while the engine loaded and the app started. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item>
+        <bitmap android:gravity="center" android:src="@drawable/splash" />
+    </item>
+</layer-list>

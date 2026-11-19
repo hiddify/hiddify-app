@@ -1,27 +1,52 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Map<String, dynamic> _override({Map<String, dynamic>? headers, UserOverride? userOverride}) =>
     jsonDecode(ProfileParser.profileOverride(populatedHeaders: headers, userOverride: userOverride))
         as Map<String, dynamic>;
 
-ProfileEntity _profile({String? header, int? keepTop}) => ProfileEntity.local(
+ProfileEntity _profile({String? header, int? keepTop, UserOverride? userOverride}) => ProfileEntity.local(
   id: 'id',
   active: true,
   name: 'name',
   lastUpdate: DateTime(2026),
   populatedHeaders: header == null ? null : {'keep-top': header},
-  userOverride: UserOverride(keepTop: keepTop),
+  userOverride: userOverride ?? UserOverride(keepTop: keepTop),
 );
+
+class _Profile extends ActiveProfile {
+  _Profile(this.profile);
+  final ProfileEntity profile;
+
+  @override
+  Stream<ProfileEntity?> build() => Stream.value(profile);
+}
+
+/// Keeps the tags it is asked to test, and tests none.
+class _Proxies extends ProxiesOverviewNotifier {
+  final tested = <List<String>>[];
+
+  @override
+  Stream<OutboundGroup?> build() => Stream.value(OutboundGroup(tag: 'select'));
+
+  @override
+  Future<void> urlTestProxies(List<String> tags) async => tested.add(tags);
+}
 
 void main() {
   test('counts the proxies the core keeps top of', () {
@@ -54,23 +79,69 @@ void main() {
     }
   });
 
-  test('the core gets the user choice, else the header, else nothing', () {
+  test('the core gets the user choice, else the header, else the default', () {
     expect(_override(headers: {'keep-top': '10'})['keep-top'], 10);
     expect(_override(headers: {'keep-top': '-1'})['keep-top'], -1);
-    expect(_override(headers: {'keep-top': 'x'}).containsKey('keep-top'), isFalse);
-    expect(_override().containsKey('keep-top'), isFalse);
+    expect(_override(headers: {'keep-top': 'x'})['keep-top'], keepTopDefault);
+    expect(_override()['keep-top'], keepTopDefault);
     expect(_override(headers: {'keep-top': '10'}, userOverride: const UserOverride(keepTop: -1))['keep-top'], -1);
     expect(_override(userOverride: const UserOverride(keepTop: 10))['keep-top'], 10);
   });
 
-  test('the user is asked only when nobody decided', () {
-    expect(_profile().keepTopDecided, isFalse);
-    expect(_profile().keepTop, -1);
-    expect(_profile(header: '5').keepTopDecided, isTrue);
-    expect(_profile(header: '5').keepTop, 5);
-    expect(_profile(header: '5', keepTop: -1).keepTop, -1);
-    expect(_profile(keepTop: 10).keepTopDecided, isTrue);
-    expect(_profile(header: 'x').keepTopDecided, isFalse);
+  test('the core gets the quick test unless the user turned it off', () {
+    expect(_override(userOverride: const UserOverride(keepTop: 10, keepTopQuick: true))['keep-top-quick'], isTrue);
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 10, keepTopQuick: false)).containsKey('keep-top-quick'),
+      isFalse,
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 10))['keep-top-quick'], isTrue, reason: 'on by default');
+    expect(
+      _override(headers: {'keep-top-quick': 'false'})['keep-top-quick'],
+      isTrue,
+      reason: 'a subscription can not turn it off',
+    );
+  });
+
+  test("the core gets the countries the user chose, never a subscription's", () {
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 5, keepTopCountries: ['DE', 'FR']))['keep-top-countries'],
+      ['DE', 'FR'],
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 5)).containsKey('keep-top-countries'), isFalse);
+    expect(_override(headers: {'keep-top-countries': 'DE'}).containsKey('keep-top-countries'), isFalse);
+  });
+
+  test("the core gets the proxies the user keeps loaded, never a subscription's", () {
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 5, keepTopPinned: ['a § 0', 'b § 1']))['keep-top-pinned'],
+      ['a § 0', 'b § 1'],
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 5)).containsKey('keep-top-pinned'), isFalse);
+    expect(_override(headers: {'keep-top-pinned': 'a'}).containsKey('keep-top-pinned'), isFalse);
+  });
+
+  test('a proxy keep top left at rest shows as resting, not as waiting for a ping', () {
+    expect(OutboundInfo(tag: 'a').rowState, ProxyRowState.untested);
+    expect(OutboundInfo(tag: 'a', resting: true).rowState, ProxyRowState.resting);
+    expect(OutboundInfo(tag: 'a', resting: true, urlTestDelay: 120).rowState, ProxyRowState.resting);
+  });
+
+  test('keep top is on with a count, the answering ones or countries, and not with chosen proxies', () {
+    expect(_profile().keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: -1)).keepsTop, isFalse);
+    expect(_profile(userOverride: const UserOverride(keepTop: 5)).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: keepTopAnswering)).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: -1, keepTopCountries: ['DE'])).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: 5, keepTags: ['a'])).keepsTop, isFalse);
+  });
+
+  test('the fastest few run unless the user or the subscription says otherwise', () {
+    expect(_profile().keepTop, keepTopDefault);
+    expect(_profile(header: 'x').keepTop, keepTopDefault);
+    expect(_profile(header: '10').keepTop, 10);
+    expect(_profile(header: '-1').keepTop, -1);
+    expect(_profile(header: '10', keepTop: -1).keepTop, -1);
+    expect(_profile(keepTop: 10).keepTop, 10);
   });
 
   test('an old user override reads without a choice', () {
@@ -79,17 +150,21 @@ void main() {
     expect(UserOverride.fromStr(const UserOverride(keepTop: 10).toStr())!.keepTop, 10);
   });
 
-  Future<int?> answer(WidgetTester tester, Future<void> Function() act) async {
-    int? result;
+  Future<KeepTopChoice?> answer(
+    WidgetTester tester,
+    Future<void> Function() act, {
+    List<(String, int)> available = const [],
+  }) async {
+    KeepTopChoice? result;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [translationsProvider.overrideWith((ref) => AppLocale.en.buildSync())],
         child: MaterialApp(
           home: Builder(
             builder: (context) => TextButton(
-              onPressed: () async => result = await showDialog<int>(
+              onPressed: () async => result = await showDialog<KeepTopChoice>(
                 context: context,
-                builder: (_) => const KeepTopDialog(count: 50, keep: 10),
+                builder: (_) => KeepTopDialog(count: 50, keep: 10, available: available),
               ),
               child: const Text('open'),
             ),
@@ -104,18 +179,101 @@ void main() {
     return result;
   }
 
+  // the chevron of the keep button opens the counts
+  Future<void> openCounts(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.expand_more_rounded));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('the dialog keeps the count the user picks', (tester) async {
     final result = await answer(tester, () async {
-      expect(find.text('30'), findsOneWidget);
+      await openCounts(tester);
+      expect(find.text('20'), findsOneWidget);
+      expect(find.text('100'), findsNothing, reason: 'not more than the profile has');
       await tester.tap(find.text('20'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Keep the 20 fastest'));
     });
-    expect(result, 20);
+    expect((result?.keep, result?.quick), (20, true));
   });
 
   testWidgets('the dialog can run them all', (tester) async {
-    expect(await answer(tester, () => tester.tap(find.text('Use all 50'))), -1);
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Use all 50'));
+    });
+    expect((result?.keep, result?.quick), (-1, true));
+  });
+
+  testWidgets('the dialog can keep the ones that answer', (tester) async {
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('Working'));
+      // its dots shimmer until the dialog closes
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.tap(find.text('Keep working ones'));
+    });
+    expect((result?.keep, result?.quick), (keepTopAnswering, true));
+  });
+
+  testWidgets('the dialog keeps the regions the user finds', (tester) async {
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('Region'));
+      await tester.pumpAndSettle();
+      // the profile's own countries are listed at once, the most proxies first
+      expect(find.textContaining('Germany'), findsOneWidget);
+      await tester.tap(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      // any other country by its name, or "uk"
+      final field = find.byType(TextField);
+      await tester.enterText(field, 'turk');
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Turkey'));
+      await tester.pumpAndSettle();
+      await tester.enterText(field, 'uk');
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('United Kingdom'));
+      await tester.pumpAndSettle();
+      // ticked again, it is off
+      await tester.enterText(field, '');
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      // the menus stayed open; closing them, the choice stays
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      if (find.byType(TextField).evaluate().isNotEmpty) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.textContaining('Keep the 10 fastest'));
+    }, available: const [('DE', 12), ('FR', 7), ('NL', 4)]);
+    expect(result?.countries, unorderedEquals(['TR', 'GB']));
+  });
+
+  testWidgets('the dialog hands over to choosing by hand', (tester) async {
+    final result = await answer(tester, () async {
+      await tester.ensureVisible(find.text('Choose the proxies yourself'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choose the proxies yourself'));
+    });
+    expect(result?.keep, KeepTopDialog.pickByHand);
+  });
+
+  testWidgets('the quick test can be turned off', (tester) async {
+    final result = await answer(tester, () async {
+      await tester.ensureVisible(find.text('Quick test'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quick test'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Keep the 10 fastest'));
+    });
+    expect((result?.keep, result?.quick), (10, false));
   });
 
   test('speeds read in Mbps: three decimals below 1, one below 10, none above', () {
@@ -125,5 +283,69 @@ void main() {
     expect(mbps(.0004), '0.000');
     expect(mbps(3.25), '3.3');
     expect(mbps(42.9), '43');
+  });
+
+  test('proxies of other regions that answered faster than the running ones are counted', () {
+    OutboundInfo proxy(String tag, {int delay = 0, int sortDelay = 0, bool resting = false, String country = ''}) =>
+        OutboundInfo(
+          tag: tag,
+          urlTestDelay: delay,
+          sortDelay: sortDelay,
+          resting: resting,
+          ipinfo: IpInfo(countryCode: country),
+        );
+    final proxies = [
+      proxy('de1', delay: 200, country: 'DE'),
+      proxy('de2', delay: 300, country: 'DE'),
+      proxy('us1', sortDelay: 90, resting: true, country: 'US'),
+      proxy('🇫🇷 fr1', sortDelay: 150, resting: true),
+      proxy('nl1', sortDelay: 400, resting: true, country: 'NL'),
+      proxy('de3', sortDelay: 50, resting: true, country: 'DE'),
+      proxy('gb1', resting: true, country: 'GB'),
+    ];
+    expect(fasterOutsideRegions(proxies, ['DE']), 2);
+    expect(fasterOutsideRegions(proxies, []), 0);
+    expect(fasterOutsideRegions([proxy('de1', country: 'DE'), ...proxies.skip(2)], ['de']), 0);
+  });
+
+  testWidgets('"test again" tests every proxy, the ones at rest too, and waits for their results', (tester) async {
+    final proxies = _Proxies();
+    final items = [
+      OutboundInfo(tag: 'a', urlTestDelay: 100),
+      OutboundInfo(tag: 'b', resting: true),
+      OutboundInfo(tag: 'c', resting: true),
+      OutboundInfo(tag: 'auto', isGroup: true),
+    ];
+    Widget footer(List<OutboundInfo> items) => ProviderScope(
+      overrides: [
+        translationsProvider.overrideWith((ref) => AppLocale.en.buildSync()),
+        activeProfileProvider.overrideWith(() => _Profile(_profile(keepTop: 1))),
+        profileProxyCountProvider('id').overrideWith((ref) => Future.value(3)),
+        proxiesOverviewNotifierProvider.overrideWith(() => proxies),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: KeepTopFooter(listed: 1, picking: false, proxies: items)),
+        ),
+      ),
+    );
+    await tester.pumpWidget(footer(items));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Test again'));
+    await tester.pump();
+    expect(proxies.tested, [
+      ['a', 'b', 'c'],
+    ]);
+    expect(find.text('Testing… 3 left'), findsOneWidget);
+
+    // results come in: one is left
+    OutboundInfo tested(OutboundInfo p) => p.deepCopy()..urlTestTime = Timestamp.fromDateTime(DateTime.utc(2026));
+    await tester.pumpWidget(footer([tested(items[0]), tested(items[1]), items[2], items[3]]));
+    expect(find.text('Testing… 1 left'), findsOneWidget);
+    await tester.pumpWidget(footer([...items.take(3).map(tested), items[3]]));
+    await tester.pump();
+    expect(find.text('Test again'), findsOneWidget);
+    // the timer that gives up on the results
+    await tester.pump(const Duration(minutes: 3));
   });
 }

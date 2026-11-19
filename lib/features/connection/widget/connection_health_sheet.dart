@@ -58,7 +58,9 @@ class ConnectionHealthSheet extends ConsumerWidget {
     // The hop's state as the proxy card shows it: slow after 15 s, failed after 60 s.
     final card = ref.watch(activeProxyCardProvider);
     final hop = card?.hopStatus;
+    // with the chain off there is no hop to wait for
     final hopState = switch (hop) {
+      _ when chain == null => HealthState.ok,
       StepStatus.connected => HealthState.ok,
       StepStatus.failed => HealthState.failed,
       StepStatus.waiting => HealthState.blocked,
@@ -85,48 +87,53 @@ class ConnectionHealthSheet extends ConsumerWidget {
       _ => (HealthState.ok, h.allGood),
     };
 
-    final hopStep = chain == null
-        ? null
-        : _Step(
-            state: hopState,
-            icon: chainIcon(chain),
-            glyph: SizedBox.square(
-              dimension: 22,
-              child: FittedBox(
-                child: ChainTypeIcon(
-                  type: chain,
-                  mode: card?.hopMode ?? ChainMode.psiphon,
-                  animate: hopState != HealthState.blocked && hopState != HealthState.failed,
-                ),
-              ),
-            ),
-            title: chainName,
-            detail: switch (hopState) {
-              HealthState.ok => h.hopReady,
-              HealthState.pending => hop == StepStatus.slow ? t.connection.slow : h.hopConnecting,
-              HealthState.blocked => h.hopBlocked,
-              HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
+    // The chain row stays while the chain is off, greyed, so its switch can turn it back on; with the
+    // chain off it offers extra security.
+    final rowType = chain ?? ChainType.extraSecurity;
+    Future<void> setChain(bool on) => ref
+        .read(ConfigOptions.chainStatus.notifier)
+        .update(on ? ChainStatus.values.byName(rowType.name) : ChainStatus.off);
+    final rowState = chain == null ? HealthState.blocked : hopState;
+    final hopStep = _Step(
+      state: rowState,
+      icon: chainIcon(rowType),
+      glyph: SizedBox.square(
+        dimension: 22,
+        child: FittedBox(
+          child: ChainTypeIcon(
+            type: rowType,
+            mode:
+                card?.hopMode ??
+                ref.watch(rowType.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
+            animate: chain != null && hopState != HealthState.blocked && hopState != HealthState.failed,
+          ),
+        ),
+      ),
+      title: rowType.present(t),
+      detail: switch (hopState) {
+        _ when chain == null => t.pages.settings.chain.quick.off,
+        HealthState.ok => h.hopReady,
+        HealthState.pending => hop == StepStatus.slow ? t.connection.slow : h.hopConnecting,
+        HealthState.blocked => h.hopBlocked,
+        HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
+      },
+      onTap: () => setChain(chain == null),
+      trailing: Switch(value: chain != null, onChanged: setChain),
+      actions: [
+        if (chain != null && hopState == HealthState.failed)
+          OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.goNamed('chainOptions');
             },
-            actions: [
-              if (hopState == HealthState.failed) ...[
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    context.goNamed('chainOptions');
-                  },
-                  child: Text(h.change),
-                ),
-                TextButton(
-                  onPressed: () => ref.read(ConfigOptions.chainStatus.notifier).update(ChainStatus.off),
-                  child: Text(h.turnOff),
-                ),
-              ],
-            ],
-          );
+            child: Text(h.change),
+          ),
+      ],
+    );
 
     // the steps in the order they connect: the unblocker before the servers, extra security after
     final steps = <_Step>[
-      if (unblocker && hopStep != null) hopStep,
+      if (unblocker) hopStep,
       // the fastest server is the pick itself with lowest, and the way out when the picked proxy is dead
       if (health.fastest != null && (!health.pickedByHand || offer))
         _Step(
@@ -164,7 +171,7 @@ class ConnectionHealthSheet extends ConsumerWidget {
               ),
           ],
         ),
-      if (!unblocker && hopStep != null) hopStep,
+      if (!unblocker) hopStep,
     ];
 
     return SafeArea(
@@ -285,6 +292,8 @@ class _Step extends StatelessWidget {
     required this.title,
     required this.detail,
     this.actions,
+    this.onTap,
+    this.trailing,
   });
   final HealthState state;
   final IconData icon;
@@ -295,69 +304,77 @@ class _Step extends StatelessWidget {
   final String detail;
   final List<Widget>? actions;
 
+  /// Tapping the step, such as the chain's row turning the chain on or off.
+  final VoidCallback? onTap;
+
+  /// At the step's end, such as the chain's switch.
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = healthColor(context, state);
     final actions = this.actions ?? const [];
-    return Semantics(
-      container: true,
-      label: '$title, $detail',
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: _Rail.station,
-            height: _Rail.station,
-            child: Stack(
-              fit: StackFit.expand,
-              clipBehavior: Clip.none,
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: _Rail.station,
+          height: _Rail.station,
+          child: Stack(
+            fit: StackFit.expand,
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: .14),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: color.withValues(alpha: .6), width: 1.5),
+                ),
+                child: Center(child: glyph ?? Icon(icon, size: 18, color: color)),
+              ),
+              PositionedDirectional(
+                end: -4,
+                bottom: -4,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow, shape: BoxShape.circle),
+                  child: _StateGlyph(state, size: 14),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Gap(14),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2, bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: .14),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: color.withValues(alpha: .6), width: 1.5),
-                  ),
-                  child: Center(child: glyph ?? Icon(icon, size: 18, color: color)),
-                ),
-                PositionedDirectional(
-                  end: -4,
-                  bottom: -4,
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow, shape: BoxShape.circle),
-                    child: _StateGlyph(state, size: 14),
+                Text(title, style: theme.textTheme.titleSmall),
+                const Gap(2),
+                Text(
+                  detail,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: state == HealthState.failed ? color : theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
+                if (actions.isNotEmpty) ...[const Gap(10), Wrap(spacing: 8, runSpacing: 8, children: actions)],
               ],
             ),
           ),
-          const Gap(14),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: theme.textTheme.titleSmall),
-                  const Gap(2),
-                  Text(
-                    detail,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: state == HealthState.failed ? color : theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  if (actions.isNotEmpty) ...[const Gap(10), Wrap(spacing: 8, runSpacing: 8, children: actions)],
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+        if (trailing case final trailing?) ...[const Gap(8), trailing],
+      ],
+    );
+    return Semantics(
+      container: true,
+      label: '$title, $detail',
+      child: onTap == null ? row : InkWell(onTap: onTap, borderRadius: BorderRadius.circular(12), child: row),
     );
   }
 }

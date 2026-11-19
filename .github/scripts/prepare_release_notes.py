@@ -7,7 +7,9 @@ Usage:
   prepare_release_notes.py <body.md> --vt-results <results.json>
 
 The first form fills <!-- ASSET_LINKS --> in the template with rows only for files
-that exist under assets-dir. The second form rewrites only the download table of an
+that exist under assets-dir, and <!-- CHANGELOG --> with .github/release_changelog.md: the
+"Change Logs" section heads the notes, and the app's update dialog shows it. Without that file,
+or with an empty one, the section is left out. The second form rewrites only the download table of an
 already published body (between the ASSETS markers), taking names and sha256 digests
 from the GitHub API release JSON, so nothing needs to be downloaded and manual edits
 to the rest of the notes survive. A VirusTotal badge already in that body is kept.
@@ -28,33 +30,45 @@ import re
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
-# (OS group, filename, link label) — only rows whose file exists are emitted.
-ASSET_CATALOG: list[tuple[str, str, str]] = [
-    ("Android", "Hiddify-Android-universal.apk", "APK Universal"),
-    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8"),
-    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7"),
-    ("Android", "Hiddify-Android-x86_64.apk", "APK x64"),
+# (OS group, filename, link label, badge color, badge logo) — only rows whose file exists
+# are emitted. The label's first word is the badge's left half, the rest its right half.
+ASSET_CATALOG: list[tuple[str, str, str, str, str]] = [
     # Attached by windows-store-sync.yml once the Microsoft Store has signed it.
-    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64"),
-    ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64"),
-    ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64"),
-    ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-AppStore.dmg", "App Store DMG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-AppStore.pkg", "App Store PKG Universal"),
-    ("iOS", "Hiddify-iOS.ipa", "IPA iOS"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.AppImage", "AppImage x64"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)"),
-    ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64"),
-    ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64"),
+    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64", "0078d7", "windows"),
+    ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64", "2d7d9a", "windows"),
+    ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64", "67b7d1", "windows"),
+    ("Android", "Hiddify-Android-universal.apk", "APK Universal", "044d29", "android"),
+    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8", "168039", "android"),
+    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7", "45bf55", "android"),
+    ("Android", "Hiddify-Android-x86_64.apk", "APK x64", "96ed89", "android"),
+    ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal", "ea005e", "apple"),
+    ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal", "bc544b", "apple"),
+    ("iOS", "Hiddify-iOS.ipa", "IPA iOS", "0a84ff", "apple"),
+    ("Linux x64", "Hiddify-Linux-x64.AppImage", "AppImage x64", "f84e29", "linux"),
+    ("Linux x64", "Hiddify-Linux-x64.AppImage.tar.gz", "AppImage x64 (tar.gz)", "f84e29", "linux"),
+    ("Linux x64", "Hiddify-Debian-x64.deb", "DebPackage x64", "FF9966", "debian"),
+    ("Linux x64", "Hiddify-rpm-x64.rpm", "RpmPackage x64", "F1B42F", "redhat"),
+    ("Linux ARM64", "Hiddify-Linux-arm64.AppImage", "AppImage ARM64", "f84e29", "linux"),
+    ("Linux ARM64", "Hiddify-Linux-arm64.AppImage.tar.gz", "AppImage ARM64 (tar.gz)", "f84e29", "linux"),
+    ("Linux ARM64", "Hiddify-Debian-arm64.deb", "DebPackage ARM64", "FF9966", "debian"),
+    ("Linux ARM64", "Hiddify-rpm-arm64.rpm", "RpmPackage ARM64", "F1B42F", "redhat"),
 ]
+
+# The macOS and Linux installer (.github/scripts/make_installer.sh): one row with its command,
+# after the groups in FIRST_GROUPS. It finds the system and the CPU, so one command serves both.
+INSTALLER = "install.sh"
+FIRST_GROUPS = ("Windows", "Android")
 
 # Not sent to VirusTotal: it rejects the IPA upload (HTTP 409), and an iOS app cannot
 # run outside the App Store or a sideloading tool anyway.
 NO_VT_SCAN = {"Hiddify-iOS.ipa"}
 
 ASSET_MARKER = "<!-- ASSET_LINKS -->"
+CHANGELOG_MARKER = "<!-- CHANGELOG -->"
+# Written by hand for each release; github_release_parser.dart reads the section back.
+CHANGELOG_FILE = Path(__file__).resolve().parents[1] / "release_changelog.md"
 TABLE_BEGIN = "<!-- ASSETS:BEGIN -->"
 TABLE_END = "<!-- ASSETS:END -->"
 REPO = "hiddify/hiddify-app"
@@ -104,13 +118,32 @@ def downloads_badge_img(tag: str, filename: str, bust: str) -> str:
     return f'<img src="{src}" alt="downloads">'
 
 
+def shield_text(text: str) -> str:
+    """Text for a shields.io static badge path: its own escapes, then URL encoding."""
+    return quote(text.replace("-", "--").replace("_", "__"), safe="")
+
+
+def shield_src(left: str, right: str, color: str, logo: str = "") -> str:
+    src = f"https://img.shields.io/badge/{shield_text(left)}-{shield_text(right)}-{color}"
+    return f"{src}?logo={logo}" if logo else src
+
+
+def download_badge_img(label: str, color: str, logo: str) -> str:
+    left, _, right = label.partition(" ")
+    return f'<img src="{shield_src(left, right, color, logo)}" alt="{label}">'
+
+
 def vt_badge_src(result: dict | None) -> str:
-    """Static badge for a virustotal_report.py result: {"count": n, "total": t} or None."""
+    """Static badge for a virustotal_report.py result: {"count": n, "total": t} or None.
+
+    Fewer than 2 engines is a clean result (one engine alone is routinely a false positive)."""
     if not result or not result.get("total"):
         return "https://img.shields.io/badge/scanning-lightgrey"
     count, total = result["count"], result["total"]
-    color = "brightgreen" if count == 0 else "yellow" if count <= 3 else "red"
-    return f"https://img.shields.io/badge/{count}%2F{total}-{color}"
+    if count < 2:
+        return f"https://img.shields.io/badge/{shield_text(f'✅ Safe: {count}/{total}')}-brightgreen"
+    color = "yellow" if count <= 3 else "red"
+    return f"https://img.shields.io/badge/{shield_text(f'{count}/{total}')}-{color}"
 
 
 def vt_badge_img(sha256: str, src: str) -> str:
@@ -137,46 +170,78 @@ def apply_vt_results(body: str, results: dict[str, dict | None]) -> str:
     return body
 
 
+def fill_changelog(text: str, changelog_path: Path = CHANGELOG_FILE) -> str:
+    """Put the change log at its marker, or drop the marker and its heading when there is none."""
+    if CHANGELOG_MARKER not in text:
+        return text
+    changelog = changelog_path.read_text(encoding="utf-8") if changelog_path.is_file() else ""
+    changelog = re.sub(r"<!--.*?-->", "", changelog, flags=re.DOTALL).strip()
+    if changelog:
+        # the rule ends the section for the app as well, before the download part
+        return text.replace(CHANGELOG_MARKER, f"{changelog}\n\n---")
+    heading = re.compile(r"^#{1,6}[^\n]*\n\s*" + re.escape(CHANGELOG_MARKER) + r"\s*", re.MULTILINE)
+    text, dropped = heading.subn("", text, count=1)
+    return text if dropped else text.replace(CHANGELOG_MARKER, "")
+
+
+def install_command(tag: str) -> str:
+    return f"bash <(curl -fsSL https://github.com/{REPO}/releases/download/{tag}/{INSTALLER})"
+
+
+def installer_row(tag: str) -> str:
+    """The installer command in a fenced block, so GitHub adds a copy button (Markdown inside an
+    HTML cell needs markdown=1 and the blank line before it)."""
+    return (
+        "<tr>\n  <td>Linux &amp; macOS<br>auto installer</td>\n"
+        f'  <td colspan="3" markdown=1>\n\n```\n{install_command(tag)}\n```\n</td>\n</tr>'
+    )
+
+
 def render_links(tag: str, assets: dict[str, "Path | str"], bust: str, old_body: str = "") -> str:
     """assets maps file name -> local Path (hashed here) or a known sha256 hex string.
 
     old_body: a published body whose VirusTotal badges are kept for unchanged files."""
+    installer_pending = find_asset(assets, INSTALLER) is not None
     rowspan_pending: dict[str, int] = {}
-    for os_name, filename, _ in ASSET_CATALOG:
+    for os_name, filename, *_ in ASSET_CATALOG:
         if find_asset(assets, filename) is None:
             continue
         rowspan_pending[os_name] = rowspan_pending.get(os_name, 0) + 1
 
     rows: list[str] = []
     os_emitted: dict[str, int] = {}
-    for os_name, filename, label in ASSET_CATALOG:
+    for os_name, filename, label, color, logo in ASSET_CATALOG:
         path = find_asset(assets, filename)
         if path is None:
             continue
         digest = path if isinstance(path, str) else sha256_file(path)
         print(f"{filename}: {digest}")
         url = f"https://github.com/{REPO}/releases/download/{tag}/{filename}"
-        download = f'<a href="{url}">{label}</a>'
+        download = f'<a href="{url}">{download_badge_img(label, color, logo)}</a>'
         downloads = f'<a href="{url}">{downloads_badge_img(tag, filename, bust)}</a>'
         if filename in NO_VT_SCAN:
             vt = "-"
         else:
             vt = vt_badge_img(digest, existing_vt_src(old_body, digest) or vt_badge_src(None))
 
+        if installer_pending and os_name not in FIRST_GROUPS:
+            rows.append(installer_row(tag))
+            installer_pending = False
+
         cells: list[str] = []
         first = os_emitted.get(os_name, 0) == 0
         os_emitted[os_name] = os_emitted.get(os_name, 0) + 1
         if first:
             span = rowspan_pending[os_name]
-            if span > 1:
-                cells.append(f'<td rowspan="{span}">{os_name}</td>')
-            else:
-                cells.append(f"<td>{os_name}</td>")
+            attr = f' rowspan="{span}"' if span > 1 else ""
+            cells.append(f"<td{attr}>{os_name}</td>")
         cells.append(f"<td>{download}</td>")
         cells.append(f"<td>{downloads}</td>")
         cells.append(f"<td>{vt}</td>")
         rows.append("<tr>\n  " + "\n  ".join(cells) + "\n</tr>")
 
+    if installer_pending:
+        rows.append(installer_row(tag))
     if not rows:
         return "_No release assets found in the build output._\n"
 
@@ -199,7 +264,7 @@ def wrap_table(links: str) -> str:
 
 def assets_from_release_json(path: Path) -> dict[str, str]:
     """name -> sha256 from `gh api repos/{repo}/releases/tags/{tag}` output."""
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     assets: dict[str, str] = {}
     for asset in data.get("assets", []):
         digest = asset.get("digest") or ""
@@ -227,19 +292,19 @@ def main() -> int:
     if len(args) >= 3 and args[1] == "--release-json":
         notes_path, release_json, tag = Path(args[0]), Path(args[2]), (args[3] if len(args) > 3 else "")
         if not tag:
-            tag = json.loads(release_json.read_text())["tag_name"]
+            tag = json.loads(release_json.read_text(encoding="utf-8"))["tag_name"]
         assets = assets_from_release_json(release_json)
-        body = notes_path.read_text()
+        body = notes_path.read_text(encoding="utf-8")
         links = render_links(tag, assets, cache_bust(), old_body=body)
-        notes_path.write_text(replace_table(body, links).strip() + "\n")
-        present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
+        notes_path.write_text(replace_table(body, links).strip() + "\n", encoding="utf-8")
+        present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
         print(f"rewrote download table with {present} rows for tag {tag}")
         return 0
 
     if len(args) == 3 and args[1] == "--vt-results":
         notes_path, results_path = Path(args[0]), Path(args[2])
-        results = json.loads(results_path.read_text())
-        notes_path.write_text(apply_vt_results(notes_path.read_text(), results))
+        results = json.loads(results_path.read_text(encoding="utf-8"))
+        notes_path.write_text(apply_vt_results(notes_path.read_text(encoding="utf-8"), results), encoding="utf-8")
         print(f"wrote VirusTotal results for {len(results)} files")
         return 0
 
@@ -267,8 +332,9 @@ def main() -> int:
     bust = cache_bust()
     print(f"badge cache-bust v={bust}")
 
-    text = notes_path.read_text()
+    text = notes_path.read_text(encoding="utf-8")
     text = text.replace("RELEASE_TAG", tag)
+    text = fill_changelog(text)
     links = render_links(tag, assets, bust)
     # Strip the template's own comments first; the ASSETS markers are added after
     # and stay in the body so the table can be rewritten later.
@@ -278,8 +344,8 @@ def main() -> int:
     else:
         text = text.rstrip() + "\n\n## Downloads\n\n" + wrap_table(links)
 
-    notes_path.write_text(text.strip() + "\n")
-    present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
+    notes_path.write_text(text.strip() + "\n", encoding="utf-8")
+    present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
     print(f"wrote {present} download rows for tag {tag}")
     return 0
 

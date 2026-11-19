@@ -8,8 +8,10 @@ import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
+import 'package:hiddify/features/profile/model/download_problem.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -31,6 +33,15 @@ import 'package:meta/meta.dart';
 /// since local profiles have no url. Every step treats a whitespace-only result
 /// as blank, so it falls through to the next step.
 
+/// Downloads a URL in the core with the user agent given; [cancel] completing stops it.
+typedef CoreFetch = Future<FetchUrlResponse> Function(String url, String userAgent, {required Future<void> cancel});
+
+/// Told that a download attempt failed with [failure] and attempt [next] of [of] begins.
+typedef DownloadRetryCallback = void Function(ProfileDownloadFailure failure, int next, int of);
+
+/// The longest update interval a subscription can ask for, in hours: a year.
+const maxUpdateIntervalHours = 24 * 365;
+
 class ProfileParser with InfraLogger {
   // Synthetic sentinel assigned to `total` for "unlimited" traffic (subscription-userinfo total=0 or
   // missing). It MUST stay above the 10 TB "unlimited" threshold the UI uses to decide whether to show
@@ -49,6 +60,9 @@ class ProfileParser with InfraLogger {
     'chain-status',
     'extra-security',
     'keep-top',
+    'keep-top-quick',
+    'keep-top-countries',
+    'keep-top-pinned',
     'keep-tags',
   ];
   static const allowedProfileHeaders = [
@@ -65,8 +79,11 @@ class ProfileParser with InfraLogger {
   ];
 
   final DioHttpClient _httpClient;
+  final CoreFetch? _coreFetch;
 
-  ProfileParser({required DioHttpClient httpClient}) : _httpClient = httpClient;
+  ProfileParser({required DioHttpClient httpClient, CoreFetch? coreFetch})
+    : _httpClient = httpClient,
+      _coreFetch = coreFetch;
   TaskEither<ProfileFailure, ProfileEntriesCompanion> addLocal({
     required String id,
     required String content,
@@ -98,7 +115,8 @@ class ProfileParser with InfraLogger {
     required String tempFilePath,
     required UserOverride? userOverride,
     CancelToken? cancelToken,
-  }) => _downloadProfile(url, tempFilePath, cancelToken).flatMap(
+    DownloadRetryCallback? onRetry,
+  }) => _downloadProfile(url, tempFilePath, cancelToken, onRetry).flatMap(
     (remoteHeaders) =>
         TaskEither.fromEither(
           populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
@@ -126,7 +144,8 @@ class ProfileParser with InfraLogger {
     required RemoteProfileEntity rp,
     required String tempFilePath,
     CancelToken? cancelToken,
-  }) => _downloadProfile(rp.url, tempFilePath, cancelToken).flatMap(
+    DownloadRetryCallback? onRetry,
+  }) => _downloadProfile(rp.url, tempFilePath, cancelToken, onRetry).flatMap(
     (remoteHeaders) =>
         TaskEither.fromEither(
           populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
@@ -152,32 +171,87 @@ class ProfileParser with InfraLogger {
       )
       .flatMap((profEntity) => Either.tryCatch(() => profEntity.toUpdateEntry(), ProfileFailure.unexpected));
 
+  /// The attempts at a download whose failure may pass, such as a timeout; one that will not, such as a
+  /// 404, is not tried again.
+  static const downloadAttempts = 2;
+  static const _retryDelay = Duration(seconds: 1);
+
+  /// Downloads the subscription, trying again once after a failure that may pass; [onRetry] is told
+  /// before the next attempt, for the user to see why it takes longer.
   TaskEither<ProfileFailure, Map<String, dynamic>> _downloadProfile(
     String url,
     String tempFilePath,
     CancelToken? cancelToken,
+    DownloadRetryCallback? onRetry,
   ) => TaskEither.tryCatch(() async {
-    // if (url.startsWith("http://"))
-    //   throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
-
-    final rs = await _httpClient
-        .download(
-          url.trim(),
-          tempFilePath,
-          cancelToken: cancelToken,
-        )
-        .catchError((err) {
-          if (CancelToken.isCancel(err as DioException)) {
-            throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
-          }
-          throw err;
-        });
-    // fixing headers before return
-    return rs.headers.map.map((key, value) {
-      if (value.length == 1) return MapEntry(key, value.first);
-      return MapEntry(key, value);
-    });
+    final token = cancelToken ?? CancelToken();
+    for (var attempt = 1; ; attempt++) {
+      try {
+        return await _downloadOnce(url, tempFilePath, token);
+      } on ProfileDownloadFailure catch (failure) {
+        if (attempt >= downloadAttempts || !failure.problem.mayPass) rethrow;
+        onRetry?.call(failure, attempt + 1, downloadAttempts);
+        await Future.any([Future<void>.delayed(_retryDelay), token.whenCancel]);
+        if (token.isCancelled) throw _cancelled;
+      }
+    }
   }, (err, st) => err is ProfileFailure ? err : ProfileFailure.unexpected(err, st));
+
+  static const _cancelled = ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+
+  /// One attempt: downloads the subscription in the core first, with the TLS handshake of Chrome, which some
+  /// networks let through when they drop Dart's; when that fails, downloads it here, once, without
+  /// retries, so a dead link fails in seconds. When both fail, the failure says why in the words of
+  /// the one that tells the most (an answer from the server before a network problem), with what
+  /// each one met as its detail.
+  Future<Map<String, dynamic>> _downloadOnce(String url, String tempFilePath, CancelToken token) async {
+    final link = url.trim();
+    final problems = <(DownloadProblem, int?)>[];
+    final details = <String>[];
+
+    if (_coreFetch case final coreFetch?) {
+      try {
+        final rs = await coreFetch(link, _httpClient.userAgent, cancel: token.whenCancel.then((_) {}));
+        if (DownloadProblem.ofCore(rs) case final problem?) {
+          final hasStatus = rs.error == FetchUrlError.FETCH_URL_ERROR_NONE;
+          problems.add((problem, hasStatus ? rs.statusCode : null));
+          details.add('core: ${hasStatus ? 'HTTP ${rs.statusCode}' : rs.errorDetail}');
+        } else {
+          await File(tempFilePath).writeAsBytes(rs.body, flush: true);
+          return _flattenHeaders({
+            for (final header in rs.headers)
+              header.name: [
+                for (final h in rs.headers)
+                  if (h.name == header.name) h.value,
+              ],
+          });
+        }
+      } catch (err) {
+        if (token.isCancelled) throw _cancelled;
+        // the core could not be asked: this says nothing about the server
+        details.add('core: unavailable');
+        loggy.debug('core download of the profile failed: $err');
+      }
+      loggy.debug('core download of the profile failed, downloading it here: ${details.last}');
+    }
+
+    try {
+      final rs = await _httpClient.download(link, tempFilePath, cancelToken: token, retry: false);
+      return _flattenHeaders(rs.headers.map);
+    } on DioException catch (err) {
+      if (CancelToken.isCancel(err)) throw _cancelled;
+      problems.add((DownloadProblem.ofDio(err), err.response?.statusCode));
+      details.add('app: ${DownloadProblem.detailOfDio(err)}');
+    }
+    final problem = DownloadProblem.mostTelling(problems.map((p) => p.$1));
+    final statusCode = problems.firstWhere((p) => p.$1 == problem).$2;
+    loggy.warning('profile download failed: ${problem.name}; ${details.join('; ')}');
+    throw ProfileFailure.download(problem, statusCode: statusCode, detail: details.join('\n'));
+  }
+
+  /// A header with one value as a string, with more as a list.
+  static Map<String, dynamic> _flattenHeaders(Map<String, List<String>> headers) =>
+      headers.map((key, value) => MapEntry(key, value.length == 1 ? value.first : value));
 
   /// Replaces every subscription link line in [text] with the content it points to.
   ///
@@ -296,8 +370,9 @@ class ProfileParser with InfraLogger {
   /// Tolerant of real-world noise: a segment without a `key=value` pair (a
   /// stray `;;`, a trailing `;`, or a malformed token) is skipped instead of
   /// throwing and failing the whole profile parse. Values may be decimals and
-  /// are truncated to int. `upload` and `download` are required; a missing or
-  /// `0` `total`/`expire` is treated as "unlimited".
+  /// are truncated to int. `upload` and `download` are required; a missing,
+  /// `0` or unreadable `total`/`expire` is treated as "unlimited", and so is an
+  /// `expire` past [infiniteTimeThreshold].
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
     final map = <String, int?>{};
     for (final segment in subInfoStr.split(';')) {
@@ -305,11 +380,14 @@ class ProfileParser with InfraLogger {
       if (parts.length < 2) continue;
       final key = parts.first.trim();
       if (key.isEmpty) continue;
-      map[key] = num.tryParse(parts[1].trim())?.toInt();
+      // NaN, infinity and negatives count as unreadable: toInt() throws on the first two.
+      final value = num.tryParse(parts[1].trim());
+      map[key] = (value == null || !value.isFinite || value < 0) ? null : value.toInt();
     }
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
-      expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
+      // An expiry past the threshold is no expiry; it may also be beyond what DateTime holds.
+      expire = (expire == null || expire == 0 || expire > infiniteTimeThreshold) ? infiniteTimeThreshold : expire;
       return SubscriptionInfo(
         upload: upload,
         download: download,
@@ -346,6 +424,20 @@ class ProfileParser with InfraLogger {
     return '';
   }
 
+  /// Decode the value of a `profile-title: base64:<value>` header.
+  ///
+  /// Accepts the value without `=` padding, which some servers send. Returns ''
+  /// when it is not valid base64 or not UTF-8, so the name falls through to the
+  /// next source instead of failing the whole profile parse.
+  @visibleForTesting
+  static String decodeBase64Title(String value) {
+    try {
+      return utf8.decode(base64.decode(base64.normalize(value.trim()))).trim();
+    } on FormatException {
+      return '';
+    }
+  }
+
   @visibleForTesting
   static Either<ProfileFailure, ProfileEntity> parse({required String tempFilePath, required ProfileEntity profile}) =>
       Either.tryCatch(() {
@@ -357,7 +449,7 @@ class ProfileParser with InfraLogger {
 
         if (headers['profile-title'] case final String titleHeader when name.isBlank) {
           if (titleHeader.startsWith("base64:")) {
-            name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            name = decodeBase64Title(titleHeader.replaceFirst("base64:", ""));
           } else {
             name = titleHeader.trim();
           }
@@ -396,9 +488,10 @@ class ProfileParser with InfraLogger {
         if (headers['profile-update-interval'] case final String updateIntervalStr
             when options == null && !isAutoUpdateDisable) {
           // Convention: a positive integer number of hours. Ignore anything else
-          // (a decimal, garbage, or <= 0) instead of failing the whole parse.
+          // (a decimal, garbage, or <= 0) instead of failing the whole parse. At most a year: a
+          // larger number overflowed the Duration into a wrong, even negative, interval.
           if (int.tryParse(updateIntervalStr.trim()) case final hours? when hours > 0) {
-            options = ProfileOptions(updateInterval: Duration(hours: hours));
+            options = ProfileOptions(updateInterval: Duration(hours: hours.clamp(1, maxUpdateIntervalHours)));
           }
         }
 
@@ -435,6 +528,10 @@ class ProfileParser with InfraLogger {
     if (content.contains("[Interface]")) {
       return ProxyType.wireguard.label;
     }
+    // a .ovpn file: its certificate inline, and the server it connects to
+    if (content.contains('<ca>') && RegExp(r'^\s*remote\s', multiLine: true).hasMatch(content)) {
+      return 'OpenVPN';
+    }
     final lines = content.split('\n');
     String? name;
     for (final line in lines) {
@@ -456,6 +553,7 @@ class ProfileParser with InfraLogger {
         'shadowtls' => fragment ?? ProxyType.shadowtls.label,
         'mieru' => fragment ?? ProxyType.mieru.label,
         'warp' => fragment ?? ProxyType.warp.label,
+        'ovpn' => fragment ?? 'OpenVPN',
         // any other link (psiphon://, anytls://, naive+https://, ...): its name, else its scheme
         final scheme when scheme.isNotEmpty && line.trimLeft().startsWith('$scheme://') =>
           fragment ?? _schemeLabel(scheme),
@@ -498,6 +596,9 @@ class ProfileParser with InfraLogger {
     return null;
   }
 
+  /// How many proxies run, the fastest, when neither the user nor the subscription says.
+  static const keepTopDefault = 5;
+
   /// A `keep-top` header: how many proxies to keep running, or -1 for all. Anything else is no
   /// header at all.
   static int? keepTopHeader(String? value) {
@@ -536,6 +637,10 @@ class ProfileParser with InfraLogger {
     final fragmentInput = headers.remove('fragment')?.toString();
     final extraSecurityInput = headers.remove('extra-security')?.toString();
     final keepTopInput = headers.remove('keep-top')?.toString();
+    // the user's choices only, never a subscription's
+    headers.remove('keep-top-quick');
+    headers.remove('keep-top-countries');
+    headers.remove('keep-top-pinned');
 
     // extra-security: exactly one documented mode. The app's own setting takes
     // precedence over the subscription; an unrecognised value is ignored.
@@ -555,9 +660,19 @@ class ProfileParser with InfraLogger {
       headers['tls-tricks'] = tricks;
     }
 
-    // keep-top: the user's choice, else the subscription's; -1 (or none) runs every proxy
-    if (userOverride?.keepTop ?? keepTopHeader(keepTopInput) case final keepTop?) {
-      headers['keep-top'] = keepTop;
+    // keep-top: the user's choice, else the subscription's, else the fastest few; -1 runs every proxy
+    headers['keep-top'] = userOverride?.keepTop ?? keepTopHeader(keepTopInput) ?? keepTopDefault;
+    // keep-top-quick: picks the fastest without testing every proxy, unless the user turned it off
+    if (userOverride?.keepTopQuick ?? true) {
+      headers['keep-top-quick'] = true;
+    }
+    // keep-top-countries: only proxies of these countries are kept
+    if (userOverride?.keepTopCountries case final countries? when countries.isNotEmpty) {
+      headers['keep-top-countries'] = countries;
+    }
+    // keep-top-pinned: the proxies the user keeps loaded, beside the fastest
+    if (userOverride?.keepTopPinned case final pinned? when pinned.isNotEmpty) {
+      headers['keep-top-pinned'] = pinned;
     }
     // keep-tags: the proxies the user chose run, and only them, while any is still in the profile
     if (userOverride?.keepTags case final tags? when tags.isNotEmpty) {

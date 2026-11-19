@@ -1,17 +1,19 @@
+# Publishes a release to WinGet once it is no longer a pre-release.
 name: Publish to WinGet
+
 on:
   release:
     types: [released]
 
-env:
-    IDENTIFIER: ${{ endsWith(github.event.release.tag_name, 'dev') && 'Hiddify.Next.Beta' || 'Hiddify.Next' }}
+permissions: {}
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: vedantmgoyal9/winget-releaser@2
+      - uses: vedantmgoyal9/winget-releaser@b7370d4d152efdce803a26cc6ca9eee58cb2ad54 # v2
         with:
-          identifier: ${{ env.IDENTIFIER }}
+          identifier: ${{ endsWith(github.event.release.tag_name, 'dev') && 'Hiddify.Next.Beta' || 'Hiddify.Next' }}
           version: ${{ github.event.release.tag_name }}
           token: ${{ secrets.WINGET_TOKEN }}

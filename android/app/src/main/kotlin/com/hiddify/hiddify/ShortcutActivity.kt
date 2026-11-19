@@ -18,6 +18,7 @@ class ShortcutActivity : Activity(), ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Application.initialize(this)
         super.onCreate(savedInstanceState)
         if (intent.action == Intent.ACTION_CREATE_SHORTCUT) {
             setResult(
@@ -53,7 +54,10 @@ class ShortcutActivity : Activity(), ServiceConnection.Callback {
     override fun onServiceStatusChanged(status: Status) {
         when (status) {
             Status.Started -> BoxService.stop()
-            Status.Stopped -> BoxService.start()
+            Status.Stopped -> {
+                // No app UI starts the core over gRPC here, so the service must start it itself.
+                BoxService.start(startCore = true)
+            }
             else -> {}
         }
         finish()

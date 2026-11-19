@@ -32,8 +32,20 @@ abstract interface class ProfileRepository {
     ProfilesSort sort = ProfilesSort.lastUpdate,
     SortMode sortMode = SortMode.ascending,
   });
-  TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken});
-  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride});
+
+  /// Adds the profile at [url], or updates it when one with that URL exists. With [activate] (the user adding a
+  /// profile, not an update), an existing one becomes the active profile, as a new one does. [onRetry] is told when
+  /// a failed download is tried again.
+  TaskEither<ProfileFailure, Unit> upsertRemote(
+    String url, {
+    UserOverride? userOverride,
+    CancelToken? cancelToken,
+    bool activate = false,
+    DownloadRetryCallback? onRetry,
+  });
+
+  /// Adds [content] as a local profile; returns its id.
+  TaskEither<ProfileFailure, String> addLocal(String content, {UserOverride? userOverride});
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity nProfile, String nContent);
   TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug);
   TaskEither<ProfileFailure, String> generateConfig(String id);
@@ -155,11 +167,22 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   }
 
   @override
-  TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken}) =>
-      TaskEither.tryCatch(
-        () async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity()),
-        ProfileFailure.unexpected,
-      ).flatMap((profEntity) {
+  TaskEither<ProfileFailure, Unit> upsertRemote(
+    String url, {
+    UserOverride? userOverride,
+    CancelToken? cancelToken,
+    bool activate = false,
+    DownloadRetryCallback? onRetry,
+  }) =>
+      TaskEither.tryCatch(() async {
+        final profEntity = await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity());
+        // adding a profile that is already there selects it, before the update, which may fail on a server that
+        // is down: the profile is there either way
+        if (activate && profEntity != null && !profEntity.active) {
+          await _profileDataSource.edit(profEntity.id, const ProfileEntriesCompanion(active: Value(true)));
+        }
+        return profEntity;
+      }, ProfileFailure.unexpected).flatMap((profEntity) {
         // if profile is null, generate id
         final id = profEntity?.id ?? const Uuid().v4();
         final file = _profilePathResolver.file(id);
@@ -171,7 +194,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             profEntity = profEntity.copyWith(userOverride: userOverride);
           }
           task = _profileParser
-              .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken)
+              .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken, onRetry: onRetry)
               .flatMap(
                 (profEntity) =>
                     validateConfig(
@@ -195,6 +218,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                 tempFilePath: tempFile.path,
                 userOverride: userOverride,
                 cancelToken: cancelToken,
+                onRetry: onRetry,
               )
               .flatMap(
                 (profEntity) =>
@@ -222,7 +246,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       });
 
   @override
-  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride}) =>
+  TaskEither<ProfileFailure, String> addLocal(String content, {UserOverride? userOverride}) =>
       TaskEither.tryCatch(() async {
         final id = const Uuid().v4();
         final file = _profilePathResolver.file(id);
@@ -239,9 +263,9 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                       ProfileParser.profileOverrideHelper(profile: profEntity),
                       false,
                     ).flatMap(
-                      (unit) => TaskEither.tryCatch(() async {
+                      (_) => TaskEither.tryCatch(() async {
                         await _profileDataSource.insert(profEntity);
-                        return unit;
+                        return id;
                       }, ProfileFailure.unexpected),
                     ),
               );

@@ -180,8 +180,11 @@ extension OutboundInfoCard on OutboundInfo {
   /// replaces it; it may have changed since, so it does not count.
   bool get hasIp => ipinfo.ip.isNotEmpty && !ipinfo.fromCache;
 
-  /// What a proxies-page row shows: the core's [status] first, then for a ready proxy its ping.
-  ProxyRowState get rowState => switch (status) {
+  /// What a proxies-page row shows: at rest when keep top left it so, else the core's [status]
+  /// first, then for a ready proxy its ping.
+  ProxyRowState get rowState => resting ? ProxyRowState.resting : _runningState;
+
+  ProxyRowState get _runningState => switch (status) {
     Status.CONNECTING => ProxyRowState.connecting,
     Status.REGISTERING => ProxyRowState.registering,
     Status.SEARCHING => ProxyRowState.searching,
@@ -197,7 +200,13 @@ extension OutboundInfoCard on OutboundInfo {
   /// [type] without the status mark the core adds while the proxy is not ready
   /// ("WARP ⏳ Connecting..."); the row shows the status its own way.
   String get typeWithoutStatus => status == Status.READY ? type : type.replaceFirst(_statusMark, '');
+
+  /// A config the core could not read: it folds the reason into the type ("Invalid: bad uuid";
+  /// hiddify-sing-box adapter/h_display.go).
+  bool get isInvalid => _invalidType.hasMatch(typeWithoutStatus);
 }
+
+final _invalidType = RegExp(r'^Invalid:?\s+\S');
 
 /// The endpoint the WARP scanner chose, as the core appends it to the display type
 /// (" · 🔍 162.159.192.1:2408", " · 🔍 [2606:4700:…]:443"; hiddify-sing-box hiddify/warpscan/status.go).
@@ -214,5 +223,6 @@ final _scannerEndpoint = RegExp(r'^(.*?) · 🔍 (\[[0-9a-fA-F:]+\]:\d+|\d+\.\d+
 final _statusMark = RegExp(r'\s+(⏳|⌛|🔍|❌|🔑)\s.*$');
 
 /// A proxies-page row's state. [untested] waits for its first ping; [pingFailed] is ready but its
-/// ping got no answer; [failed] is the core's FAILED, the proxy gave up.
-enum ProxyRowState { ready, untested, pingFailed, connecting, registering, searching, reconnecting, failed }
+/// ping got no answer; [failed] is the core's FAILED, the proxy gave up; [resting] is one keep top
+/// left at rest: not loaded and not tested until it is selected, tested or kept loaded.
+enum ProxyRowState { ready, untested, pingFailed, connecting, registering, searching, reconnecting, failed, resting }

@@ -1,0 +1,148 @@
+# Android APK (one per ABI and a universal one) and the Google Play bundle.
+name: Build Android
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Sign the build and upload it as an artifact. Off, the job only checks that it builds.
+        type: boolean
+        required: true
+      channel:
+        description: dev or prod (the Makefile's CHANNEL).
+        type: string
+        required: true
+      upload-symbols:
+        description: Upload the debug symbols to Sentry.
+        type: boolean
+        default: false
+      build-number:
+        description: The store build number (build.yml's codegen). Empty - the next one, found here.
+        type: string
+        default: ''
+      targets:
+        description: What to build, a JSON list of apk and aab.
+        type: string
+        default: '["apk", "aab"]'
+      ref:
+        description: The commit to build. Empty - the one of this run.
+        type: string
+        default: ''
+      generated-code:
+        description: Take the generated code from this run's `generated-code` artifact (build.yml's codegen). Off, it is generated here.
+        type: boolean
+        default: true
+
+env:
+  CHANNEL: ${{ inputs.channel }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+jobs:
+  build:
+    name: android-${{ matrix.target }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # A failed build does not stop the release of the other platforms.
+    continue-on-error: true
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(inputs.targets) }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      # No Gradle cache: it had grown to 5 GB, and restoring it took 65-185 s of every build -
+      # about what Gradle needs to download its dependencies again.
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        with:
+          # default also installs the legacy 'tools' package, which no longer exists
+          packages: platform-tools
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: android-${{ matrix.target }}
+          generated-code: ${{ inputs.generated-code }}
+
+      - name: Set up the signing key
+        if: inputs.release
+        env:
+          SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+        run: |
+          echo "$SIGNING_KEY" | base64 --decode > android/key.jks
+          printf '%s=%s\n' \
+            storeFile "$PWD/android/key.jks" \
+            storePassword "$STORE_PASSWORD" \
+            keyPassword "$KEY_PASSWORD" \
+            keyAlias "$KEY_ALIAS" > android/key.properties
+
+      # Google Play takes each version code once, and every build of a version (each draft, the .dev
+      # tag, the release) has pubspec's. The APKs and the bundle get the run's store build number
+      # (next-build-number: one more than the highest any store took), the one the IPA and the Mac
+      # App Store pkg carry too.
+      - name: Give the build the store build number
+        if: inputs.release
+        uses: ./.github/actions/set-build-number
+        with:
+          build: ${{ inputs.build-number }}
+
+      - name: Build
+        run: make android-${{ matrix.target }}-release
+
+      - name: Upload debug symbols to Sentry
+        if: inputs.release && inputs.upload-symbols
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_DIST: ${{ matrix.target == 'aab' && 'google-play' || 'general' }}
+        run: |
+          dart pub global activate sentry_dart_plugin
+          dart run sentry_dart_plugin
+
+      - name: Collect the APKs
+        if: matrix.target == 'apk'
+        run: |
+          mkdir out
+          ls -R build/app/outputs
+          apk=build/app/outputs/flutter-apk
+          cp $apk/*arm64-v8a*.apk out/Hiddify-Android-arm64.apk || echo "no arm64 apk"
+          cp $apk/*armeabi-v7a*.apk out/Hiddify-Android-arm7.apk || echo "no arm7 apk"
+          cp $apk/*x86_64*.apk out/Hiddify-Android-x86_64.apk || echo "no x64 apk"
+          cp $apk/app-release.apk out/Hiddify-Android-universal.apk || echo "no universal apk"
+
+      - name: Collect the Google Play bundle
+        if: matrix.target == 'aab'
+        run: |
+          mkdir out
+          ls -R build/app/outputs
+          cp build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab
+
+      - name: Upload the artifact
+        if: inputs.release
+        uses: actions/upload-artifact@v6
+        with:
+          name: android-${{ matrix.target }}
+          path: out
+          retention-days: 1
+          # The packages are compressed already.
+          compression-level: 0
+          if-no-files-found: error

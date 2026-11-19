@@ -15,28 +15,53 @@ abstract class UriUtils {
     return tryShareFile(uri);
   }
 
+  /// Android and iOS open [uri] without asking first: Android answers "can launch" only for apps
+  /// in the manifest's queries, so a browser, Telegram or a mail app looked absent and nothing
+  /// opened; iOS answers it only for schemes in Info.plist (`mailto` is not). Opening just fails
+  /// when no app takes it. Desktops check first, as in [tryLaunchAppOrWeb].
   static Future<bool> tryLaunch(Uri uri) async {
     try {
       loggy.debug("launching [$uri]");
-      if (!await canLaunchUrl(uri)) {
+      if (!Platform.isAndroid && !Platform.isIOS && !await canLaunchUrl(uri)) {
         loggy.warning("can't launch [$uri]");
         return false;
       }
-      return launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) loggy.warning("no app opened [$uri]");
+      return launched;
     } catch (e, stackTrace) {
       loggy.warning("error launching [$uri]", e, stackTrace);
       return false;
     }
   }
 
-  static Future<bool> tryShareFile(Uri uri, {String? mimeType}) async {
+  /// Opens [appUri] (such as `tg://`) in its app, and [webUri] when no app takes it.
+  /// Android and iOS are asked to open the app link directly: iOS answers "can launch" only
+  /// for schemes listed in Info.plist, and Android only for apps in the manifest's queries,
+  /// while opening it just fails when no app is there. Desktops check first: Windows opens
+  /// a "find an app" prompt for a scheme nothing handles instead of failing.
+  static Future<bool> tryLaunchAppOrWeb(Uri appUri, Uri webUri) async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS || await canLaunchUrl(appUri)) {
+        loggy.debug("launching [$appUri]");
+        if (await launchUrl(appUri, mode: LaunchMode.externalNonBrowserApplication)) return true;
+      }
+    } catch (e, stackTrace) {
+      loggy.debug("no app for [$appUri], opening [$webUri]", e, stackTrace);
+    }
+    return tryLaunch(webUri);
+  }
+
+  /// [subject] and [text] go with the file to the app the user picks: a mail app makes them
+  /// the message's subject and body.
+  static Future<bool> tryShareFile(Uri uri, {String? mimeType, String? subject, String? text}) async {
     try {
       loggy.debug("sharing [$uri]");
       // the file's own path: uri.path keeps the percent-encoding, so a name with a space or a
       // non-ASCII letter pointed at a file that does not exist
       final path = uri.scheme.isEmpty || uri.isScheme('file') ? uri.toFilePath() : uri.path;
       final file = XFile(path, mimeType: mimeType);
-      final result = await Share.shareXFiles([file], sharePositionOrigin: _shareOrigin());
+      final result = await Share.shareXFiles([file], subject: subject, text: text, sharePositionOrigin: _shareOrigin());
       loggy.debug("share result: ${result.raw}");
       return result.status == ShareResultStatus.success;
     } catch (e, stackTrace) {

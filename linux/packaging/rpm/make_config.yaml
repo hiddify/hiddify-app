@@ -1,50 +1,68 @@
+display_name: Hiddify
+url: https://github.com/hiddify/hiddify-app
+license: Other
+summary: A multi-platform proxy client based on Sing-box universal proxy tool-chain.
 
+packager: hiddify
+packagerEmail: linux@hiddify.com
 
-# <<<   RPM NOT SUPPORTED   >>>
-# We decided to remove RPM packaging for the following reasons:
-# - Flutter officially supports Debian-based systems only.
-# - Persistent issues with dependency linking.
-# - High maintenance overhead (requires Fedora environment setup).
-# - Successful builds do not guarantee runtime stability on Red Hat-based systems.
+icon: assets/images/source/ic_launcher_border.png
 
+keywords:
+  - Hiddify
+  - Proxy
+  - VPN
+  - V2ray
+  - Nekoray
+  - Xray
+  - Psiphon
+  - OpenVPN
 
-# display_name: Hiddify
-# url: https://github.com/hiddify/hiddify-app
-# license: Other
+generic_name: Hiddify
 
-# packager: hiddify
-# packagerEmail: linux@hiddify.com
+# The libraries the bundle links (the tray icon's libayatana-appindicator3.so.1 among them) are
+# not listed here: rpmbuild adds them itself as soname requirements, which every distribution
+# resolves to its own package. A package name would not: Fedora calls the tray library
+# libayatana-appindicator-gtk3, openSUSE libayatana-appindicator3-1.
+requires:
+  # VPN mode asks for the administrator password once, through pkexec
+  - polkit
 
-# icon: assets/images/source/ic_launcher_border.png
+categories:
+  - Network
 
-# keywords:
-#   - Hiddify
-#   - Proxy
-#   - VPN
-#   - V2ray
-#   - Nekoray
-#   - Xray
-#   - Psiphon
-#   - OpenVPN
+startup_notify: true
 
-# generic_name: Hiddify
+# %post runs on every install and upgrade, so both steps are safe to repeat.
+# - fastforge's RPM maker has no startup_wm_class option (its .deb maker has), so the desktop
+#   entry has no StartupWMClass. The window's app id is app.hiddify.com (linux/CMakeLists.txt),
+#   which does not match hiddify.desktop, so GNOME showed the generic icon for the window and in
+#   the dock. The line is added unless the entry has one.
+# - As in the .deb: the per-user launchers the AppImage wrote (marked X-AppImage-Name) have the
+#   same desktop id and would hide this one, and start the AppImage instead. They are dropped;
+#   every other user file is left alone.
+postinstall_scripts:
+  - |
+    desktop=/usr/share/applications/hiddify.desktop
+    if [ -f "$desktop" ] && ! grep -q '^StartupWMClass=' "$desktop"; then
+      sed -i '/^StartupNotify=/a StartupWMClass=app.hiddify.com' "$desktop"
+    fi
+    for user_desktop in /home/*/.local/share/applications/hiddify.desktop /root/.local/share/applications/hiddify.desktop; do
+      if [ -f "$user_desktop" ] && grep -q '^X-AppImage-Name=' "$user_desktop"; then
+        rm -f "$user_desktop"
+      fi
+    done
+    if command -v update-desktop-database >/dev/null 2>&1; then
+      update-desktop-database -q /usr/share/applications || true
+    fi
 
-# requires:
-#   - libayatana-appindicator-gtk3
-#   # - libcurl
-#   # - openssl
-
-# categories:
-#   - Network
-
-# startup_notify: true
-# # app_links setup for Linux
-# # https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
-# supported_mime_type:
-#   - x-scheme-handler/hiddify
-#   - x-scheme-handler/v2ray
-#   - x-scheme-handler/v2rayn
-#   - x-scheme-handler/v2rayng
-#   - x-scheme-handler/clash
-#   - x-scheme-handler/clashmeta
-#   - x-scheme-handler/sing-box
+# app_links setup for Linux
+# https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+supported_mime_type:
+  - x-scheme-handler/hiddify
+  - x-scheme-handler/v2ray
+  - x-scheme-handler/v2rayn
+  - x-scheme-handler/v2rayng
+  - x-scheme-handler/clash
+  - x-scheme-handler/clashmeta
+  - x-scheme-handler/sing-box

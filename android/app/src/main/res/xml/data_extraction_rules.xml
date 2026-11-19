@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12 and later (android:dataExtractionRules): the same exclusions as backup_rules.xml,
+     for cloud backups and for a transfer to a new device. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="grpc/" />
+        <exclude domain="external" path="data/AppSettings.db/" />
+        <exclude domain="root" path="app_flutter/data/AppSettings.db/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="grpc/" />
+        <exclude domain="external" path="data/AppSettings.db/" />
+        <exclude domain="root" path="app_flutter/data/AppSettings.db/" />
+    </device-transfer>
+</data-extraction-rules>

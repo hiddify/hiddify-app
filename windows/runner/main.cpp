@@ -49,6 +49,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command)
 {
 
+  // A launch at login (the Run key, the Startup folder shortcut or the MSIX startup task) can
+  // find a copy that another of those entries already started. Showing that copy's window, as a
+  // second launch by hand does, would undo a silent start, so this one just leaves.
+  if (wcsstr(command_line, L"--autostart") != nullptr &&
+      ::FindWindow(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Hiddify") != nullptr)
+  {
+    return EXIT_SUCCESS;
+  }
+
   // Replace "example" with the generated title found as parameter of `window.Create` in this file.
   // You may ignore the result if you need to create another window.
   if (SendAppLinkToInstance(L"Hiddify"))

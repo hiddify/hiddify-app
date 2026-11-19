@@ -41,7 +41,9 @@ final _cidrPrefixRegex = RegExp(r'^(0|[1-9]\d{0,2})$');
 
 final _domainRegex = RegExp(r'^([a-zA-Z\d\-]+\.)+[a-zA-Z\d\-]{2,}$', caseSensitive: false);
 
-final _domainSuffix = RegExp(r'^\.[a-zA-Z\d\-]{2,}$', caseSensitive: false);
+/// What sing-box's domain_suffix takes: a top-level suffix (`.ir`, `ir`), a whole
+/// domain with its subdomains (`noon.com`), or only its subdomains (`.noon.com`).
+final _domainSuffix = RegExp(r'^\.?([a-zA-Z\d\-_]+\.)*[a-zA-Z\d\-]{2,}$', caseSensitive: false);
 
 /// https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url/3809435#3809435
 bool isUrl(String input) {

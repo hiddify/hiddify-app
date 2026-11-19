@@ -8,6 +8,11 @@ enum Environment {
   dev;
 
   static const sentryDSN = String.fromEnvironment("sentry_dsn");
+
+  // The commit this build was made from, 7 characters (the Makefile sets it); empty in a build
+  // made without it, such as `flutter run`
+  static const commit = String.fromEnvironment("commit");
+
   // This environment variable is set in the 'windows-release-zip' command
   static const isPortable = bool.fromEnvironment("portable");
 }
@@ -38,6 +43,9 @@ enum Release {
     if (Release.values.firstOrNullWhere((e) => e.key == defined) case final release?) return release;
     if (kIsWeb) return general;
     if (Platform.isIOS) return appStore;
+    // only the Mac App Store build runs sandboxed: it never updates itself nor asks for root,
+    // even when built without the define
+    if (Platform.isMacOS && Platform.environment.containsKey('APP_SANDBOX_CONTAINER_ID')) return appStore;
     if (Platform.isWindows && isMsix(Platform.resolvedExecutable)) return microsoftStore;
     return general;
   }

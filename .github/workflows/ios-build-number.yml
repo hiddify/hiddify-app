@@ -1,0 +1,27 @@
+# Shows the build number the next store builds (Android, iOS, macOS) get, from the
+# android-build, ios-build and macos-build tags the store uploads record, without building anything.
+name: Next build number
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  next-build-number:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Find the next build number
+        id: next
+        uses: ./.github/actions/next-build-number
+
+      - name: Summary
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+          BUILD: ${{ steps.next.outputs.build }}
+        run: |
+          echo "### $VERSION: next build number $BUILD" >> "$GITHUB_STEP_SUMMARY"

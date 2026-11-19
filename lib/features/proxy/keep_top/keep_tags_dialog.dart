@@ -9,16 +9,17 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/proxy/keep_top/country_names.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:protobuf/protobuf.dart';
 
 /// How the picker's list is ordered.
 enum _Sort { profile, ping, download, upload }
@@ -29,13 +30,25 @@ enum _Status { answering, paused }
 /// The quick filters that narrow the list; each kind of filter counts with the others in place.
 enum _Facet { status, protocol, country }
 
+/// How many proxies the picker's speed test has the core test at a time, how long it waits for
+/// the core to say it tests one, and for the test to end.
+const _speedTestsAtOnce = 3;
+const _speedTestSeen = Duration(seconds: 4);
+const _speedTestWait = Duration(minutes: 2);
+
 /// How many "the fastest" are, to test or to choose.
 const _fastest = 10;
 
-/// A country with fewer proxies than this is under "others" in the country filter.
-const _fewCountry = 5;
+/// A country with fewer proxies than this shares an entry of the country filter with other rare ones.
+const _fewCountry = 3;
 
-/// The country filter's entry for the countries with few proxies, and the proxies with none.
+/// The most rare countries one entry holds.
+const _mergedCountries = 4;
+
+/// The start of the entry of a group of rare countries: `+0`, `+1`, ...
+const _countryGroup = '+';
+
+/// The country filter's entry for the proxies of no known country.
 const _otherCountries = '*';
 
 /// The protocol a sing-box [type] is, as the core names it on the proxy page.
@@ -101,38 +114,32 @@ class KeepTagsDialog extends HookConsumerWidget {
 
     final tags = useMemoized(() => [for (final p in proxies) p.tag], [proxies]);
     final protocols = useMemoized(() => {for (final p in proxies) p.tag: protocolName(p.type)}, [proxies]);
-    final countries = useMemoized(
-      () => {
-        for (final p in proxies)
-          if (countryOf(p.tag) case final code?) p.tag: code,
-      },
-      [proxies],
-    );
 
     final selected = useState<Set<String>>({...profile.keepTags.where(tags.contains)});
     final query = useState('');
     final sort = useState(_Sort.profile);
     final countryFilter = useState(<String>{});
-    // the countries with few proxies, and the proxies with none, are one entry: the list stays short
-    final fewCountries = useMemoized(() {
-      final totals = <String, int>{};
-      for (final code in countries.values) {
-        totals[code] = (totals[code] ?? 0) + 1;
-      }
-      return {
-        for (final MapEntry(:key, :value) in totals.entries)
-          if (value < _fewCountry) key,
-      };
-    }, [countries]);
-    // the entry a proxy's country is under: its own, or the others'
-    String countryEntry(String tag) => switch (countries[tag]) {
-      final code? when !fewCountries.contains(code) => code,
-      _ => _otherCountries,
-    };
     final protocolFilter = useState(<String>{});
     // the proxies that answer first: those are the ones worth choosing
     final statusFilter = useState(<_Status>{_Status.answering});
     final woke = useState(false);
+    // the proxies a ping was asked for, with the time of the result each had then: a row says it is
+    // being tested until a newer result is in
+    final pinging = useState(const <String, int>{});
+    final pingTimeout = useRef<Timer?>(null);
+    // the speed test under way: another one, or the picker closing, ends it
+    final speedRun = useRef(0);
+    useEffect(
+      () =>
+          () => speedRun.value++,
+      const [],
+    );
+    final liveNow = useRef(const <String, OutboundInfo>{});
+    useEffect(
+      () =>
+          () => pingTimeout.value?.cancel(),
+      const [],
+    );
     // the chosen proxies in the list whatever the other filters; off, those they hide go to the
     // tray at the bottom
     final showChosen = useState(true);
@@ -145,11 +152,52 @@ class KeepTagsDialog extends HookConsumerWidget {
     };
     final connected = group != null && live.isNotEmpty;
 
+    // a proxy's country: where its IP is, as the core looked it up, else the flag in its name
+    final countries = {
+      for (final tag in tags)
+        if (live[tag]?.ipinfo.countryCode.toUpperCase() ?? '' case final code when code.length == 2)
+          tag: code
+        else if (countryOf(tag) case final code?)
+          tag: code,
+    };
+    // a country of a proxy or two is not a row of its own: such countries share rows, up to
+    // _mergedCountries in one, the most common first, each row named by their flags
+    final countryTotals = <String, int>{};
+    for (final code in countries.values) {
+      countryTotals[code] = (countryTotals[code] ?? 0) + 1;
+    }
+    final rare =
+        [
+          for (final e in countryTotals.entries)
+            if (e.value < _fewCountry) e.key,
+        ]..sort(
+          (a, b) =>
+              countryTotals[a] != countryTotals[b] ? countryTotals[b]!.compareTo(countryTotals[a]!) : a.compareTo(b),
+        );
+    final countryGroups = <String, List<String>>{};
+    final groupOf = <String, String>{};
+    for (final (i, code) in rare.indexed) {
+      final group = '$_countryGroup${i ~/ _mergedCountries}';
+      (countryGroups[group] ??= []).add(code);
+      groupOf[code] = group;
+    }
+    // the entry a proxy's country is under: its own, its group's, or the others' when it has none
+    String countryEntry(String tag) => switch (countries[tag]) {
+      final code? => groupOf[code] ?? code,
+      _ => _otherCountries,
+    };
+
     // a paused proxy, as the core would show it: its tag without the core's mark, its protocol
     OutboundInfo info(String tag) =>
         live[tag] ??
         OutboundInfo(tag: tag, tagDisplay: tag.replaceFirst(RegExp('§.*'), '').trimRight(), type: protocols[tag]);
-    bool answers(OutboundInfo e) => e.urlTestDelay > 0 && e.urlTestDelay < 65000;
+    bool validDelay(int delay) => delay > 0 && delay < 65000;
+    // the ping known of a proxy: of this run, else, for one not tested in it, the one the core kept
+    // from the run before; 0 when it failed or was never tested
+    int delayOf(OutboundInfo e) => validDelay(e.urlTestDelay)
+        ? e.urlTestDelay
+        : (e.urlTestDelay == 0 && validDelay(e.sortDelay) ? e.sortDelay : 0);
+    bool answers(OutboundInfo e) => delayOf(e) > 0;
     bool paused(String tag) => connected && !live.containsKey(tag);
     bool hasStatus(String tag, _Status status) => switch (status) {
       // not connected, nothing answers yet: the filter would hide every proxy
@@ -192,7 +240,7 @@ class KeepTagsDialog extends HookConsumerWidget {
         shown.sort((a, b) {
           final (x, y) = (info(a), info(b));
           if (answers(x) != answers(y)) return answers(x) ? -1 : 1;
-          final delay = answers(x) ? x.urlTestDelay.compareTo(y.urlTestDelay) : 0;
+          final delay = answers(x) ? delayOf(x).compareTo(delayOf(y)) : 0;
           return delay != 0 ? delay : byOrder(a, b);
         });
       // by the one speed, then the other, then ping, as on the proxy page
@@ -232,18 +280,77 @@ class KeepTagsDialog extends HookConsumerWidget {
     final chosenLive = tags.where((tag) => selected.value.contains(tag) && live.containsKey(tag)).toList();
     final shownLive = shown.where(live.containsKey).toList();
 
-    /// Runs [run] on [targets]: every proxy that runs, together in the core; else one by one.
-    Future<void> runOn(List<String> targets, Future<void> Function(String tag) run) async {
-      final groupTag = group?.tag;
-      if (groupTag == null || targets.isEmpty) return;
-      if (targets.length == live.length) return run(groupTag);
-      for (final tag in targets) {
-        await run(tag);
+    // the speed test hands the core a few proxies at a time, and the next as each is done: the
+    // picker closed, or another test started, nothing more is asked for. All of them asked for at
+    // once kept the core testing, a hundred proxies on, long after the picker was gone, and a test
+    // of the proxy page waited behind them.
+    liveNow.value = live;
+    Future<void> speedTestTags(List<String> targets) async {
+      final run = ++speedRun.value;
+      final notifier = ref.read(proxiesOverviewNotifierProvider.notifier);
+      bool stopped() => speedRun.value != run;
+      bool testing(String tag) {
+        final proxy = liveNow.value[tag];
+        return proxy != null && (proxy.uploadTesting || proxy.downloadTesting);
+      }
+
+      final left = [...targets];
+      Future<void> worker() async {
+        while (left.isNotEmpty && !stopped()) {
+          final tag = left.removeAt(0);
+          await notifier.speedTest(tag);
+          // the core says it tests it a moment after it was asked, then that it is done
+          final asked = DateTime.now();
+          var seen = false;
+          while (!stopped()) {
+            await Future<void>.delayed(const Duration(milliseconds: 300));
+            final waited = DateTime.now().difference(asked);
+            if (testing(tag)) {
+              seen = true;
+            } else if (seen || waited > _speedTestSeen) {
+              break;
+            }
+            if (waited > _speedTestWait) break;
+          }
+        }
+      }
+
+      await Future.wait([for (var i = 0; i < _speedTestsAtOnce; i++) worker()]);
+    }
+
+    // a ping costs next to nothing: it runs at once on the proxies shown, the ones at rest too,
+    // which the core loads a few at a time for it
+    Future<void> pingTags(List<String> targets) async {
+      if (targets.isEmpty) return;
+      pinging.value = {for (final tag in targets) tag: live[tag]!.urlTestTime.seconds.toInt()};
+      // one that never answers, or was not tested, stops saying so
+      pingTimeout.value?.cancel();
+      pingTimeout.value = Timer(const Duration(seconds: 30), () => pinging.value = const {});
+      await ref.read(proxiesOverviewNotifierProvider.notifier).urlTestProxies(targets);
+    }
+
+    Future<void> ping() => pingTags(shownLive);
+
+    // "answering" is asked of every proxy: the ones with no ping of this run, which the other
+    // filters let through, are tested now, and join the list as they answer. One with a ping from
+    // the run before is listed meanwhile.
+    void flipStatus(_Status status) {
+      final turnedOn = !statusFilter.value.contains(status);
+      statusFilter.value = _flip(statusFilter.value, status);
+      if (status == _Status.answering && turnedOn && connected) {
+        unawaited(
+          pingTags([
+            for (final tag in tags)
+              if (live[tag]?.urlTestDelay == 0 && passes(tag, skip: _Facet.status)) tag,
+          ]),
+        );
       }
     }
 
-    // a ping costs next to nothing: it runs at once on the proxies shown
-    Future<void> ping() => runOn(shownLive, ref.read(proxiesOverviewNotifierProvider.notifier).urlTest);
+    bool beingPinged(String tag) => switch (pinging.value[tag]) {
+      final asked? => live[tag]?.urlTestTime.seconds.toInt() == asked,
+      _ => false,
+    };
 
     // a speed test sends megabytes through each: the speed test dialog says how much first
     Future<void> speedTest() async {
@@ -251,12 +358,9 @@ class KeepTagsDialog extends HookConsumerWidget {
           .read(dialogNotifierProvider.notifier)
           .showPickerSpeedTest(shown: shownLive.length, chosen: chosenLive.length);
       if (target == null) return;
-      final base = target == SpeedTestTarget.chosen ? chosenLive : shownLive;
-      final limit = ref.read(ConfigOptions.uploadTestLimit);
-      await runOn(
-        limit <= 0 || base.length <= limit ? base : fastestOf(base, limit),
-        ref.read(proxiesOverviewNotifierProvider.notifier).speedTest,
-      );
+      // every one of them, as its dialog said: the picker is where they are compared. One at rest
+      // is tested by its tag: the core loads it for the test and lets it rest again after it
+      await speedTestTags(target == SpeedTestTarget.chosen ? chosenLive : shownLive);
     }
 
     // the rows show both speeds: a sort needs not change what the speed test measures
@@ -268,17 +372,15 @@ class KeepTagsDialog extends HookConsumerWidget {
     }
 
     final pausedCount = connected ? tags.where(paused).length : 0;
+    // the user decides among all the proxies: the paused ones run, and get a ping, while the picker
+    // is open
+    useEffect(() {
+      if (connected && pausedCount > 0 && !woke.value) unawaited(wake());
+      return null;
+    }, [connected]);
     final emoji = PlatformUtils.isWindows ? FontFamily.emoji : null;
-    // "Others: CN JP TR …", the most common of them first
-    String otherCountriesLabel(String others) {
-      final codes = _counts([
-        for (final code in countries.values)
-          if (fewCountries.contains(code)) code,
-      ]).map((e) => e.$1).toList();
-      if (codes.isEmpty) return others;
-      final shown = codes.take(6).join(' ');
-      return '$others: $shown${codes.length > 6 ? ' …' : ''}';
-    }
+    // a group of rare countries by their flags: "🇬🇧 🇹🇼 🇮🇹 🇰🇷"
+    String groupLabel(String group) => countryGroups[group]!.map(flagOf).join('  ');
 
     return PopScope(
       // dismissed: the proxies run as they did before the picker woke them
@@ -371,7 +473,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                   ],
                 ),
               ),
-              // the quick filters, in one row
+              // the quick filters
               const Gap(10),
               _FilterRow(
                 children: [
@@ -383,13 +485,13 @@ class KeepTagsDialog extends HookConsumerWidget {
                   ),
                   for (final (status, label, icon) in [
                     if (connected) (_Status.answering, text.statusAnswering, Icons.signal_cellular_alt_rounded),
-                    if (pausedCount > 0) (_Status.paused, text.statusPaused, Icons.pause_circle_outline_rounded),
+                    if (pausedCount > 0) (_Status.paused, text.statusPaused, Icons.bedtime_outlined),
                   ])
                     _Chip(
                       label: Text('$label · ${statusCounts[status]}'),
                       icon: icon,
                       selected: statusFilter.value.contains(status),
-                      onSelected: () => statusFilter.value = _flip(statusFilter.value, status),
+                      onSelected: () => flipStatus(status),
                     ),
                   if (protocolCounts.isNotEmpty)
                     _FacetButton(
@@ -407,14 +509,21 @@ class KeepTagsDialog extends HookConsumerWidget {
                       icon: Icons.public_rounded,
                       options: [
                         for (final (code, count) in countryCounts)
-                          if (code != _otherCountries) (code, '${flagOf(code)}  $code', count),
-                        // the others last, named by their codes
+                          if (!code.startsWith(_countryGroup) && code != _otherCountries)
+                            (code, '${flagOf(code)}  ${countryNames[code] ?? code}', count),
+                        // then the groups of rare countries, by their flags, and the proxies of no country
                         for (final (code, count) in countryCounts)
-                          if (code == _otherCountries) (code, otherCountriesLabel(text.otherCountries), count),
+                          if (code.startsWith(_countryGroup)) (code, groupLabel(code), count),
+                        for (final (code, count) in countryCounts)
+                          if (code == _otherCountries) (code, text.otherCountries, count),
                       ],
                       selected: countryFilter.value,
                       onChanged: (value) => countryFilter.value = value,
                       style: TextStyle(fontFamily: emoji),
+                      // a country by its code or name; a group by those of its countries
+                      searchTerms: (entry) => [
+                        for (final code in countryGroups[entry] ?? [entry]) '$code ${countryNames[code] ?? ''}',
+                      ].join(' '),
                     ),
                 ],
               ),
@@ -446,11 +555,11 @@ class KeepTagsDialog extends HookConsumerWidget {
                 const _ConnectCard()
               else if (pausedCount > 0 && !woke.value)
                 _Banner(
-                  icon: Icons.pause_circle_outline_rounded,
+                  icon: Icons.bedtime_outlined,
                   text: text.paused(n: pausedCount),
                   action: TextButton.icon(
                     onPressed: wake,
-                    icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                    icon: const Icon(Icons.wb_sunny_outlined, size: 18),
                     label: Text(text.wake),
                   ),
                 ),
@@ -486,6 +595,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                                       checked: selected.value.contains(tag),
                                       paused: paused(tag),
                                       live: live.containsKey(tag),
+                                      testing: beingPinged(tag),
                                       onTap: () => toggle(tag),
                                     );
                                   },
@@ -573,7 +683,7 @@ class KeepTagsDialog extends HookConsumerWidget {
 
 /// A filter of many values, as one chip: "Protocol", or what is ticked, opening the values with
 /// their counts to tick.
-class _FacetButton extends StatelessWidget {
+class _FacetButton extends HookWidget {
   const _FacetButton({
     required this.label,
     required this.any,
@@ -582,6 +692,7 @@ class _FacetButton extends StatelessWidget {
     required this.selected,
     required this.onChanged,
     this.style,
+    this.searchTerms,
   });
 
   final String label;
@@ -596,9 +707,15 @@ class _FacetButton extends StatelessWidget {
   final ValueChanged<Set<String>> onChanged;
   final TextStyle? style;
 
+  /// What a value is found by, typed in the field at the top of the values; no field when null.
+  final String Function(String value)? searchTerms;
+
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    final query = useTextEditingController();
+    useListenable(query);
+    final needle = query.text.trim().toLowerCase();
     final names = {for (final (value, name, _) in options) value: name};
     final title = switch (selected.length) {
       0 => label,
@@ -624,6 +741,22 @@ class _FacetButton extends StatelessWidget {
         onSelected: (_) => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        if (searchTerms != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
+            child: SizedBox(
+              width: 220,
+              child: TextField(
+                controller: query,
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                  hintText: label,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ),
         MenuItemButton(
           leadingIcon: Icon(Icons.clear_all_rounded, size: 20, color: selected.isEmpty ? s.primary : null),
           onPressed: () => onChanged({}),
@@ -631,16 +764,18 @@ class _FacetButton extends StatelessWidget {
         ),
         const Divider(height: 1),
         for (final (value, name, count) in options)
-          CheckboxMenuButton(
-            value: selected.contains(value),
-            closeOnActivate: false,
-            onChanged: (checked) => onChanged(checked ?? false ? {...selected, value} : ({...selected}..remove(value))),
-            trailingIcon: Text(
-              '$count',
-              style: TextStyle(color: s.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()]),
+          if (needle.isEmpty || searchTerms!(value).toLowerCase().contains(needle))
+            CheckboxMenuButton(
+              value: selected.contains(value),
+              closeOnActivate: false,
+              onChanged: (checked) =>
+                  onChanged(checked ?? false ? {...selected, value} : ({...selected}..remove(value))),
+              trailingIcon: Text(
+                '$count',
+                style: TextStyle(color: s.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()]),
+              ),
+              child: Text(name, style: style),
             ),
-            child: Text(name, style: style),
-          ),
       ],
     );
   }
@@ -655,12 +790,16 @@ class _PickRow extends StatelessWidget {
     required this.checked,
     required this.paused,
     required this.live,
+    this.testing = false,
     required this.onTap,
   });
 
   final OutboundInfo proxy;
   final bool checked;
   final bool paused;
+
+  /// A ping asked for is on its way.
+  final bool testing;
 
   /// The core runs it: its ping is or will be known.
   final bool live;
@@ -669,6 +808,18 @@ class _PickRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    // every proxy is a choice here, also one keep top left at rest: it shows as any other, with
+    // the last ping known of it (of this run, else the one kept from the run before), not as paused
+    final last = proxy.urlTestDelay > 0 ? proxy.urlTestDelay : proxy.sortDelay;
+    // a speed measured before the core restarted is still what is known of the proxy: it stays
+    // as bright as a new one, where the proxy page fades it
+    final shown = proxy.resting || proxy.uploadSpeedCached || proxy.downloadSpeedCached
+        ? (proxy.deepCopy()
+            ..resting = false
+            ..urlTestDelay = proxy.resting ? last : proxy.urlTestDelay
+            ..uploadSpeedCached = false
+            ..downloadSpeedCached = false)
+        : proxy;
     return Stack(
       children: [
         AnimatedOpacity(
@@ -679,7 +830,15 @@ class _PickRow extends StatelessWidget {
             type: MaterialType.transparency,
             // a tap anywhere chooses it; the tests are the buttons', never a stray tap's
             // not running (paused, or not connected): no ping is coming, so none shows
-            child: ProxyTile(proxy, selected: checked, onTap: onTap, testable: false, showPing: live),
+            child: ProxyTile(
+              shown,
+              selected: checked,
+              onTap: onTap,
+              testable: false,
+              // one at rest with no ping known waits for none
+              showPing: live && !(proxy.resting && last == 0),
+              testing: testing,
+            ),
           ),
         ),
         // the check, on the flag's corner
@@ -837,21 +996,19 @@ class _ChosenTray extends ConsumerWidget {
   }
 }
 
-/// One row of quick filters, scrolled sideways when they do not fit.
+/// The quick filters, on as many lines as they need: a row scrolled sideways hid the last ones
+/// past the edge, with nothing to show there were more.
 class _FilterRow extends StatelessWidget {
   const _FilterRow({required this.children});
 
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 36,
-    child: ListView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: [
-        for (final (i, child) in children.indexed) ...[if (i > 0) const Gap(6), child],
-      ],
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: SizedBox(
+      width: double.infinity,
+      child: Wrap(spacing: 6, runSpacing: 6, children: children),
     ),
   );
 }

@@ -663,6 +663,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.bool? downloadSpeedCached,
     $core.String? error,
     $core.int? sortDelay,
+    $core.bool? resting,
+    $core.String? insecureReason,
+    $core.bool? deepSearchAvailable,
   }) {
     final $result = create();
     if (tag != null) {
@@ -743,6 +746,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (sortDelay != null) {
       $result.sortDelay = sortDelay;
     }
+    if (resting != null) {
+      $result.resting = resting;
+    }
+    if (insecureReason != null) {
+      $result.insecureReason = insecureReason;
+    }
+    if (deepSearchAvailable != null) {
+      $result.deepSearchAvailable = deepSearchAvailable;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -776,6 +788,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOB(24, _omitFieldNames ? '' : 'downloadSpeedCached')
     ..aOS(25, _omitFieldNames ? '' : 'error')
     ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
+    ..aOB(27, _omitFieldNames ? '' : 'resting')
+    ..aOS(28, _omitFieldNames ? '' : 'insecureReason')
+    ..aOB(29, _omitFieldNames ? '' : 'deepSearchAvailable')
     ..hasRequiredFields = false
   ;
 
@@ -1037,6 +1052,33 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasSortDelay() => $_has(25);
   @$pb.TagNumber(26)
   void clearSortDelay() => clearField(26);
+
+  @$pb.TagNumber(27)
+  $core.bool get resting => $_getBF(26);
+  @$pb.TagNumber(27)
+  set resting($core.bool v) { $_setBool(26, v); }
+  @$pb.TagNumber(27)
+  $core.bool hasResting() => $_has(26);
+  @$pb.TagNumber(27)
+  void clearResting() => clearField(27);
+
+  @$pb.TagNumber(28)
+  $core.String get insecureReason => $_getSZ(27);
+  @$pb.TagNumber(28)
+  set insecureReason($core.String v) { $_setString(27, v); }
+  @$pb.TagNumber(28)
+  $core.bool hasInsecureReason() => $_has(27);
+  @$pb.TagNumber(28)
+  void clearInsecureReason() => clearField(28);
+
+  @$pb.TagNumber(29)
+  $core.bool get deepSearchAvailable => $_getBF(28);
+  @$pb.TagNumber(29)
+  set deepSearchAvailable($core.bool v) { $_setBool(28, v); }
+  @$pb.TagNumber(29)
+  $core.bool hasDeepSearchAvailable() => $_has(28);
+  @$pb.TagNumber(29)
+  void clearDeepSearchAvailable() => clearField(29);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -1223,6 +1265,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
     $core.bool? selectable,
     $core.bool? isExpand,
     $core.Iterable<OutboundInfo>? items,
+    $core.bool? keepTopPicking,
   }) {
     final $result = create();
     if (tag != null) {
@@ -1243,6 +1286,9 @@ class OutboundGroup extends $pb.GeneratedMessage {
     if (items != null) {
       $result.items.addAll(items);
     }
+    if (keepTopPicking != null) {
+      $result.keepTopPicking = keepTopPicking;
+    }
     return $result;
   }
   OutboundGroup._() : super();
@@ -1256,6 +1302,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
     ..aOB(4, _omitFieldNames ? '' : 'selectable')
     ..aOB(5, _omitFieldNames ? '' : 'IsExpand', protoName: 'Is_expand')
     ..pc<OutboundInfo>(6, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundInfo.create)
+    ..aOB(7, _omitFieldNames ? '' : 'keepTopPicking')
     ..hasRequiredFields = false
   ;
 
@@ -1327,6 +1374,15 @@ class OutboundGroup extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $core.List<OutboundInfo> get items => $_getList(5);
+
+  @$pb.TagNumber(7)
+  $core.bool get keepTopPicking => $_getBF(6);
+  @$pb.TagNumber(7)
+  set keepTopPicking($core.bool v) { $_setBool(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasKeepTopPicking() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearKeepTopPicking() => clearField(7);
 }
 
 class OutboundGroupList extends $pb.GeneratedMessage {
@@ -2117,13 +2173,67 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
   void clearOutboundTag() => clearField(2);
 }
 
-class UrlTestRequest extends $pb.GeneratedMessage {
-  factory UrlTestRequest({
+class DeepSearchRequest extends $pb.GeneratedMessage {
+  factory DeepSearchRequest({
     $core.String? tag,
   }) {
     final $result = create();
     if (tag != null) {
       $result.tag = tag;
+    }
+    return $result;
+  }
+  DeepSearchRequest._() : super();
+  factory DeepSearchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DeepSearchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeepSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'tag')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DeepSearchRequest clone() => DeepSearchRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DeepSearchRequest copyWith(void Function(DeepSearchRequest) updates) => super.copyWith((message) => updates(message as DeepSearchRequest)) as DeepSearchRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DeepSearchRequest create() => DeepSearchRequest._();
+  DeepSearchRequest createEmptyInstance() => create();
+  static $pb.PbList<DeepSearchRequest> createRepeated() => $pb.PbList<DeepSearchRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DeepSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeepSearchRequest>(create);
+  static DeepSearchRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get tag => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set tag($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTag() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTag() => clearField(1);
+}
+
+class UrlTestRequest extends $pb.GeneratedMessage {
+  factory UrlTestRequest({
+    $core.String? tag,
+    $core.Iterable<$core.String>? tags,
+  }) {
+    final $result = create();
+    if (tag != null) {
+      $result.tag = tag;
+    }
+    if (tags != null) {
+      $result.tags.addAll(tags);
     }
     return $result;
   }
@@ -2133,6 +2243,7 @@ class UrlTestRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UrlTestRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'tag')
+    ..pPS(2, _omitFieldNames ? '' : 'tags')
     ..hasRequiredFields = false
   ;
 
@@ -2165,6 +2276,9 @@ class UrlTestRequest extends $pb.GeneratedMessage {
   $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
   void clearTag() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.String> get tags => $_getList(1);
 }
 
 class SpeedTestRequest extends $pb.GeneratedMessage {
@@ -2312,10 +2426,18 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
 class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
   factory SetSystemProxyEnabledRequest({
     $core.bool? isEnabled,
+    $core.String? address,
+    $core.bool? supportSocks,
   }) {
     final $result = create();
     if (isEnabled != null) {
       $result.isEnabled = isEnabled;
+    }
+    if (address != null) {
+      $result.address = address;
+    }
+    if (supportSocks != null) {
+      $result.supportSocks = supportSocks;
     }
     return $result;
   }
@@ -2325,6 +2447,8 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetSystemProxyEnabledRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOB(1, _omitFieldNames ? '' : 'isEnabled')
+    ..aOS(2, _omitFieldNames ? '' : 'address')
+    ..aOB(3, _omitFieldNames ? '' : 'supportSocks')
     ..hasRequiredFields = false
   ;
 
@@ -2357,6 +2481,26 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
   $core.bool hasIsEnabled() => $_has(0);
   @$pb.TagNumber(1)
   void clearIsEnabled() => clearField(1);
+
+  /// Where the system proxy points (host:port), when enabling: the local proxy of a core that runs
+  /// as root and cannot set the user's system proxy itself.
+  @$pb.TagNumber(2)
+  $core.String get address => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set address($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAddress() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAddress() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get supportSocks => $_getBF(2);
+  @$pb.TagNumber(3)
+  set supportSocks($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSupportSocks() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSupportSocks() => clearField(3);
 }
 
 class LogMessage extends $pb.GeneratedMessage {
@@ -2676,6 +2820,8 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     $core.String? destinationPath,
     $core.Map<$core.String, $core.List<$core.int>>? extraFiles,
     $core.bool? inline,
+    $core.bool? unencrypted,
+    $core.Map<$core.String, $core.List<$core.int>>? genericFiles,
   }) {
     final $result = create();
     if (destinationPath != null) {
@@ -2687,6 +2833,12 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     if (inline != null) {
       $result.inline = inline;
     }
+    if (unencrypted != null) {
+      $result.unencrypted = unencrypted;
+    }
+    if (genericFiles != null) {
+      $result.genericFiles.addAll(genericFiles);
+    }
     return $result;
   }
   ExportDiagnosticsRequest._() : super();
@@ -2697,6 +2849,8 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'destinationPath')
     ..m<$core.String, $core.List<$core.int>>(2, _omitFieldNames ? '' : 'extraFiles', entryClassName: 'ExportDiagnosticsRequest.ExtraFilesEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OY, packageName: const $pb.PackageName('hcore'))
     ..aOB(3, _omitFieldNames ? '' : 'inline')
+    ..aOB(4, _omitFieldNames ? '' : 'unencrypted')
+    ..m<$core.String, $core.List<$core.int>>(5, _omitFieldNames ? '' : 'genericFiles', entryClassName: 'ExportDiagnosticsRequest.GenericFilesEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OY, packageName: const $pb.PackageName('hcore'))
     ..hasRequiredFields = false
   ;
 
@@ -2741,12 +2895,29 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
   $core.bool hasInline() => $_has(2);
   @$pb.TagNumber(3)
   void clearInline() => clearField(3);
+
+  /// leave the sensitive part (config, logs, crashes, extra files) in the clear: for the user to
+  /// look at, or for a zip that goes inside another core's report, which encrypts it
+  @$pb.TagNumber(4)
+  $core.bool get unencrypted => $_getBF(3);
+  @$pb.TagNumber(4)
+  set unencrypted($core.bool v) { $_setBool(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasUnencrypted() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearUnencrypted() => clearField(4);
+
+  /// more files for the zip that are not sensitive, kept readable outside the encrypted part (the
+  /// app's own exceptions with their stack traces)
+  @$pb.TagNumber(5)
+  $core.Map<$core.String, $core.List<$core.int>> get genericFiles => $_getMap(4);
 }
 
 class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
   factory ExportDiagnosticsResponse({
     $core.String? path,
     $core.List<$core.int>? content,
+    $core.bool? encrypted,
   }) {
     final $result = create();
     if (path != null) {
@@ -2754,6 +2925,9 @@ class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
     }
     if (content != null) {
       $result.content = content;
+    }
+    if (encrypted != null) {
+      $result.encrypted = encrypted;
     }
     return $result;
   }
@@ -2764,6 +2938,7 @@ class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExportDiagnosticsResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'path')
     ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'content', $pb.PbFieldType.OY)
+    ..aOB(3, _omitFieldNames ? '' : 'encrypted')
     ..hasRequiredFields = false
   ;
 
@@ -2805,6 +2980,17 @@ class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
   $core.bool hasContent() => $_has(1);
   @$pb.TagNumber(2)
   void clearContent() => clearField(2);
+
+  /// the sensitive part is sensitive.encrypted.age, encrypted to the build's diagnostics key; false
+  /// when it was asked unencrypted or the build has no key
+  @$pb.TagNumber(3)
+  $core.bool get encrypted => $_getBF(2);
+  @$pb.TagNumber(3)
+  set encrypted($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasEncrypted() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearEncrypted() => clearField(3);
 }
 
 class LANIPResponse extends $pb.GeneratedMessage {
@@ -3148,6 +3334,7 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     $core.int? ownerPid,
     $core.String? cliPath,
     $core.String? ownerUser,
+    $core.bool? proxyOnly,
   }) {
     final $result = create();
     if (configContent != null) {
@@ -3174,6 +3361,9 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     if (ownerUser != null) {
       $result.ownerUser = ownerUser;
     }
+    if (proxyOnly != null) {
+      $result.proxyOnly = proxyOnly;
+    }
     return $result;
   }
   EnsureAdminBgServiceRequest._() : super();
@@ -3189,6 +3379,7 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     ..a<$core.int>(6, _omitFieldNames ? '' : 'ownerPid', $pb.PbFieldType.O3)
     ..aOS(7, _omitFieldNames ? '' : 'cliPath')
     ..aOS(8, _omitFieldNames ? '' : 'ownerUser')
+    ..aOB(9, _omitFieldNames ? '' : 'proxyOnly')
     ..hasRequiredFields = false
   ;
 
@@ -3279,6 +3470,16 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
   $core.bool hasOwnerUser() => $_has(7);
   @$pb.TagNumber(8)
   void clearOwnerUser() => clearField(8);
+
+  /// Runs the engine without its TUN: a proxy mode whose profile needs administrator rights.
+  @$pb.TagNumber(9)
+  $core.bool get proxyOnly => $_getBF(8);
+  @$pb.TagNumber(9)
+  set proxyOnly($core.bool v) { $_setBool(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasProxyOnly() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearProxyOnly() => clearField(9);
 }
 
 class EnsureAdminBgServiceEvent extends $pb.GeneratedMessage {
@@ -3357,6 +3558,255 @@ class EnsureAdminBgServiceEvent extends $pb.GeneratedMessage {
   $core.bool hasServicePort() => $_has(2);
   @$pb.TagNumber(3)
   void clearServicePort() => clearField(3);
+}
+
+class FetchUrlRequest extends $pb.GeneratedMessage {
+  factory FetchUrlRequest({
+    $core.String? url,
+    $core.String? userAgent,
+    $core.int? timeoutMs,
+  }) {
+    final $result = create();
+    if (url != null) {
+      $result.url = url;
+    }
+    if (userAgent != null) {
+      $result.userAgent = userAgent;
+    }
+    if (timeoutMs != null) {
+      $result.timeoutMs = timeoutMs;
+    }
+    return $result;
+  }
+  FetchUrlRequest._() : super();
+  factory FetchUrlRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FetchUrlRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FetchUrlRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'url')
+    ..aOS(2, _omitFieldNames ? '' : 'userAgent')
+    ..a<$core.int>(3, _omitFieldNames ? '' : 'timeoutMs', $pb.PbFieldType.O3)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FetchUrlRequest clone() => FetchUrlRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FetchUrlRequest copyWith(void Function(FetchUrlRequest) updates) => super.copyWith((message) => updates(message as FetchUrlRequest)) as FetchUrlRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlRequest create() => FetchUrlRequest._();
+  FetchUrlRequest createEmptyInstance() => create();
+  static $pb.PbList<FetchUrlRequest> createRepeated() => $pb.PbList<FetchUrlRequest>();
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FetchUrlRequest>(create);
+  static FetchUrlRequest? _defaultInstance;
+
+  /// http or https
+  @$pb.TagNumber(1)
+  $core.String get url => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set url($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUrl() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUrl() => clearField(1);
+
+  /// Sent as is: servers pick the format of a subscription by it.
+  @$pb.TagNumber(2)
+  $core.String get userAgent => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set userAgent($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasUserAgent() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearUserAgent() => clearField(2);
+
+  /// For the whole download, redirects included; 0 for the default (30 s).
+  @$pb.TagNumber(3)
+  $core.int get timeoutMs => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set timeoutMs($core.int v) { $_setSignedInt32(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasTimeoutMs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearTimeoutMs() => clearField(3);
+}
+
+class HttpHeader extends $pb.GeneratedMessage {
+  factory HttpHeader({
+    $core.String? name,
+    $core.String? value,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (value != null) {
+      $result.value = value;
+    }
+    return $result;
+  }
+  HttpHeader._() : super();
+  factory HttpHeader.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory HttpHeader.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'HttpHeader', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'name')
+    ..aOS(2, _omitFieldNames ? '' : 'value')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  HttpHeader clone() => HttpHeader()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  HttpHeader copyWith(void Function(HttpHeader) updates) => super.copyWith((message) => updates(message as HttpHeader)) as HttpHeader;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static HttpHeader create() => HttpHeader._();
+  HttpHeader createEmptyInstance() => create();
+  static $pb.PbList<HttpHeader> createRepeated() => $pb.PbList<HttpHeader>();
+  @$core.pragma('dart2js:noInline')
+  static HttpHeader getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<HttpHeader>(create);
+  static HttpHeader? _defaultInstance;
+
+  /// lower case
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get value => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set value($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasValue() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearValue() => clearField(2);
+}
+
+class FetchUrlResponse extends $pb.GeneratedMessage {
+  factory FetchUrlResponse({
+    $core.int? statusCode,
+    $core.Iterable<HttpHeader>? headers,
+    $core.List<$core.int>? body,
+    FetchUrlError? error,
+    $core.String? errorDetail,
+  }) {
+    final $result = create();
+    if (statusCode != null) {
+      $result.statusCode = statusCode;
+    }
+    if (headers != null) {
+      $result.headers.addAll(headers);
+    }
+    if (body != null) {
+      $result.body = body;
+    }
+    if (error != null) {
+      $result.error = error;
+    }
+    if (errorDetail != null) {
+      $result.errorDetail = errorDetail;
+    }
+    return $result;
+  }
+  FetchUrlResponse._() : super();
+  factory FetchUrlResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FetchUrlResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FetchUrlResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'statusCode', $pb.PbFieldType.O3)
+    ..pc<HttpHeader>(2, _omitFieldNames ? '' : 'headers', $pb.PbFieldType.PM, subBuilder: HttpHeader.create)
+    ..a<$core.List<$core.int>>(3, _omitFieldNames ? '' : 'body', $pb.PbFieldType.OY)
+    ..e<FetchUrlError>(4, _omitFieldNames ? '' : 'error', $pb.PbFieldType.OE, defaultOrMaker: FetchUrlError.FETCH_URL_ERROR_NONE, valueOf: FetchUrlError.valueOf, enumValues: FetchUrlError.values)
+    ..aOS(5, _omitFieldNames ? '' : 'errorDetail')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FetchUrlResponse clone() => FetchUrlResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FetchUrlResponse copyWith(void Function(FetchUrlResponse) updates) => super.copyWith((message) => updates(message as FetchUrlResponse)) as FetchUrlResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlResponse create() => FetchUrlResponse._();
+  FetchUrlResponse createEmptyInstance() => create();
+  static $pb.PbList<FetchUrlResponse> createRepeated() => $pb.PbList<FetchUrlResponse>();
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FetchUrlResponse>(create);
+  static FetchUrlResponse? _defaultInstance;
+
+  /// 0 when there is an error
+  @$pb.TagNumber(1)
+  $core.int get statusCode => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set statusCode($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasStatusCode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatusCode() => clearField(1);
+
+  /// One entry per value: a header sent twice comes twice.
+  @$pb.TagNumber(2)
+  $core.List<HttpHeader> get headers => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get body => $_getN(2);
+  @$pb.TagNumber(3)
+  set body($core.List<$core.int> v) { $_setBytes(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasBody() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBody() => clearField(3);
+
+  @$pb.TagNumber(4)
+  FetchUrlError get error => $_getN(3);
+  @$pb.TagNumber(4)
+  set error(FetchUrlError v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasError() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearError() => clearField(4);
+
+  /// the error in technical words, without the URL (it carries the user's token)
+  @$pb.TagNumber(5)
+  $core.String get errorDetail => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set errorDetail($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasErrorDetail() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearErrorDetail() => clearField(5);
 }
 
 

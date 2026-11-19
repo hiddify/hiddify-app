@@ -352,7 +352,10 @@ void main() {
 
   group("content-disposition (#6)", () {
     test("reads the quoted ASCII form", () {
-      expect(ProfileParser.filenameFromContentDisposition('attachment; filename="MyProfile.txt"'), equals("MyProfile.txt"));
+      expect(
+        ProfileParser.filenameFromContentDisposition('attachment; filename="MyProfile.txt"'),
+        equals("MyProfile.txt"),
+      );
     });
 
     test("decodes the RFC 5987 extended form (non-ASCII)", () {
@@ -390,6 +393,33 @@ void main() {
       expectRemote(parseRemoteWithHeaders({"content-disposition": header}), (rp) {
         expect(rp.name, equals(persian));
       });
+    });
+  });
+
+  group("profile-title base64", () {
+    test("decodes a padded value", () {
+      expect(ProfileParser.decodeBase64Title(base64.encode(utf8.encode("My VPN"))), equals("My VPN"));
+    });
+
+    test("decodes a value without padding (previously threw)", () {
+      final padded = base64.encode(utf8.encode("Stockholm 1"));
+      expect(padded.endsWith("="), isTrue);
+      expect(ProfileParser.decodeBase64Title(padded.replaceAll("=", "")), equals("Stockholm 1"));
+    });
+
+    test("invalid base64 falls through to the next name source (previously threw)", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "base64:not base64!"}, url: "https://example.com/sub#Fallback"),
+        (rp) => expect(rp.name, equals("Fallback")),
+      );
+    });
+
+    test("parse() uses an unpadded base64 title (previously threw)", () {
+      final unpadded = base64.encode(utf8.encode("Stockholm 1")).replaceAll("=", "");
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "base64:$unpadded"}),
+        (rp) => expect(rp.name, equals("Stockholm 1")),
+      );
     });
   });
 
@@ -459,6 +489,53 @@ void main() {
       );
     });
 
+    test("an infinite total is unlimited, not a rejected profile", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1e999;expire=1704054600",
+        }),
+        (rp) {
+          expect(rp.subInfo!.download, equals(200));
+          expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
+          expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)));
+        },
+      );
+    });
+
+    test("NaN or negative upload yields null subInfo but still parses", () {
+      for (final upload in ["NaN", "-1", "-Infinity"]) {
+        expectRemote(
+          parseRemoteWithHeaders({
+            "profile-title": "p",
+            "subscription-userinfo": "upload=$upload;download=200;total=1000;expire=1704054600",
+          }),
+          (rp) {
+            expect(rp.subInfo, isNull);
+            expect(rp.name, equals("p"));
+          },
+        );
+      }
+    });
+
+    test("an expiry beyond DateTime's range is no expiry", () {
+      for (final expire in ["9999999999999", "99999999999999999999", "1e999"]) {
+        expectRemote(
+          parseRemoteWithHeaders({
+            "profile-title": "p",
+            "subscription-userinfo": "upload=100;download=200;total=1000;expire=$expire",
+          }),
+          (rp) {
+            expect(rp.subInfo!.total, equals(1000));
+            expect(
+              rp.subInfo!.expire,
+              equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+            );
+          },
+        );
+      }
+    });
+
     test("decimals are truncated to int", () {
       expectRemote(
         parseRemoteWithHeaders({
@@ -495,6 +572,15 @@ void main() {
       );
     });
 
+    // a number of hours past what a Duration holds made a wrong, even negative, interval
+    test("a huge interval is held to a year", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "999999999999999"}),
+        (rp) =>
+            expect(rp.options, equals(const ProfileOptions(updateInterval: Duration(hours: maxUpdateIntervalHours)))),
+      );
+    });
+
     test("zero or negative is ignored", () {
       expectRemote(
         parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "0"}),
@@ -513,20 +599,18 @@ void main() {
 
     test("whitespace content-disposition falls through to the url fragment", () {
       expectRemote(
-        parseRemoteWithHeaders(
-          {"content-disposition": whitespaceContentDisposition},
-          url: "https://example.com/config#RealName",
-        ),
+        parseRemoteWithHeaders({
+          "content-disposition": whitespaceContentDisposition,
+        }, url: "https://example.com/config#RealName"),
         (rp) => expect(rp.name, equals("RealName")),
       );
     });
 
     test("whitespace content-disposition falls through to the url filename", () {
       expectRemote(
-        parseRemoteWithHeaders(
-          {"content-disposition": whitespaceContentDisposition},
-          url: "https://example.com/myconfig.json",
-        ),
+        parseRemoteWithHeaders({
+          "content-disposition": whitespaceContentDisposition,
+        }, url: "https://example.com/myconfig.json"),
         (rp) => expect(rp.name, equals("myconfig")),
       );
     });
@@ -665,10 +749,8 @@ void main() {
   });
 
   group("populateHeaders - fragment/extra-security intake", () {
-    Map<String, dynamic> populate(Map<String, dynamic> remoteHeaders) => ProfileParser.populateHeaders(
-      content: '',
-      remoteHeaders: remoteHeaders,
-    ).getOrElse((_) => <String, dynamic>{});
+    Map<String, dynamic> populate(Map<String, dynamic> remoteHeaders) =>
+        ProfileParser.populateHeaders(content: '', remoteHeaders: remoteHeaders).getOrElse((_) => <String, dynamic>{});
 
     test("empty fragment header is dropped", () {
       expect(populate({"fragment": ""}).containsKey("fragment"), isFalse);
@@ -698,6 +780,17 @@ void main() {
       expect(ProfileParser.protocol('anytls://pass@1.2.3.4:443'), 'Anytls');
       expect(ProfileParser.protocol('naive+https://u:p@1.2.3.4:443'), 'Naive');
       expect(ProfileParser.protocol('socks://u:p@1.2.3.4:1080'), 'SOCKS');
+    });
+
+    test('an OpenVPN profile, as a file or a link', () {
+      expect(
+        ProfileParser.protocol(
+          'client\ndev tun\nremote vpn.example.com 1194\n<ca>\n-----BEGIN CERTIFICATE-----\n</ca>',
+        ),
+        'OpenVPN',
+      );
+      expect(ProfileParser.protocol('ovpn://Y2xpZW50'), 'OpenVPN');
+      expect(ProfileParser.protocol('ovpn://Y2xpZW50#Office'), 'Office');
     });
 
     test('other link schemes prefer the link name', () {

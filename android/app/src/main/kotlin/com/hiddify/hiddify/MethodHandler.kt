@@ -4,6 +4,8 @@ import android.util.Log
 import com.hiddify.hiddify.bg.BoxService
 //import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
 import com.hiddify.hiddify.constant.Status
+import com.hiddify.hiddify.utils.DeviceMemory
+import com.hiddify.hiddify.utils.answer
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -53,15 +55,13 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
         when (call.method) {
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
-                    result.runCatching {
-                        result.success(Mobile.getServerPublicKey())
-                    }
+                    result.answer(call.method) { Mobile.getServerPublicKey() }
                 }
             }
 
             Trigger.Setup.method -> {
                 GlobalScope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val args = call.arguments as Map<*, *>
                         Settings.baseDir = args["baseDir"] as String
                         Settings.workingDir = args["workingDir"] as String
@@ -70,27 +70,22 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val mode = args["mode"] as Int
                         val grpcPort = args["grpcPort"] as Int
                         Log.d("debugmode","${Settings.debugMode}")
-                        runCatching {
-                            Mobile.setup(
-                                SetupOptions().also {
-                                    it.basePath = Settings.baseDir
-                                    it.workingDir = Settings.workingDir
-                                    it.tempDir = Settings.tempDir
-                                    it.fixAndroidStack = Bugs.fixAndroidStack
-                                    it.mode=mode.toLong()
-                                    it.listen= "127.0.0.1:" + grpcPort
-                                    it.secret=""
-                                    it.debug = Settings.debugMode
-                                }, BoxService.activePlatformInterface)
+                        Mobile.setup(
+                            SetupOptions().also {
+                                it.basePath = Settings.baseDir
+                                it.workingDir = Settings.workingDir
+                                it.tempDir = Settings.tempDir
+                                it.fixAndroidStack = Bugs.fixAndroidStack
+                                it.mode=mode.toLong()
+                                it.listen= "127.0.0.1:" + grpcPort
+                                it.secret=""
+                                it.debug = Settings.debugMode
+                                DeviceMemory.applyTo(it)
+                            }, BoxService.activePlatformInterface)
 
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
-                            Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
-
-                            success("")
-                        }.onFailure {
-                            error(it)
-                        }
-
+                        Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
+                        ""
                     }
                 }
             }
@@ -98,7 +93,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
             Trigger.Start.method -> {
                 scope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val args = call.arguments as Map<*, *>
                         Settings.activeConfigPath = args["path"] as String? ?: ""
                         Settings.activeProfileName = args["name"] as String? ?: ""
@@ -128,18 +123,17 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                             }
                             Status.Stopped, null -> {}
                         }
-                        Settings.startCoreAfterStartingService = false
 
                         // Answers after the permission dialogs, so the caller's wait for the
                         // service starts only once it can start.
-                        success(mainActivity.startService())
+                        mainActivity.startService()
                     }
                 }
             }
 
             Trigger.Stop.method -> {
                 scope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val mainActivity = MainActivity.instance
                         when (mainActivity.serviceStatus.value) {
                             Status.Stopped, null -> Log.w(TAG, "service is not running")
@@ -160,7 +154,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                                 }
                             }
                         }
-                        success(true)
+                        true
                     }
                 }
             }
@@ -196,3 +190,4 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
         }
     }
 }
+

@@ -10,6 +10,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
@@ -252,15 +253,15 @@ class _Alternating extends HookWidget {
   Widget build(BuildContext context) {
     final showFirst = useState(true);
     useEffect(() {
-      final timer = Timer.periodic(_period, (_) => showFirst.value = !showFirst.value);
+      final timer = Timer.periodic(_period, (_) {
+        if (appSeen.value) showFirst.value = !showFirst.value;
+      });
       return timer.cancel;
     }, const []);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 400),
-      layoutBuilder: (current, previous) => Stack(
-        alignment: AlignmentDirectional.centerStart,
-        children: [...previous, ?current],
-      ),
+      layoutBuilder: (current, previous) =>
+          Stack(alignment: AlignmentDirectional.centerStart, children: [...previous, ?current]),
       child: KeyedSubtree(key: ValueKey(showFirst.value), child: showFirst.value ? first : second),
     );
   }
@@ -271,6 +272,46 @@ TextStyle? _nameStyle(BuildContext context, StepStatus status) => Theme.of(conte
   // a step that waits for the one before it is dimmed
   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: status == StepStatus.waiting ? .45 : 1),
 );
+
+// ---------- the speed of the proxy in use ----------
+
+/// How fast the proxy in use uploads and downloads: a tap measures the upload, a long press the
+/// download. A speed from an earlier run is never shown here, and a fresh one only for [_shownFor]
+/// after its test ends; the gauge then shows again.
+class _SpeedChip extends HookConsumerWidget {
+  const _SpeedChip(this.server, {super.key});
+  final OutboundInfo server;
+
+  static const _shownFor = Duration(seconds: 20);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final busy = server.uploadTesting || server.downloadTesting;
+    // a result shows only once this card saw its test run
+    final shown = useState(false);
+    final wasBusy = useRef(false);
+    useEffect(() {
+      Timer? timer;
+      if (busy) {
+        shown.value = true;
+      } else if (wasBusy.value) {
+        timer = Timer(_shownFor, () => shown.value = false);
+      }
+      wasBusy.value = busy;
+      return timer?.cancel;
+    }, [busy]);
+    int fresh(int value, bool cached) => shown.value && !cached ? value : 0;
+    final notifier = ref.read(activeProxyNotifierProvider.notifier);
+    return UploadSpeedChip(
+      speed: fresh(server.uploadSpeed.toInt(), server.uploadSpeedCached),
+      testing: server.uploadTesting,
+      onTest: notifier.uploadTest,
+      downloadSpeed: fresh(server.downloadSpeed.toInt(), server.downloadSpeedCached),
+      downloadTesting: server.downloadTesting,
+      onDownloadTest: notifier.downloadTest,
+    );
+  }
+}
 
 // ---------- the proxy row: how the server was picked, its name, IP and protocol ----------
 
@@ -297,18 +338,7 @@ class _ProxyRow extends ConsumerWidget {
       onTap: () => context.goNamed('proxies'),
       // how fast the proxy in use uploads and downloads: a tap measures the upload, a long press the
       // download
-      end: connected
-          ? UploadSpeedChip(
-              speed: server.uploadSpeed.toInt(),
-              testing: server.uploadTesting,
-              cached: server.uploadSpeedCached,
-              onTest: () => ref.read(activeProxyNotifierProvider.notifier).uploadTest(),
-              downloadSpeed: server.downloadSpeed.toInt(),
-              downloadTesting: server.downloadTesting,
-              downloadCached: server.downloadSpeedCached,
-              onDownloadTest: () => ref.read(activeProxyNotifierProvider.notifier).downloadTest(),
-            )
-          : null,
+      end: connected ? _SpeedChip(server, key: ValueKey(server.tag)) : null,
       flag: InkWell(
         onTap: () async {
           await urlTest();
@@ -778,21 +808,29 @@ class _Bone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    return RepaintBoundary(
-      // both loops repaint the bone alone, not the card round it
-      child:
-          Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: s.onSurface.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(radius),
-                ),
-              )
-              .animate(onPlay: (c) => c.repeat())
-              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-              .animate(onPlay: (c) => c.repeat(reverse: true))
-              .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+    final bone = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .12), borderRadius: BorderRadius.circular(radius)),
+    );
+    // on the ambient clock: a lookup that never answers keeps it for a long time
+    return AmbientLoop(
+      period: 1300.ms,
+      still: (_) => bone,
+      // the loop repaints the bone alone, not the card round it
+      builder: (context, phase) => RepaintBoundary(
+        child: ValueListenableBuilder<double>(
+          valueListenable: phase,
+          // it fades in and out every 1.8 s, under the sweep every 1.3 s
+          builder: (context, _, child) {
+            final breath = AmbientClock.now % 1.8 / 1.8;
+            return Opacity(opacity: .55 + .45 * Curves.easeInOut.transform(1 - (2 * breath - 1).abs()), child: child);
+          },
+          child: bone
+              .animate(adapter: ValueNotifierAdapter(phase))
+              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6),
+        ),
+      ),
     );
   }
 }

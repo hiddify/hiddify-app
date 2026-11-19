@@ -5,12 +5,15 @@ display_name: Hiddify
 create_desktop_icon: true
 install_dir_name: "{autopf64}\\Hiddify"
 setup_icon_file: windows\runner\resources\app_icon.ico
+# The first locale is the setup's language when Windows' UI language matches none.
 locales:
-  - ar
   - en
+  - ar
   - es
+  - fa
   - fr
   - pt
   - ru
   - tr
+  - zh
 script_template: inno_setup.sas

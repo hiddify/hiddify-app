@@ -1,0 +1,52 @@
+name: Apple signing
+description: >
+  Imports the Apple distribution certificates into a temporary keychain and installs the
+  provisioning profiles, for the signed macOS and iOS builds.
+
+inputs:
+  p12-base64:
+    description: The certificates with their private keys, a base64 .p12 file.
+    required: true
+  p12-password:
+    description: Password of the .p12 file.
+    required: true
+  profiles-targz-base64:
+    description: The provisioning profiles, a base64 .tar.gz file.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # Explicit keychain password (not a repo secret): the action's auto-generated
+    # keychain-password output is often empty in the next step, which makes
+    # `security unlock-keychain` fail with "passphrase is not correct".
+    - name: Import the certificates
+      uses: apple-actions/import-codesign-certs@fe74d46e82474f87e1ba79832ad28a4013d0e33a # v6.1.0
+      with:
+        p12-file-base64: ${{ inputs.p12-base64 }}
+        p12-password: ${{ inputs.p12-password }}
+        keychain-password: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
+
+    - name: Install the provisioning profiles
+      shell: bash
+      env:
+        KEYCHAIN_PASSWORD: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
+        PROFILES_TARGZ_BASE64: ${{ inputs.profiles-targz-base64 }}
+      run: |
+        set -euo pipefail
+        profiles="$HOME/Library/MobileDevice/Provisioning Profiles"
+        mkdir -p "$profiles"
+        echo "$PROFILES_TARGZ_BASE64" | base64 --decode | tar xz -C "$profiles"
+        ls "$profiles"
+        # Xcode 16+ also reads this folder.
+        mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+        cp "$profiles"/* "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/"
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" signing_temp.keychain
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" signing_temp.keychain
+        security find-identity -v -p codesigning
+        # Fail early: a broken certificate secret imports certs but no private keys.
+        identities="$(security find-identity -v -p codesigning | grep -c 'Apple Distribution' || true)"
+        if [[ "$identities" -lt 1 ]]; then
+          echo '::error::No Apple Distribution identity after importing APPLE_CERTIFICATE_P12. Re-export the .p12 from Keychain Access → My Certificates (must include the private key), base64 it, and update the secret.'
+          exit 1
+        fi

@@ -143,13 +143,21 @@
         "failed": "失敗",
         "ready": "就緒",
         "searching": "正在搜尋",
-        "reconnecting": "正在重新連線"
+        "reconnecting": "正在重新連線",
+        "resting": "休眠中"
       },
       "signalStyle": "訊號樣式",
       "keepTop": {
         "picking": "正在從 $count 個中尋找最快的 $keep 個…",
         "pickingBody": "所有代理測試一次後,只有最快的繼續執行。",
+        "thenFastest": "測試後，只有最快的 $keep 個$where繼續執行。",
+        "thenWorking": "測試後，只有有回應的代理$where繼續執行。",
+        "thenAll": "測試後，所有代理$where繼續執行。",
+        "inRegions": "（$flags）",
+        "pickingAnswering": "正在測試全部 $count 個…",
+        "keptAnswering": "$n 個有回應的代理$where正在執行",
         "kept": "最快的 $n 個正在執行",
+        "keptFastest": "最快的 $n 個$where正在執行",
         "keptBody": "其餘 $paused 個代理已暫停,以節省電量和流量。",
         "showAll": "顯示全部 $count 個",
         "big": "$count 個代理正在執行",
@@ -157,7 +165,23 @@
         "keep": "保留最快的 $keep 個",
         "change": "變更數量",
         "chosen": "你選擇的 $n 個代理正在執行",
-        "choose": "選擇"
+        "choose": "選擇",
+        "restingShow": "顯示 $n 個休眠代理",
+        "restingHide": "隱藏休眠代理",
+        "restingHint": "休眠的代理不會被載入。點一下即可喚醒：它會被載入並測試。長按可將其固定。",
+        "restingTitle": "$n 個代理正在小憩",
+        "restingWhy": "只有最快的代理保持喚醒，這樣您的裝置更流暢，也更省電省流量。點一下任一個即可喚醒。",
+        "fasterElsewhere": "其他地區有 $n 個代理更快",
+        "anyRegion": "顯示所有地區",
+        "running": "執行中",
+        "testing": "測試中…",
+        "untested": "待測試…",
+        "modeTop": "最快的 $keep 個",
+        "modeWorking": "僅可用的",
+        "modeChosen": "您的選擇",
+        "onlyAnswer": "最快的 $keep 個 · 僅 $n 個有回應",
+        "working": "可用",
+        "failing": "不可用"
       },
       "upload": {
         "test": "測試上傳速度",
@@ -189,6 +213,17 @@
         "which": "哪些代理",
         "shown": "顯示的 ($n)",
         "chosen": "已選 ($n)"
+      },
+      "single": {
+        "share": "分享",
+        "edit": "編輯",
+        "shareTitle": "分享代理",
+        "configHint": "僅包含這個代理，以及它所連線經過的代理。Hiddify 可像匯入其他設定一樣匯入它。",
+        "editTitle": "以新設定檔編輯",
+        "editMsg": "「${name}」會複製到一個可編輯的新設定檔。原本的內容保持不變，因為訂閱每次更新都會取代其中的代理。",
+        "editConfirm": "複製並編輯",
+        "savedAsProfile": "已複製到新設定檔「${name}」",
+        "failed": "無法讀取此代理的設定"
       }
     },
     "profiles": {
@@ -241,9 +276,25 @@
       "failedToLoad": "載入失敗",
       "updateSubscriptions": "更新訂閱",
       "share": {
-        "urlToClipboard": "複製 URL",
-        "showUrlQr": "顯示 QR Code",
-        "jsonToClipboard": "複製 JSON"
+        "title": "分享設定檔",
+        "scanHint": "在另一台裝置上用 Hiddify 掃描，即可新增此設定檔",
+        "link": "訂閱連結",
+        "config": "設定",
+        "configHint": "此設定檔執行時使用的完整 JSON，包含您的設定",
+        "configFailed": "無法產生設定",
+        "copy": "複製",
+        "shareFile": "分享",
+        "saveFile": "儲存",
+        "tooLargeToCopy": "內容過大，無法放入剪貼簿：請以檔案分享或儲存",
+        "toTv": {
+          "button": "傳送到電視",
+          "scanHint": "在電視上開啟 Hiddify，點一下 + 新增設定檔，然後掃描顯示的代碼。兩台裝置必須連線到同一個 Wi-Fi。",
+          "sent": "已傳送。請在電視上按「匯入」來新增。",
+          "notTvCode": "這不是 Hiddify 電視代碼。請在電視上點一下 + 新增設定檔，即可顯示代碼。",
+          "expired": "電視已不再接受此代碼的連結。請在電視上重新開啟新增設定檔畫面，並掃描新的代碼。",
+          "busy": "電視上等待中的連結太多。請先在電視上匯入或捨棄，然後再試一次。",
+          "unreachable": "無法連到電視。請確認手機和電視連線到同一個 Wi-Fi 網路。"
+        }
       },
       "msg": {
         "save": {
@@ -258,12 +309,35 @@
           "failure": "更新設定檔失敗",
           "failureNamed": "更新「${name}」失敗",
           "bulkSuccess(plural, param=count)": {
+            "one": "已更新 $count 個設定檔",
             "other": "已更新 $count 個設定檔"
           },
           "bulkPartial": "${success} 個已更新\n${failed} 個失敗：${names}"
         },
         "delete": {
-          "success": "設定檔已刪除"
+          "success": "設定檔已刪除",
+          "bulkSuccess(plural, param=count)": {
+            "one": "已刪除 $count 個設定檔",
+            "other": "已刪除 $count 個設定檔"
+          },
+          "bulkPartial": "已刪除 ${total} 個設定檔中的 ${deleted} 個"
+        }
+      },
+      "removeInactive": {
+        "action": "移除失效的訂閱",
+        "title": "移除失效的訂閱",
+        "hint": "這些訂閱已無法使用。已勾選的會被刪除；取消勾選即可保留。",
+        "none": "沒有失效的訂閱",
+        "remove(plural, param=count)": {
+          "one": "刪除 $count 個",
+          "other": "刪除 $count 個"
+        },
+        "reason": {
+          "expired": "已到期",
+          "expiredOn": "已於 ${date} 到期",
+          "noTraffic": "流量已用盡",
+          "updateFailing": "更新持續失敗",
+          "updateFailingSince": "自 ${date} 起更新失敗"
         }
       }
     },
@@ -278,6 +352,8 @@
         "disableAutoUpdate": "關閉自動更新",
         "autoUpdateInterval": "自動更新間隔",
         "loading": "正在新增設定檔…",
+        "retrying": "第 ${failed} 次嘗試失敗：${reason}",
+        "retryingNext": "正在重試（第 ${next} 次，共 ${of} 次）…",
         "adminPreference": "管理員權限",
         "adminPreferenceAskEachTime": "每次詢問",
         "adminPreferencePreferAdmin": "一律使用管理員權限",
@@ -303,17 +379,24 @@
       "fileSaveFailed": "無法儲存檔案",
       "coreLogLevel": "核心級別",
       "coreLogLevelMsg": "重新連線後生效",
-      "buffer": "緩衝區"
+      "buffer": "緩衝區",
+      "diagnostics": "診斷報告",
+      "diagnosticsMsg": "當機報告、日誌和您的設定（不含伺服器和密碼），打包為一個 zip",
+      "fullReport": "完整報告"
     },
     "about": {
       "title": "關於",
       "notAvailableMsg": "您正在使用最新版本",
       "checkForUpdate": "檢查更新",
+      "betaUpdates": "測試版更新",
+      "betaUpdatesMsg": "在新版本向所有人發布之前搶先取得",
       "openWorkingDir": "開啟工作目錄",
       "sourceCode": "原始碼",
       "telegramChannel": "Telegram 頻道",
       "termsAndConditions": "條款與條件",
-      "privacyPolicy": "隱私權政策"
+      "privacyPolicy": "隱私權政策",
+      "reportProblem": "回報問題",
+      "reportProblemMsg": "將日誌和應用程式狀態傳送給開發者"
     },
     "settings": {
       "title": "設定",
@@ -344,6 +427,8 @@
         "enableAnalytics": "開啟分析",
         "enableAnalyticsMsg": "從您的裝置傳送分析資料和崩潰報告，協助改進應用程式",
         "autoIpCheck": "自動檢查連線 IP",
+        "reduceAnimations": "減少動畫",
+        "reduceAnimationsMsg": "已連線時，連線按鈕周圍的光效保持靜止，以節省電量",
         "dynamicNotification": "在通知中顯示速度",
         "hapticFeedback": "觸覺回饋",
         "alwaysOnVpn": "永遠開啟 VPN",
@@ -357,8 +442,6 @@
         "connectionTestUrl": "連線測試 URL",
         "urlTestInterval": "URL 測試間隔",
         "clashApiPort": "Clash API 連接埠",
-        "useXrayCoreWhenPossible": "盡可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析訂閱連結時使用 xray-core。重新匯入訂閱即可開啟此選項。",
         "useSystemTlsEngine": "可用時使用系統 TLS",
         "useSystemTlsEngineMsg": "沒有 TLS 指紋的連線，會在系統 TLS 通過此裝置上的檢查後，使用 macOS、iOS 或 Windows 的 TLS；否則看起來會像 Chrome。",
         "uploadTestSize": "上傳測試大小",
@@ -370,6 +453,9 @@
         "routeRule": {
           "add": "新增規則",
           "delete": "刪除規則",
+          "duplicate": "複製規則",
+          "duplicated": "已複製為新規則：可隨意編輯",
+          "copyAll": "全部複製",
           "options": {
             "import": {
               "clipboard": "從剪貼簿匯入規則",
@@ -400,6 +486,7 @@
             "validDomain": "有效的「網域」，例如\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com 或 .tw",
             "validDomainSuffix": "有效的「網域後綴」，例如\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "內建規則無法變更。請複製後編輯副本。",
             "tileTitle(map)": {
               "name": "名稱",
               "outbound": "符合時出站",
@@ -449,6 +536,12 @@
         "builtinRules": {
           "tag": "內建",
           "bypassLan": "繞過區域網路",
+          "systemDirect": {
+            "apple": "Apple 服務",
+            "microsoft": "Microsoft 服務",
+            "android": "Android 服務",
+            "linux": "Linux 更新"
+          },
           "blockAds": "攔截廣告和惡意軟體",
           "bypassRegion": "繞過${region}的網站"
         },
@@ -542,11 +635,28 @@
           "consistentHashDescription": "每個網站一律使用同一個伺服器",
           "stickySessionDescription": "每個網站使用一個隨機伺服器，直到您重新連線"
         },
+        "defaultProxy": {
+          "title": "預設代理",
+          "lowest": "最低延遲",
+          "balance": "平均分配",
+          "first": "第一個代理",
+          "lowestDescription": "在您選擇代理之前，使用最快的一個",
+          "balanceDescription": "在您選擇代理之前，連線會分散到所有代理",
+          "firstDescription": "在您選擇代理之前，使用設定檔中的第一個"
+        },
         "resolveDestination": "解析目的地",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "為什麼 IPv6 是關閉的？",
+        "ipv6RouteTurnOnTitle": "開啟 IPv6？",
+        "ipv6RouteTurnOn": "開啟",
+        "ipv6RouteHelp": "大多數代理的出口沒有 IPv6。\n\n代理無法承載的連線在開啟後就會中斷，而瀏覽器不會改用 IPv4 重試，因此 Google 和 YouTube 會載入失敗。\n\n開啟後，每個代理會在連線測試時檢查一次。只有支援 IPv6 的代理才會使用 IPv6，其餘一律在不知不覺中走 IPv4。\n\nIPv6 一律在 VPN 內傳送，絕不繞過 VPN。",
         "ipv6Modes": {
+          "ipv4Only": "關閉（僅 IPv4）",
           "preferIpv4": "IPv4 優先",
-          "preferIpv6": "IPv6 優先"
+          "preferIpv6": "IPv6 優先",
+          "ipv4OnlyDescription": "應用程式只使用 IPv4。IPv6 會立即被拒絕。",
+          "preferIpv4Description": "IPv4 優先。僅在確認支援 IPv6 的代理上使用 IPv6。",
+          "preferIpv6Description": "IPv6 優先，僅在確認支援 IPv6 的代理上使用。"
         }
       },
       "dns": {
@@ -570,16 +680,19 @@
         "serviceModes": {
           "proxy": "僅代理服務",
           "systemProxy": "設定系統代理",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "路由器（整個網路）"
         },
         "shortServiceModes": {
           "proxy": "代理",
           "systemProxy": "系統代理",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "路由器"
         },
         "strictRoute": "嚴格路由",
         "tunImplementation": "TUN 實現",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "混合",
           "system": "系統",
           "gvisor": "gVisor"
@@ -629,6 +742,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "關閉",
+          "extraSecurity": {
+            "title": "額外安全",
+            "subtitle": "當您不信任代理時",
+            "ipBy": "您的 IP 由 $mode 決定",
+            "notTracked": "您的 VPN 供應商無法看到您的流量",
+            "forPublic": "適合公共和匿名代理",
+            "slower": "可能降低速度"
+          },
+          "unblocker": {
+            "title": "代理解鎖器",
+            "subtitle": "讓代理繞過過濾",
+            "mayConnect": "被過濾的代理可能可以連線",
+            "personalOnly": "僅對個人代理有用",
+            "notForPublic": "不適合公共代理",
+            "slower": "代理會稍微變慢"
+          }
+        },
         "title": "鏈",
         "subtitle": "額外安全與解鎖器",
         "finalIp": "最終 IP",
@@ -686,13 +818,37 @@
           "mtu": "MTU",
           "customized": "已自訂",
           "scanner": {
-            "title": "掃描器"
+            "title": "掃描器",
+            "searchNoise": "搜尋雜訊",
+            "maxRtt": "最大 RTT (ms)",
+            "timeout": "探測逾時 (ms)",
+            "count": "探測的位址數量",
+            "concurrency": "平行探測數",
+            "ports": "連接埠",
+            "cidrs": "範圍"
           },
           "masque": {
-            "title": "MASQUE"
+            "title": "MASQUE",
+            "vhttp": "HTTP 版本",
+            "serverName": "伺服器名稱",
+            "useIpv6": "偏好 IPv6",
+            "udpTimeout": "UDP 逾時 (s)",
+            "keepalive": "UDP 保持連線 (s)",
+            "packetSize": "初始封包大小",
+            "reconnectDelay": "重新連線延遲 (s)",
+            "tlsInsecure": "略過 TLS 驗證",
+            "fragment": "分片 TLS",
+            "fragmentDelay": "分片備援延遲 (ms)",
+            "recordFragment": "分片 TLS 記錄",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "ECH 設定",
+            "echQueryServerName": "ECH 查詢名稱"
           },
           "awg": {
-            "title": "AmneziaWG"
+            "title": "AmneziaWG",
+            "jc": "垃圾封包",
+            "jmin": "垃圾封包最小大小",
+            "jmax": "垃圾封包最大大小"
           }
         },
         "psiphon": {
@@ -758,6 +914,7 @@
       "expired": "已到期",
       "noTraffic": "流量已用盡",
       "remainingDuration(plural, param=days)": {
+        "one": "剩餘 $days 天",
         "other": "剩餘 $days 天"
       },
       "remainingUnlimited": "無限制",
@@ -794,6 +951,7 @@
       "msg": "@:common.appTitle 的新版本已發布。立即更新嗎？",
       "currentVersion": "目前版本",
       "newVersion": "新版本",
+      "changelog": "更新內容",
       "updateNow": "立即更新",
       "downloading": "正在下載…",
       "installing": "正在啟動安裝程式…",
@@ -837,11 +995,53 @@
     "adminBgService": {
       "vpnNeedsAdmin": {
         "title": "需要管理員權限",
-        "msg": "VPN 模式需要一次性的管理員權限來安裝 Hiddify 背景服務。之後無需再次授權即可連線。",
-        "connectWithAdmin": "使用管理員權限連線",
+        "vpnMode": "VPN 模式",
+        "allApps": "所有應用程式",
+        "recommended": "推薦",
+        "systemProxyMode": "系統代理",
+        "someApps": "瀏覽器和大多數應用程式",
+        "switched": "已切換為系統代理模式。您可以在設定中變更。",
         "waitingTitle": "正在等待管理員權限",
-        "waitingMsg": "請允許管理員權限要求以繼續。你可以停止並稍後重試。",
-        "stop": "停止"
+        "waitingMsg": "Hiddify 正在等待你允許 VPN 模式。",
+        "waitingWhere": "在開啟的視窗中：",
+        "waitingWindows": "點一下「是」。",
+        "waitingMac": "輸入您的 Mac 密碼並確認。",
+        "waitingLinux": "輸入您的密碼並確認。",
+        "back": "返回",
+        "needsAdmin": "需要管理員權限，僅一次",
+        "needsAdminAppImage": "每次啟動都需要管理員權限",
+        "noAdmin": "不需要管理員權限",
+        "someAppsExcept": "Telegram 和少數應用程式除外",
+        "useVpn": "使用 VPN 模式",
+        "useSystemProxy": "使用系統代理",
+        "helpTooltip": "這是什麼？",
+        "helpWhatTitle": "運作方式",
+        "helpProsTitle": "優點",
+        "helpConsTitle": "注意事項",
+        "helpVpn": {
+          "what": "Hiddify 會在您的電腦上新增一個虛擬網路，所有應用程式的網路流量都會自動經過它：瀏覽器、Telegram、遊戲、更新等等。不需要在每個應用程式中另外設定。",
+          "pros": [
+            "所有應用程式都經過 Hiddify，不必在每個應用程式中設定。",
+            "會忽略代理設定的應用程式，例如 Telegram 和遊戲，也能正常運作。",
+            "網域名稱查詢 (DNS) 也經過 Hiddify，因此以此方式封鎖的網站也能開啟。"
+          ],
+          "cons": [
+            "第一次使用時，電腦會要求管理員權限，以安裝 Hiddify 的背景服務。之後連線就不會再詢問。",
+            "使用時請關閉其他 VPN 應用程式：兩個同時執行會互相干擾。"
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify 會變更電腦的代理設定。遵循該設定的應用程式（例如網頁瀏覽器）會透過 Hiddify 傳送流量；其餘應用程式則直接連線，就像 Hiddify 沒有開啟一樣。",
+          "pros": [
+            "不需要管理員權限。",
+            "開關都很快，中斷連線時 Hiddify 會還原該設定。",
+            "可與電腦上的其他網路工具並存。"
+          ],
+          "cons": [
+            "會忽略系統代理的應用程式，例如 Telegram、許多遊戲和部分更新工具，不會受到保護。",
+            "如果它們無法運作，請改用 VPN 模式。"
+          ]
+        }
       },
       "proxyNeedsAdmin": {
         "title": "建議使用管理員權限",
@@ -902,7 +1102,10 @@
       "speed": "速度",
       "server": "伺服器",
       "country": "國家",
-      "tapToTest": "點擊測試"
+      "tapToTest": "點擊測試",
+      "error": "失敗原因",
+      "keepLoaded": "固定代理",
+      "keepLoadedBody": "無論延遲多高，它都會和最快的代理一起保持載入並接受測試。"
     },
     "windowClosing": {
       "askEachTime": "每次詢問",
@@ -924,16 +1127,99 @@
     "qrScanner": {
       "notFound": "此圖片中找不到 QR Code"
     },
+    "crashReport": {
+      "recommended": "推薦",
+      "email": "電子郵件",
+      "localOnly": "僅限本機",
+      "localOnlyMsg": "不會傳送任何內容：保存、查看內容，或稍後自行傳送。",
+      "scrubSecrets": "正在移除 IP、網域和金鑰",
+      "encryptingLogs": "正在加密日誌",
+      "notEncrypted": "日誌未加密",
+      "title": "Hiddify 上次當機了",
+      "msg": "傳送報告，幫我們修正問題。日誌會一併附上。",
+      "sendHiddify": "傳送給 Hiddify",
+      "sendHiddifyMsg": "應用程式會自行上傳報告",
+      "sent": "報告已傳送。謝謝！",
+      "sendFailed": "無法傳送報告。請改用電子郵件或 Telegram。",
+      "subject": "Hiddify 當機報告",
+      "problemTitle": "回報問題",
+      "problemMsg": "告訴我們哪裡出了問題。日誌會一併附上。",
+      "description": "發生了什麼事？（選填）",
+      "descriptionHint": "你做了什麼、期望什麼、實際看到了什麼",
+      "problemSubject": "Hiddify 問題報告",
+      "back": "返回",
+      "chooseHow": "你想怎麼傳送？",
+      "steps": {
+        "preparing": "正在收集日誌和設定…",
+        "prepareFailed": "無法準備報告。請返回後重試。",
+        "uploading": "正在上傳…",
+        "save": "儲存報告",
+        "saveDesktopMsg": "選擇儲存位置",
+        "saveMobileMsg": "在選單中選擇 Save to Files 或 Downloads",
+        "openBot": "開啟支援機器人並點一下 Start",
+        "openBotButton": "開啟機器人",
+        "openMail": "開啟你的郵件應用程式",
+        "openMailMsg": "一封寄給 $address 的新郵件，主旨已填好",
+        "openMailButton": "開啟郵件",
+        "attachSend": "把報告附加到新郵件並寄出",
+        "openGithub": "建立新的 GitHub issue",
+        "openGithubMsg": "登入 GitHub。你的描述、平台、版本和系統資訊已填好。",
+        "openGithubButton": "開啟 GitHub",
+        "dropInIssue": "附上報告並按下 Create",
+        "telegramPrivate": "私密：只有 Hiddify 支援團隊能看到報告。",
+        "emailPrivate": "私密：只有 Hiddify 團隊會閱讀報告。",
+        "attachInChat": "在機器人聊天中附上報告並傳送",
+        "attachHow": "把檔案拖進來，或使用迴紋針",
+        "dropInIssueHow": "把檔案拖到 Additional Context，或點一下該欄位下方的列",
+        "ready": "報告已就緒",
+        "saveUnencryptedCopy": "儲存未加密副本"
+      },
+      "trace": {
+        "offerTitle": "當場抓住問題",
+        "offerMsg": "開啟詳細日誌，再讓問題發生一次，然後傳送。這樣我們能更快找到原因。",
+        "step1": "詳細日誌將開啟 $minutes 分鐘",
+        "step1Msg": "之後會自動關閉",
+        "step2": "重新連線並讓問題再次發生",
+        "step2Msg": "完全照出問題時的操作再做一次",
+        "step2Connected": "Hiddify 會自動重新連線以開始記錄。現在重複之前出問題的操作。",
+        "step3": "回到這裡傳送報告",
+        "step3Msg": "再次開啟「回報問題」，描述你看到的情況",
+        "privacy": "任何內容離開你的裝置前，IP、網域和金鑰都會被移除。$minutes 分鐘後日誌恢復正常。",
+        "start": "開始詳細日誌",
+        "skip": "略過",
+        "gotIt": "知道了",
+        "connect": "連線",
+        "onTitle": "詳細日誌已開啟",
+        "onMsg": "去讓問題發生吧。看到後回到這裡。",
+        "bannerTitle": "詳細日誌 · 剩餘 $time",
+        "bannerMsg": "描述發生了什麼，然後點擊繼續",
+        "stop": "停止",
+        "ended": "詳細日誌已結束。請從「回報問題」傳送報告。"
+      },
+      "send": "傳送報告"
+    },
     "keepTop": {
       "title": "大型訂閱",
-      "description": "此設定檔包含 $count 個代理。全部執行會消耗電量、流量和記憶體。Hiddify 可以先測試一次,只保留最快的 $keep 個執行,暫停其餘代理。",
+      "subtitle": "$count 個代理 · 全部執行會消耗電量、流量和記憶體",
       "hint": "您隨時可以在代理清單末尾重新執行全部代理。",
       "keeping": "最快的 $keep 個執行,其餘暫停",
       "all": "全部 $count 個執行",
       "keep": "保留最快的 $keep 個",
       "useAll": "使用全部 $count 個",
       "howMany": "保留執行的數量",
-      "pickByHand": "自己選擇代理"
+      "pickByHand": "自己選擇代理",
+      "region": "地區",
+      "anyRegion": "任何地區",
+      "keepAnswering": "保留有回應的",
+      "keepingAnswering": "只執行有回應的",
+      "answering": "有回應",
+      "everyOne": "全部",
+      "quick": "快速測試",
+      "quickHint": "找到最快的之後就停止",
+      "quickHelp": "這是做什麼的？",
+      "quickFirst": "先測試上次最快的",
+      "quickStop": "當其餘的先前較慢時，就停止測試",
+      "quickNew": "新的代理，以及一天沒測試的代理，一律會測試"
     },
     "keepTags": {
       "title": "選擇代理",
@@ -975,6 +1261,7 @@
       ],
       "hint": "代理模式 · 使用說明",
       "setPassword": "設定密碼",
+      "removePassword": "移除密碼",
       "manual": "手動",
       "dontShowAgain": "不再顯示",
       "thisDevice": "本裝置",
@@ -988,6 +1275,25 @@
       "portRange": "請使用 1024 到 65535 之間的連接埠",
       "passwordTooShort": "至少 4 個字元",
       "edit": "編輯"
+    },
+    "dbNewerThanApp": {
+      "title": "儲存的資料來自較新版本",
+      "msg": "您的設定檔和設定是由較新版本的 Hiddify 儲存的，這個較舊的版本無法讀取。請安裝最新版本以保留它們，或刪除它們以使用此版本。",
+      "deleteData": "清除資料",
+      "deleteConfirm": "儲存的資料將被清除。您的訂閱和本機設定檔會盡可能重新加入；較新版本儲存的其他內容將會遺失。",
+      "downloadLatest": "下載最新版本"
+    },
+    "dbBroken": {
+      "title": "無法開啟儲存的資料",
+      "msg": "Hiddify 無法開啟已儲存的設定檔。請清除儲存的資料並重新開始：您的訂閱和本機設定檔會盡可能重新加入，您的設定則會保留。",
+      "wipeData": "清除資料",
+      "wipeConfirm": "儲存的資料將被清除，Hiddify 會重新開始。仍可讀取的設定檔會重新加入；其餘的無法復原。",
+      "copyError": "複製錯誤"
+    },
+    "telegramChannel": {
+      "title": "加入 Hiddify Telegram 頻道",
+      "msg": "關注 Hiddify 官方頻道，取得新聞、新版本和保持連線的技巧。",
+      "join": "加入頻道"
     }
   },
   "connection": {
@@ -1045,6 +1351,140 @@
       "invalidUrl": "URL 無效",
       "canceledByUser": "使用者已取消"
     },
+    "download": {
+      "details": "詳細資訊",
+      "errorCode": "錯誤代碼",
+      "technicalDetails": "技術詳細資訊",
+      "whatToTry": "您可以嘗試",
+      "copyDetails": "複製詳細資訊",
+      "side": {
+        "provider": "VPN 供應商的伺服器",
+        "subscription": "您的訂閱",
+        "network": "您的連線",
+        "unknown": "原因不明"
+      },
+      "path": {
+        "title": "在哪裡中斷",
+        "device": "您的裝置",
+        "internet": "網際網路",
+        "provider": "VPN 供應商"
+      },
+      "serverError": {
+        "title": "VPN 供應商的伺服器發生問題",
+        "why": "您的 VPN 供應商的伺服器回傳了錯誤（代碼 $code）。您的裝置和應用程式沒有問題。",
+        "tips": [
+          "幾分鐘後再試一次",
+          "如果問題持續，請聯絡您的 VPN 供應商"
+        ]
+      },
+      "notFound": {
+        "title": "找不到訂閱",
+        "why": "此連結中沒有訂閱。",
+        "tips": [
+          "檢查您是否複製了完整的連結",
+          "向您的 VPN 供應商索取新連結：訂閱可能已被刪除"
+        ]
+      },
+      "denied": {
+        "title": "VPN 供應商拒絕了此連結",
+        "why": "VPN 供應商的伺服器不接受此訂閱。",
+        "tips": [
+          "您的訂閱可能已過期、被關閉或流量已用完",
+          "請聯絡您的 VPN 供應商檢查或續訂"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "嘗試次數過多",
+        "why": "VPN 供應商的伺服器收到了您發出的過多請求。",
+        "tips": [
+          "等待幾分鐘後再試"
+        ]
+      },
+      "badStatus": {
+        "title": "伺服器回傳了錯誤",
+        "why": "VPN 供應商的伺服器回傳了意外錯誤（代碼 $code）。",
+        "tips": [
+          "檢查連結",
+          "聯絡您的 VPN 供應商"
+        ]
+      },
+      "tooLarge": {
+        "title": "訂閱檔案過大",
+        "why": "伺服器傳送的資料超出了應用程式能讀取的範圍。",
+        "tips": [
+          "請確認這是訂閱連結",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "noInternet": {
+        "title": "沒有網路連線",
+        "why": "你的裝置未連接到網際網路。",
+        "tips": [
+          "請檢查 Wi-Fi 或行動數據",
+          "請確認飛航模式已關閉"
+        ]
+      },
+      "dns": {
+        "title": "找不到伺服器位址",
+        "why": "找不到伺服器的名稱。",
+        "tips": [
+          "請檢查連結是否有拼寫錯誤",
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "certificate": {
+        "title": "伺服器憑證不受信任",
+        "why": "伺服器的安全憑證無效，或你網路中的某些裝置正在攔截連線。",
+        "tips": [
+          "請檢查裝置的日期和時間是否正確",
+          "請換一個網路試試",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "reset": {
+        "title": "連線中斷，可能被封鎖",
+        "why": "與伺服器建立連線時連線被中斷。這通常表示你的網路或網路業者封鎖了此伺服器。",
+        "tips": [
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "tls": {
+        "title": "安全連線失敗",
+        "why": "無法與伺服器建立安全連線。你的網路可能封鎖了它。",
+        "tips": [
+          "請換一個網路試試",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "refused": {
+        "title": "伺服器拒絕了連線",
+        "why": "伺服器不接受連線。它可能已當機，或連結有誤。",
+        "tips": [
+          "請稍後再試",
+          "請檢查連結",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "timeout": {
+        "title": "伺服器沒有回應",
+        "why": "伺服器未及時回應。它可能已當機，或你的網路正在封鎖它。",
+        "tips": [
+          "請再試一次",
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "unknown": {
+        "title": "無法下載訂閱",
+        "why": "下載訂閱時發生問題。",
+        "tips": [
+          "請檢查網路連線和連結，然後再試一次",
+          "如果仍然失敗，請複製詳細資訊並傳送給你的 VPN 供應商"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "意外失敗",
       "missingVpnPermission": "缺少 VPN 權限",
@@ -1058,7 +1498,8 @@
       "tunAddressInUse": "另一個 VPN 正在執行",
       "tunAddressInUseMsg": "VPN 模式無法啟動。請關閉另一個 VPN，或更改服務模式。",
       "invalidConfigOptions": "設定選項無效",
-      "invalidConfig": "設定無效"
+      "invalidConfig": "設定無效",
+      "missingConfig": "此設定檔的設定遺失。請更新設定檔，或重新新增。"
     },
     "warp": {
       "missingLicense": "WARP 授權缺失",

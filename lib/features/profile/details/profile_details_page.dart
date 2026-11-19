@@ -180,12 +180,13 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                               padding: const EdgeInsets.symmetric(horizontal: 10),
                                               child: Slider(
                                                 focusNode: sliderFocusNode,
-                                                value:
-                                                    userOverride.updateInterval?.toDouble() ??
-                                                    options?.updateInterval.inHours.toDouble() ??
-                                                    0.0,
-                                                max: 96,
-                                                divisions: 96,
+                                                value: _intervalSlider(userOverride, options).value,
+                                                // the subscription's own interval can be longer than
+                                                // the 96 hours offered (a week, 168): the slider is
+                                                // made long enough to show it, where a value past
+                                                // its end failed its assertion
+                                                max: _intervalSlider(userOverride, options).max,
+                                                divisions: _intervalSlider(userOverride, options).max.toInt(),
                                                 label: (userOverride.updateInterval ?? 0).toString(),
                                                 onChanged: (double value) => ref
                                                     .read(ProfileDetailsNotifierProvider(id).notifier)
@@ -356,4 +357,10 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
       ],
     );
   }
+}
+
+/// The update interval slider's value and end, in hours: 96, or longer when the interval is.
+({double value, double max}) _intervalSlider(UserOverride userOverride, ProfileOptions? options) {
+  final value = (userOverride.updateInterval ?? options?.updateInterval.inHours ?? 0).toDouble();
+  return (value: value, max: value > 96 ? value : 96);
 }

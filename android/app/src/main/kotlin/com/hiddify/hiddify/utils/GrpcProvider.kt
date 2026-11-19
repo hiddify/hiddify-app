@@ -1,5 +1,6 @@
 package com.hiddify.hiddify.utils
 
+import android.util.Base64
 import android.util.Log
 import com.hiddify.core.mobile.Mobile
 import com.hiddify.hiddify.Settings
@@ -13,7 +14,6 @@ import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.Base64
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
@@ -44,20 +44,22 @@ object GrpcClientProvider {
     private fun identityDirectory() = File(Settings.baseDir, IDENTITY_DIR)
 
     /**
-     * Built on every call: the server certificate exists only once the core is set up, and the
-     * client identity is made by Flutter before it starts the service.
+     * A client for the server the service set up, in the mode it set it up with ([mutualTls] when
+     * that was mode 2). Not decided again from the identity files: when they appeared after the
+     * server was set up (the app writes its identity before its own setup, while a service started
+     * by the tile or always-on already ran a plain server), the client spoke TLS to a plaintext
+     * server, and the core had no server certificate to trust.
      */
-    val grpcClient: GrpcClient
-        get() = buildClient()
+    fun grpcClient(mutualTls: Boolean): GrpcClient = buildClient(mutualTls)
 
-    private fun buildClient(): GrpcClient {
+    private fun buildClient(mutualTls: Boolean): GrpcClient {
         val port = Settings.grpcServiceModePort
         val builder = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
 
-        if (!usesMutualTls) {
+        if (!mutualTls) {
             val client = builder.protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE)).build()
             return GrpcClient.Builder().client(client).baseUrl("http://127.0.0.1:$port").build()
         }
@@ -74,7 +76,10 @@ object GrpcClientProvider {
         val directory = identityDirectory()
         val clientCertificate = readCertificate(File(directory, CERTIFICATE_FILE).readBytes())
         val clientKey = readPrivateKey(File(directory, PRIVATE_KEY_FILE).readText())
-        val serverCertificate = readCertificate(Mobile.getServerPublicKey())
+        // null until the core has set up its server certificate
+        val serverCertificate = readCertificate(
+            Mobile.getServerPublicKey() ?: throw IllegalStateException("the core has no server certificate yet"),
+        )
 
         val password = CharArray(0)
         val identityStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
@@ -106,6 +111,7 @@ object GrpcClientProvider {
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
             .replace(Regex("\\s"), "")
-        return KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(Base64.getDecoder().decode(body)))
+        // android.util.Base64: java.util.Base64 is Android 8.0 (API 26) on, and connecting crashed on 7
+        return KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(Base64.decode(body, Base64.DEFAULT)))
     }
 }

@@ -6,12 +6,16 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import com.hiddify.hiddify.bg.BoxService
 import com.hiddify.hiddify.bg.ServiceConnection
 import com.hiddify.hiddify.bg.ServiceNotification
 import com.hiddify.hiddify.constant.Alert
@@ -41,6 +45,15 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     var logCallback: ((Boolean) -> Unit)? = null
     val serviceStatus = MutableLiveData(Status.Stopped)
     val serviceAlerts = MutableLiveData<ServiceEvent?>(null)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Application.initialize(this)
+        super.onCreate(savedInstanceState)
+        // Android 15 draws apps targeting SDK 35 edge-to-edge; this does the same on older
+        // versions, with transparent bars the Flutter UI draws behind. After super, which
+        // tints the status bar for its own fullscreen look.
+        enableEdgeToEdge()
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -93,7 +106,9 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                     return@launch
                 }
             }
+            // the app starts the core itself, over gRPC, once the service is up
             val intent = Intent(Application.application, Settings.serviceClass())
+                .putExtra(BoxService.EXTRA_START_CORE, false)
             withContext(Dispatchers.Main) {
                 val started = runCatching { ContextCompat.startForegroundService(this@MainActivity, intent) }
                     .onFailure { onServiceAlert(Alert.StartService, it.message) }
@@ -158,6 +173,24 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     override fun onDestroy() {
         connection.disconnect()
         super.onDestroy()
+    }
+
+    /**
+     * The app picked in a share sheet opens in its own task. Without this the system starts it
+     * in Hiddify's task, on top of this activity: after sharing a log to Telegram, the Hiddify
+     * icon and its recents card brought back Telegram's share screen instead of Hiddify.
+     * share_plus starts the sheet from here and has no option for it, so the flag is added to
+     * the intent inside every chooser this activity starts (startActivity comes through here).
+     */
+    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+    override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
+        if (intent.action == Intent.ACTION_CHOOSER) {
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT, Intent::class.java)?.let { target ->
+                target.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.putExtra(Intent.EXTRA_INTENT, target)
+            }
+        }
+        super.startActivityForResult(intent, requestCode, options)
     }
 
     @SuppressLint("NewApi")

@@ -76,7 +76,7 @@ object Settings {
         set(value) = preferences.edit().putBoolean(SettingsKey.DEBUG_MODE, value).apply()
 
     var disableMemoryLimit: Boolean
-        get() = preferences.getBoolean(SettingsKey.DISABLE_MEMORY_LIMIT, false)
+        get() = preferences.getBoolean(SettingsKey.DISABLE_MEMORY_LIMIT, true)
         set(value) =
             preferences.edit().putBoolean(SettingsKey.DISABLE_MEMORY_LIMIT, value).apply()
 
@@ -149,9 +149,6 @@ object Settings {
         get() = preferences.getInt(SettingsKey.GRPC_PORT, 17078)!!
         set(value) = preferences.edit().putInt(SettingsKey.GRPC_PORT, value).apply()
 
-    var startCoreAfterStartingService: Boolean
-        get() = preferences.getBoolean(SettingsKey.START_CORE_ON_STARTING_SERVICE, false)
-        set(value) = preferences.edit().putBoolean(SettingsKey.START_CORE_ON_STARTING_SERVICE, value).apply()
 
 
 }

@@ -1,6 +1,7 @@
 // dart format width=80
 // ignore_for_file: unused_local_variable, unused_import
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/db/db.dart';
@@ -17,6 +18,61 @@ void main() {
 
   setUpAll(() {
     verifier = SchemaVerifier(GeneratedHelper());
+  });
+
+  group('downgrade', () {
+    test('a database from a newer version is refused and left alone', () async {
+      final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+      schema.rawDatabase.userVersion = 99;
+
+      final db = Db(NativeDatabase.opened(schema.rawDatabase));
+      await expectLater(
+        db.customSelect('SELECT 1').get(),
+        throwsA(isA<DbNewerThanAppException>()),
+      );
+      expect(schema.rawDatabase.userVersion, 99);
+    });
+
+    test('upgrades again after an older app lowered the version', () async {
+      // An older app keeps the newer columns but writes its own lower version.
+      final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+      schema.rawDatabase.userVersion = 5;
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
+
+    // Whichever version an older app lowered it to, every step from there on
+    // must take the newer columns that are already in place.
+    for (final lowered in GeneratedHelper.versions.skip(1)) {
+      test('upgrades a current database lowered to v$lowered', () async {
+        final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+        schema.rawDatabase.userVersion = lowered;
+        final db = Db(schema.newConnection());
+        await verifier.migrateAndValidate(db, db.schemaVersion);
+        await db.close();
+      });
+    }
+
+    test('upgrades a v4 database that has both test_url and profile_override (#2078)', () async {
+      final schema = await verifier.schemaAt(4);
+      schema.rawDatabase.execute(
+        'ALTER TABLE profile_entries ADD COLUMN profile_override TEXT',
+      );
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
+
+    test('upgrades a v4 database that has profile_override but no test_url', () async {
+      final schema = await verifier.schemaAt(4);
+      schema.rawDatabase.execute(
+        'ALTER TABLE profile_entries RENAME COLUMN test_url TO profile_override',
+      );
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
   });
 
   group('simple database migrations', () {

@@ -24,12 +24,14 @@ import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Alert
 import com.hiddify.hiddify.constant.Status
+import com.hiddify.hiddify.utils.DeviceMemory
 import com.hiddify.hiddify.utils.GrpcClientProvider
 import com.hiddify.core.mobile.SetupOptions
 
 import go.Seq
 import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.mobile.Mobile
+import com.hiddify.core.mobile.CoreStoppedListener
 
 
 import com.hiddify.core.libbox.CommandServer
@@ -43,6 +45,12 @@ import com.hiddify.hiddify.constant.Bugs
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -96,13 +104,29 @@ class BoxService(
             return
         }
 
-        fun start() {
+        /**
+         * The start intent's extra: whether the service starts the core itself. A start says it
+         * for itself: it was a persisted setting that every entry point had to set (the app
+         * cleared it, the tile, the shortcut and always-on set it), and a start that forgot left
+         * the service without a core, on "Connecting". A start without the extra is the system's
+         * (always-on, a restart), with no app to start the core: the service starts it.
+         */
+        const val EXTRA_START_CORE = "com.hiddify.app.START_CORE"
+
+        /** Starts the service; [startCore] when no app UI starts the core over gRPC. */
+        fun start(startCore: Boolean) {
             val intent = runBlocking {
                 withContext(Dispatchers.IO) {
                     Intent(Application.application, Settings.serviceClass())
                 }
+            }.putExtra(EXTRA_START_CORE, startCore)
+            // Android 12+ refuses a foreground start from the background with an exception; the
+            // callers (boot receiver, tile, shortcut) have nobody to report it to.
+            try {
+                ContextCompat.startForegroundService(Application.application, intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "cannot start the service", e)
             }
-            ContextCompat.startForegroundService(Application.application, intent)
         }
 
         fun stop() {
@@ -148,9 +172,19 @@ class BoxService(
     /// Mode last passed to Mobile.setup for the VPN gRPC server (2 mTLS / 4 insecure).
     private var grpcSetupMode: Long = 4L
 
-    private suspend fun startService() {
+    /** Why a start failed: the alert the app shows. */
+    private class StartFailure(val alert: Alert, val message: String?)
+
+    /**
+     * Sets the core up and, when asked, starts it; null when it worked. It does not tear down on
+     * failure: the caller does (teardown), so a stop and a failed start share one teardown. A stop
+     * cancels it, and it checks for that after each call into the core, so a stop during Starting
+     * no longer gets Started, a started core and a polling notification after it.
+     */
+    private suspend fun startService(startCore: Boolean): StartFailure? {
         try {
-            status.postValue(Status.Starting)
+            // Starting is set by who started this (onStartCommand, a reload), on the main thread:
+            // posted from here it could land after a stop's Stopping
             Log.d(TAG, "starting service")
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_starting)
@@ -158,8 +192,7 @@ class BoxService(
 
             val selectedConfigPath = Settings.activeConfigPath
             if (selectedConfigPath.isBlank()) {
-                stopAndAlert(Alert.EmptyConfiguration)
-                return
+                return StartFailure(Alert.EmptyConfiguration, null)
             }
 
             activeProfileName = Settings.activeProfileName
@@ -172,7 +205,6 @@ class BoxService(
             }
 
             DefaultNetworkMonitor.start()
-            Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
             activePlatformInterface = platformInterface
             // 2 = GRPC_BACKGROUND (mTLS), 4 = GRPC_BACKGROUND_INSECURE. Must match Mobile.close.
             grpcSetupMode = if (GrpcClientProvider.usesMutualTls) 2L else 4L
@@ -187,36 +219,35 @@ class BoxService(
                         it.listen = "127.0.0.1:${Settings.grpcServiceModePort}"
                         it.secret = ""
                         it.debug = Settings.debugMode
+                        DeviceMemory.applyTo(it)
                     },
                     platformInterface,
                 )
                 // the core trusts the client certificate stored in the base folder by itself
+                Mobile.setCoreStoppedListener(coreStoppedListener)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 Log.e(TAG, "Mobile.setup failed", e)
-                stopAndAlert(Alert.CreateService, e.message ?: e.toString())
-                return
+                return StartFailure(Alert.CreateService, e.message ?: e.toString())
             }
-            status.postValue(Status.Started)
+            coroutineContext.ensureActive()
 
-            if (Settings.startCoreAfterStartingService){
+            if (startCore) {
                 Mobile.start("","")
-                }
-//            if (delayStart) {
-//                delay(1000L)
-//            }
-
-//            newService.start()
-//            boxService = newService
-//            commandServer?.setService(boxService)
-
-
+                coroutineContext.ensureActive()
+            }
             withContext(Dispatchers.Main) {
+                // on the main thread, where a stop sets Stopping and cancels this start: either
+                // the stop came first and this start ends here, or Started comes before Stopping
+                coroutineContext.ensureActive()
+                status.value = Status.Started
                 notification.show(activeProfileName, R.string.status_started)
             }
-            notification.start()
+            notification.start(mutualTls = grpcSetupMode == 2L)
+            return null
         } catch (e: Exception) {
-            stopAndAlert(Alert.StartService, e.message)
-            return
+            if (e is CancellationException) throw e
+            return StartFailure(Alert.StartService, e.message)
         }
     }
 
@@ -225,6 +256,9 @@ class BoxService(
             serviceReload0()
         }
     }
+
+    /** Whether the running start started the core itself: a reload does the same. */
+    private var startedCore = false
 
     suspend fun serviceReload0() {
         notification.close()
@@ -246,9 +280,7 @@ class BoxService(
 //        }
         Mobile.stop()
 //        boxService = null
-        
-            startService()
-        
+        startService(startedCore)?.let { teardown(it) }
     }
 
     fun getSystemProxyStatus(): SystemProxyStatus {
@@ -275,60 +307,51 @@ class BoxService(
         }
     }
 
-    private fun stopService() {
-        if (status.value == Status.Stopped) return
-        status.value = Status.Stopping
-        if (receiverRegistered) {
-            service.unregisterReceiver(receiver)
-            receiverRegistered = false
-        }
-        notification.close()
-        GlobalScope.launch(Dispatchers.IO) {
-            val pfd = fileDescriptor
-            if (pfd != null) {
-                pfd.close()
-                fileDescriptor = null
-            }
-//            commandServer?.setService(null)
-//            boxService?.apply {
-//                runCatching {
-//                    close()
-//                }.onFailure {
-//                    writeLog("service: error when closing: $it")
-//                }
-//                //Seq.destroyRef(refnum)
-//            }
-
-//            boxService = null
-//            Libbox.registerLocalDNSTransport(null)
-            DefaultNetworkMonitor.stop()
-
-//            commandServer?.apply {
-//                close()
-//                Seq.destroyRef(refnum)
-//            }
-//            commandServer = null
-            Settings.startedByUser = false
-            if (activePlatformInterface === platformInterface) activePlatformInterface = null
-            // Close the mode we actually started. Old code always closed 4 (insecure), so
-            // mTLS background (mode 2) left :17079 listening and reconnect failed with
-            // "background service did not stop".
-            // Closing stops the core, which can take seconds: never on the main thread, or the
-            // app freezes while it disconnects.
-            val closeStart = System.currentTimeMillis()
-            for (mode in linkedSetOf(grpcSetupMode, 2L, 4L)) {
-                Mobile.close(mode)
-            }
-            Log.i(TAG, "core closed in ${System.currentTimeMillis() - closeStart}ms")
-            withContext(Dispatchers.Main) {
-                status.value = Status.Stopped
-                service.stopSelf()
-            }
-            notification.close()
+    /**
+     * Told by the core when it stops by itself (a start, stop or reload that failed), on a thread
+     * of the core's. Only the app saw that, on the core's status stream: with the app closed (a
+     * start by always-on, the tile, the shortcut, or the app gone since), the service stayed up,
+     * with its TUN and nothing behind it.
+     */
+    private val coreStoppedListener = object : CoreStoppedListener {
+        override fun onCoreStopped(messageType: Int, message: String?) {
+            GlobalScope.launch(Dispatchers.Main) { coreStopped(message) }
         }
     }
 
-    private suspend fun stopAndAlert(type: Alert, message: String? = null) {
+    /** The core stopped by itself: the service goes down with it, and tells why. Main thread. */
+    private fun coreStopped(message: String?) {
+        // a start still running reports its own failure; a stop under way is already going down
+        if (status.value != Status.Started) return
+        Log.w(TAG, "the core stopped by itself: $message")
+        status.value = Status.Stopping
+        notification.close()
+        GlobalScope.launch(Dispatchers.IO) { teardown(StartFailure(Alert.StartService, message)) }
+    }
+
+    /** The start in progress; a stop cancels it and waits for it before it tears down. */
+    private var startJob: Job? = null
+
+    private fun stopService() {
+        if (status.value == Status.Stopped || status.value == Status.Stopping) return
+        status.value = Status.Stopping
+        notification.close()
+        val start = startJob
+        GlobalScope.launch(Dispatchers.IO) {
+            // a start still calling into the core finishes that call first: closing the core
+            // under it raced its setup
+            start?.cancelAndJoin()
+            teardown(null)
+        }
+    }
+
+    /**
+     * Takes everything down: the receiver, the notification, the TUN, the core and its gRPC
+     * servers, the network monitor, and the service. A stop and a failed start both end here; a
+     * failed start used to only set Stopped, leaving the core, the TUN and the service up.
+     * Running it twice is harmless.
+     */
+    private suspend fun teardown(failure: StartFailure?) = withContext(NonCancellable) {
         Settings.startedByUser = false
         withContext(Dispatchers.Main) {
             if (receiverRegistered) {
@@ -336,18 +359,57 @@ class BoxService(
                 receiverRegistered = false
             }
             notification.close()
-            binder.broadcast { callback ->
-                callback.onServiceAlert(type.ordinal, message)
+        }
+        fileDescriptor?.let {
+            it.close()
+            fileDescriptor = null
+        }
+        if (activePlatformInterface === platformInterface) activePlatformInterface = null
+        Mobile.setCoreStoppedListener(null) // its own close is not a stop to report
+        // Close the mode we actually started. Old code always closed 4 (insecure), so
+        // mTLS background (mode 2) left :17079 listening and reconnect failed with
+        // "background service did not stop".
+        // Closing stops the core, which can take seconds: never on the main thread, or the
+        // app freezes while it disconnects.
+        val closeStart = System.currentTimeMillis()
+        for (mode in linkedSetOf(grpcSetupMode, 2L, 4L)) {
+            runCatching { Mobile.close(mode) }.onFailure { Log.e(TAG, "closing the core ($mode)", it) }
+        }
+        Log.i(TAG, "core closed in ${System.currentTimeMillis() - closeStart}ms")
+        // after the core: until it is closed it may still ask for the default network
+        DefaultNetworkMonitor.stop()
+        withContext(Dispatchers.Main) {
+            if (failure != null) {
+                binder.broadcast { callback ->
+                    callback.onServiceAlert(failure.alert.ordinal, failure.message)
+                }
             }
             status.value = Status.Stopped
+            notification.close()
+            service.stopSelf()
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("SameReturnValue")
-    internal fun onStartCommand(): Int {
-        // Already up or starting: ignore duplicate start intents.
-        if (status.value == Status.Started || status.value == Status.Starting) {
+    internal fun onStartCommand(intent: Intent?): Int {
+        val startCore = intent?.getBooleanExtra(EXTRA_START_CORE, true) ?: true
+        // Already up, and in the foreground: ignore duplicate start intents.
+        if (status.value == Status.Started) {
+            return Service.START_NOT_STICKY
+        }
+        // Every start comes through startForegroundService, and Android kills the app ("did not
+        // then call Service.startForeground()") when the service stops, or 10 seconds pass,
+        // before startForeground is called. So go to the foreground here, on the main thread,
+        // before anything slow (loading the core at boot) and before the returns below: a start
+        // that arrives while a stop is still closing the core used to return without it, and
+        // the stop's stopSelf() then crashed the app.
+        try {
+            notification.show(activeProfileName, R.string.status_starting)
+        } catch (e: Exception) {
+            Log.e(TAG, "cannot go to the foreground", e)
+        }
+        if (status.value == Status.Starting) {
             return Service.START_NOT_STICKY
         }
         // A stop is still tearing down Mobile/VPN; wait then start so reconnect
@@ -359,12 +421,7 @@ class BoxService(
                     delay(200)
                     i++
                 }
-                if (status.value == Status.Stopped) {
-                    ContextCompat.startForegroundService(
-                        Application.application,
-                        Intent(Application.application, Settings.serviceClass()),
-                    )
-                }
+                if (status.value == Status.Stopped) start(startCore)
             }
             return Service.START_NOT_STICKY
         }
@@ -380,16 +437,11 @@ class BoxService(
             receiverRegistered = true
         }
 
-        GlobalScope.launch(Dispatchers.IO) {
+        startJob = GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()
-//            try {
-//                startCommandServer()
-//            } catch (e: Exception) {
-//                stopAndAlert(Alert.StartCommandServer, e.message)
-//                return@launch
-//            }
-            startService()
+            startedCore = startCore
+            startService(startCore)?.let { teardown(it) }
         }
         return Service.START_NOT_STICKY
     }

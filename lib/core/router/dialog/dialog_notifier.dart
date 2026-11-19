@@ -5,6 +5,7 @@ import 'package:hiddify/core/router/dialog/widgets/admin_bg_service_dialogs.dart
 import 'package:hiddify/core/router/dialog/widgets/chain_license_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/confirmation_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/custom_alert_dialog.dart';
+import 'package:hiddify/core/router/dialog/widgets/deep_search_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/experimental_feature_notice.dart';
 import 'package:hiddify/core/router/dialog/widgets/free_profile_consent_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/new_version_dialog.dart';
@@ -19,6 +20,7 @@ import 'package:hiddify/core/router/dialog/widgets/setting_radio_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_slider_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_text_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/sort_profiles_dialog.dart';
+import 'package:hiddify/core/router/dialog/widgets/telegram_channel_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/unknown_domains_warning_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/window_closing_dialog.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
@@ -27,6 +29,10 @@ import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
 import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
+import 'package:hiddify/features/profile/overview/remove_inactive_profiles_dialog.dart';
+import 'package:hiddify/features/profile/widget/download_failure_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
@@ -56,16 +62,26 @@ class DialogNotifier extends _$DialogNotifier {
     });
   }
 
-  Future<String?> showQrScanner() async {
-    return await _show<String?>(const QrCodeScannerDialog());
+  /// [hint] says which code to scan.
+  Future<String?> showQrScanner({String? hint}) async {
+    return await _show<String?>(QrCodeScannerDialog(hint: hint));
   }
 
   Future<void> showCrashReport() async {
     return await _show<void>(const CrashReportDialog());
   }
 
+  Future<void> showReportProblem() async {
+    return await _show<void>(const ReportProblemDialog());
+  }
+
   Future<void> showSortProfiles() async {
     return await _show<void>(const SortProfilesDialog());
+  }
+
+  /// The ids of the [inactive] subscriptions the user chose to delete, or null.
+  Future<List<String>?> showRemoveInactiveProfiles(List<InactiveProfile> inactive) async {
+    return await _show<List<String>?>(RemoveInactiveProfilesDialog(inactive));
   }
 
   Future<bool> showWarpLicense() async {
@@ -74,6 +90,18 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<bool> showPsiphonLicense() async {
     return await _show<bool?>(const ChainLicenseDialog(mode: ChainMode.psiphon)) ?? false;
+  }
+
+  /// One proxy's configuration, [loadConfig], to copy, share, save or scan.
+  Future<void> showShareProxy({
+    required String name,
+    required Future<String> Function() loadConfig,
+    required String title,
+    required String configHint,
+  }) async {
+    return await _show<void>(
+      ShareProfileDialog(name: name, loadConfig: loadConfig, title: title, configHint: configHint, configQr: true),
+    );
   }
 
   /// Shows [link] as a QR code that the copy button also copies.
@@ -133,6 +161,10 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<void>(NewVersionDialog(currentVersion, newVersion, canIgnore: canIgnore));
   }
 
+  Future<void> showTelegramChannel() async {
+    return await _show<void>(const TelegramChannelDialog());
+  }
+
   Future<bool> showConfirmation({
     required String title,
     required String message,
@@ -170,10 +202,18 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<bool?>(UnknownDomainsWarningDialog(url: url)) ?? false;
   }
 
-  /// How many of a profile's [count] proxies run, the fastest, starting at [keep]: -1 for all of
-  /// them, null when dismissed.
-  Future<int?> showKeepTop({required int count, required int keep}) async {
-    return await _show<int?>(KeepTopDialog(count: count, keep: keep));
+  /// How many of a profile's [count] proxies run, the fastest, starting at [keep], and whether a
+  /// quick test picks them, starting at [quick]: -1 for all of them, null when dismissed.
+  Future<KeepTopChoice?> showKeepTop({
+    required int count,
+    required int keep,
+    bool quick = true,
+    List<String> countries = const [],
+    List<(String, int)> available = const [],
+  }) async {
+    return await _show<KeepTopChoice?>(
+      KeepTopDialog(count: count, keep: keep, quick: quick, countries: countries, available: available),
+    );
   }
 
   /// Which of [profile]'s [proxies] run, by their tags; null when dismissed.
@@ -190,7 +230,12 @@ class DialogNotifier extends _$DialogNotifier {
   /// The speed test of the proxy picker: of the [shown] proxies or the [chosen] ones; which, once
   /// saved and to start, or null when dismissed.
   Future<SpeedTestTarget?> showPickerSpeedTest({required int shown, required int chosen}) async {
-    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen));
+    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen, limited: false));
+  }
+
+  /// Whether the user wants a deep search on [name], whose search for a way through gave up.
+  Future<bool> showDeepSearch({required String name}) async {
+    return await _show<bool?>(DeepSearchDialog(name: name)) ?? false;
   }
 
   Future<void> showProxyInfo({required OutboundInfo outboundInfo}) async {
@@ -302,6 +347,11 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<void> showCustomAlertFromErr(({String type, String? message}) err) async {
     return await _show<void>(CustomAlertDialog.fromErr(err));
+  }
+
+  /// Why a subscription could not be downloaded, in plain words; [action] is what failed.
+  Future<void> showDownloadFailure(ProfileDownloadFailure failure, {String? action}) async {
+    return await _show<void>(DownloadFailureDialog(failure: failure, action: action));
   }
 
   /// Mode B: VPN needs elevated admin_bgservice.

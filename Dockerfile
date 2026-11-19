@@ -18,7 +18,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     echo "root ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-RUN wget -O /usr/local/bin/appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" && \
+# appimagetool for this image's CPU (docker build --platform linux/arm64 builds the arm64 app)
+# The AppImage magic (bytes 8-10 of the ELF header) is zeroed: qemu-user binfmt (an arm64 build on
+# an x64 host) does not match ELF files with those bytes set and fails with "Exec format error".
+# The tool runs the same; AppImages it makes are unaffected.
+RUN wget -O /usr/local/bin/appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage" && \
+    printf '\0\0\0' | dd of=/usr/local/bin/appimagetool bs=1 seek=8 count=3 conv=notrunc 2>/dev/null && \
     chmod +x /usr/local/bin/appimagetool
 
 RUN mkdir -p /root/develop && \

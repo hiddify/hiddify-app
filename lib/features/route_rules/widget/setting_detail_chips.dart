@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 
 class SettingDetailChips<T extends Object> extends HookConsumerWidget {
@@ -186,12 +185,12 @@ class AndroidAppInfo extends HookConsumerWidget {
     }
   }
 
-  Future<AppInfo?> getAppInfo() async => await InstalledApps.getAppInfo(packageName, BuiltWith.flutter);
+  Future<AppInfo?> getAppInfo() async => await InstalledApps.getAppInfo(packageName);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final app = useFuture<AppInfo?>(useMemoized(() => getAppInfo(), [packageName]));
-    if (app.hasData && app.data != null) {
+    if (app.hasData && app.data?.icon != null) {
       return Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 8, 4),
         child: Row(

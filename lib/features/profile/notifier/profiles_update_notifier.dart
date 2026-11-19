@@ -12,6 +12,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:meta/meta.dart';
 import 'package:neat_periodic_task/neat_periodic_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'profiles_update_notifier.g.dart';
 
@@ -22,7 +23,7 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
   static const prefKey = "profiles_update_check";
   static const interval = Duration(minutes: 15);
 
-  /// When each profile began to fail its updates, by id: until one succeeds.
+  /// When each failing profile's update fell due, by id: until one succeeds.
   static const failingKey = "profiles_update_failing_since";
 
   /// A profile whose updates failed this long is no longer updated on its own; a manual update
@@ -66,11 +67,20 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
   }
 
   /// Whether a profile failing since [since] is no longer updated on its own at [now].
-  @visibleForTesting
   static bool gaveUp(DateTime? since, DateTime now) => since != null && now.difference(since) >= giveUpAfter;
 
-  Map<String, DateTime> _failingSince() {
-    final raw = ref.read(sharedPreferencesProvider).requireValue.getString(failingKey);
+  /// When a failing profile's update fell due: its last success plus its update interval. A
+  /// subscription that broke long ago (before an app update, or while the app was closed) gives up
+  /// on its first failed run, not three days after it.
+  @visibleForTesting
+  static DateTime failingSince(DateTime lastSuccess, Duration? updateInterval) =>
+      lastSuccess.add(updateInterval ?? Duration.zero);
+
+  Map<String, DateTime> _failingSince() => readFailingSince(ref.read(sharedPreferencesProvider).requireValue);
+
+  /// When each failing profile's update fell due, by id, as the last update run saved it.
+  static Map<String, DateTime> readFailingSince(SharedPreferences prefs) {
+    final raw = prefs.getString(failingKey);
     if (raw == null) return {};
     try {
       return {
@@ -148,7 +158,7 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
         await ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile, isBulk: true);
         if (ref.read(updateProfileNotifierProvider(profile.id)).hasError) {
           failedNames.add(profile.name);
-          failing.putIfAbsent(profile.id, () => now);
+          failing[profile.id] = failingSince(profile.lastUpdate, profile.options?.updateInterval);
         } else {
           successCount++;
           failing.remove(profile.id);

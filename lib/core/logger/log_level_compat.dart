@@ -13,12 +13,10 @@ import 'package:logging/logging.dart';
 extension LogLevelCompat on Logger {
   /// FINEST — engine TRACE. The most detailed level, off unless you are
   /// chasing one specific thing.
-  void trace(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      finest(message, error, stackTrace);
+  void trace(Object? message, [Object? error, StackTrace? stackTrace]) => finest(message, error, stackTrace);
 
   /// FINE — engine DEBUG. Developer detail, not shown by default.
-  void debug(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      fine(message, error, stackTrace);
+  void debug(Object? message, [Object? error, StackTrace? stackTrace]) => fine(message, error, stackTrace);
 
   /// SEVERE — engine ERROR, and anything that failed and mattered.
   ///
@@ -53,10 +51,4 @@ extension LevelNaming on Level {
 
 /// The levels worth offering as a filter. FINER, CONFIG and SHOUT are never
 /// produced by anything here, so listing them would only be noise.
-const uiLevels = <Level>[
-  Level.FINEST,
-  Level.FINE,
-  Level.INFO,
-  Level.WARNING,
-  Level.SEVERE,
-];
+const uiLevels = <Level>[Level.FINEST, Level.FINE, Level.INFO, Level.WARNING, Level.SEVERE];

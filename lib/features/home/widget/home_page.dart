@@ -126,48 +126,55 @@ class HomePage extends HookConsumerWidget {
                   constraints: const BoxConstraints(
                     maxWidth: 600, // Set the maximum width here
                   ),
-                  child: CustomScrollView(
-                    slivers: [
-                      // switch (activeProfile) {
-                      // AsyncData(value: final profile?) =>
-                      MultiSliver(
-                        children: [
-                          // const Gap(100),
-                          switch (activeProfile) {
-                            AsyncData(value: final profile?) => ProfileTile(
-                              profile: profile,
-                              isMain: true,
-                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            ),
-                            _ => const Text(""),
-                          },
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                  // The page does not move under the finger: no bounce (iOS) or stretch (Android) when it
+                  // fits the screen. It still scrolls, without them, when it does not (a small screen or a
+                  // large font).
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+                    child: CustomScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      slivers: [
+                        // switch (activeProfile) {
+                        // AsyncData(value: final profile?) =>
+                        MultiSliver(
+                          children: [
+                            // const Gap(100),
+                            switch (activeProfile) {
+                              AsyncData(value: final profile?) => ProfileTile(
+                                profile: profile,
+                                isMain: true,
+                                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              ),
+                              _ => const Text(""),
+                            },
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                    ),
                                   ),
-                                ),
-                                ActiveProxyFooter(),
-                                Gap(32),
-                              ],
+                                  ActiveProxyFooter(),
+                                  Gap(32),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      // AsyncData() => switch (hasAnyProfile) {
-                      //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                      //     _ => const EmptyProfilesHomeBody(),
-                      //   },
-                      // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                      // _ => const SliverToBoxAdapter(),
-                      // },
-                    ],
+                          ],
+                        ),
+                        // AsyncData() => switch (hasAnyProfile) {
+                        //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                        //     _ => const EmptyProfilesHomeBody(),
+                        //   },
+                        // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                        // _ => const SliverToBoxAdapter(),
+                        // },
+                      ],
+                    ),
                   ),
                 ),
               ),

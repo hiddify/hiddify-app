@@ -1,6 +1,7 @@
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/app_update/data/app_update_data_providers.dart';
@@ -55,7 +56,7 @@ class AppUpdateNotifier extends _$AppUpdateNotifier with AppLogger {
     }
     return ref
         .read(appUpdateRepositoryProvider)
-        .getLatestVersion()
+        .getLatestVersion(includePreReleases: ref.read(Preferences.betaUpdates))
         .match(
           (err) {
             loggy.warning("failed to get latest version", err);

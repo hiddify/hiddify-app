@@ -1,6 +1,7 @@
 package com.hiddify.hiddify.bg
 import android.util.Log
 
+import com.hiddify.hiddify.Application
 import com.hiddify.hiddify.Settings
 import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
@@ -26,8 +27,20 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     private val service = BoxService(this, this)
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
-        service.onStartCommand()
+    override fun onCreate() {
+        Application.initialize(this)
+        super.onCreate()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Always-on VPN: Android starts the service by itself (at boot, or after the process was
+        // killed), with no app to start the core over gRPC; its intent has no EXTRA_START_CORE,
+        // which is a start of the core (see BoxService.EXTRA_START_CORE).
+        if (intent?.action == VpnService.SERVICE_INTERFACE) {
+            Log.i(TAG, "started by always-on VPN")
+        }
+        return service.onStartCommand(intent)
+    }
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)

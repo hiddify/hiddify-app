@@ -2,12 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/features/app_update/data/github_release_parser.dart';
 import 'package:hiddify/features/app_update/model/install_kind.dart';
+import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 
-Map<String, dynamic> _release(String tag, {bool draft = false, List<String> assets = const []}) => {
+Map<String, dynamic> _release(
+  String tag, {
+  bool draft = false,
+  bool prerelease = false,
+  List<String> assets = const [],
+  String? body,
+}) => {
   'tag_name': tag,
+  'body': ?body,
   'draft': draft,
-  // the release workflow marks every release a pre-release on GitHub
-  'prerelease': true,
+  'prerelease': prerelease,
   'html_url': 'https://github.com/hiddify/hiddify-app/releases/tag/$tag',
   'published_at': '2026-11-01T22:42:47Z',
   'assets': [
@@ -22,12 +29,16 @@ Map<String, dynamic> _release(String tag, {bool draft = false, List<String> asse
 
 void main() {
   group('a release tag', () {
-    test('names its version; the GitHub pre-release flag does not make it one', () {
+    test('names its version', () {
       final release = GithubReleaseParser.parse(_release('v5.4.0', assets: ['Hiddify-MacOS.dmg']))!;
       expect(release.version, '5.4.0');
       expect(release.preRelease, isFalse);
       expect(release.flavor, Environment.prod);
       expect(release.asset('Hiddify-MacOS.dmg')!.size, 42);
+    });
+
+    test('still a pre-release on GitHub is one, whatever its tag', () {
+      expect(GithubReleaseParser.parse(_release('v5.9.2', prerelease: true))!.preRelease, isTrue);
     });
 
     test('with a suffix is a pre-release, .dev a dev build', () {
@@ -44,6 +55,44 @@ void main() {
     });
   });
 
+  group('the change log of a release', () {
+    const table = '## Downloads\n\n<!-- ASSETS:BEGIN -->\n<table>\n<tr><td>x</td></tr>\n</table>\n<!-- ASSETS:END -->';
+
+    test('is the Change Logs section, without the rest of the notes', () {
+      final release = GithubReleaseParser.parse(
+        _release(
+          'v5.6.0',
+          body:
+              '# Change Logs\n\n- **WARP** connects faster\n<!-- note -->\n- fixed a crash\n\n'
+              '### Android\n- TV\n\n'
+              '# Download\n\n$table\n\n**List of all changes:** [ChangeLog](https://x)',
+        ),
+      )!;
+      expect(release.changelog, '- **WARP** connects faster\n\n- fixed a crash\n\n### Android\n- TV');
+    });
+
+    test('ends at a rule or the download table', () {
+      expect(GithubReleaseParser.changelog('## Changelog\r\n- a\r\n---\nmore'), '- a');
+      expect(GithubReleaseParser.changelog("## What's new:\n- b\n$table"), '- b');
+      expect(
+        GithubReleaseParser.changelog('# Change Logs\n- c\n### iOS\n- d\n## Downloads\n**Download**'),
+        '- c\n### iOS\n- d',
+      );
+    });
+
+    test('is null when the notes have none or it is empty', () {
+      expect(GithubReleaseParser.parse(_release('v5.6.0'))!.changelog, isNull);
+      expect(GithubReleaseParser.changelog('**Download**\n\n$table'), isNull);
+      expect(GithubReleaseParser.changelog('# Change Logs\n\n<!-- none -->\n# Downloads\n$table'), isNull);
+    });
+
+    test('a long one is cut at a line', () {
+      final long = GithubReleaseParser.changelog('# Change Logs\n${List.filled(500, '- a change').join('\n')}')!;
+      expect(long.length, lessThan(GithubReleaseParser.maxChangelogLength + 10));
+      expect(long, endsWith('- a change\n\n…'));
+    });
+  });
+
   group('the file an install updates from', () {
     final release = GithubReleaseParser.parse(
       _release(
@@ -56,7 +105,7 @@ void main() {
           'Hiddify-Windows-Setup-x64.exe',
           'Hiddify-Windows-Setup-x64.Msix',
           'Hiddify-Windows-Portable-x64.zip',
-          'Hiddify-Linux-x64-AppImage.AppImage',
+          'Hiddify-Linux-x64.AppImage',
           'Hiddify-Debian-x64.deb',
           'Hiddify-MacOS.dmg',
           'Hiddify-MacOS-AppStore.dmg',
@@ -75,9 +124,29 @@ void main() {
 
     test('each desktop install takes its own format, never a store build', () {
       expect(asset(InstallKind.windowsSetup), 'Hiddify-Windows-Setup-x64.exe');
-      expect(asset(InstallKind.linuxAppImage), 'Hiddify-Linux-x64-AppImage.AppImage');
+      expect(asset(InstallKind.linuxAppImage), 'Hiddify-Linux-x64.AppImage');
       expect(asset(InstallKind.linuxDeb), 'Hiddify-Debian-x64.deb');
       expect(asset(InstallKind.macOS), 'Hiddify-MacOS.dmg');
+    });
+
+    test('on an arm64 Linux the update is the arm64 build, never the x64 one', () {
+      final withArm = GithubReleaseParser.parse(
+        _release(
+          'v5.6.0',
+          assets: [
+            'Hiddify-Linux-x64.AppImage',
+            'Hiddify-Debian-x64.deb',
+            'Hiddify-Linux-arm64.AppImage',
+            'Hiddify-Debian-arm64.deb',
+          ],
+        ),
+      )!;
+      String? arm(InstallKind kind, RemoteVersionEntity r) => kind.assetIn(r, arm64: true)?.name;
+      expect(arm(InstallKind.linuxAppImage, withArm), 'Hiddify-Linux-arm64.AppImage');
+      expect(arm(InstallKind.linuxDeb, withArm), 'Hiddify-Debian-arm64.deb');
+      // a release without arm64 Linux files opens the release page instead of installing x64
+      expect(arm(InstallKind.linuxAppImage, release), isNull);
+      expect(arm(InstallKind.linuxDeb, release), isNull);
     });
 
     test('a store install, the portable zip and other Linux installs download nothing', () {

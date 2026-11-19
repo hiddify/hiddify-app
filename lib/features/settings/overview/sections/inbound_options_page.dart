@@ -19,7 +19,7 @@ class InboundOptionsPage extends HookConsumerWidget with AppLogger {
     final t = ref.watch(translationsProvider).requireValue;
     final text = t.pages.settings.inbound;
     final mode = ref.watch(ConfigOptions.serviceMode);
-    final vpn = mode == ServiceMode.tun;
+    final vpn = mode == ServiceMode.tun || mode == ServiceMode.router;
     final shared = ref.watch(ConfigOptions.allowConnectionFromLan);
     final localAuth = ref.watch(ConfigOptions.localProxyAuth);
     final mixedPort = ref.watch(ConfigOptions.mixedPort);

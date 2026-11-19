@@ -188,6 +188,32 @@ final $typed_data.Uint8List ensureAdminBgServiceProgressDescriptor = $convert.ba
     '9CR19GQUlMRURfUEVSTUlTU0lPTl9ERU5JRUQQAxIgChxFTlNVUkVfQURNSU5fQkdfRkFJTEVE'
     'X09USEVSEAQ=');
 
+@$core.Deprecated('Use fetchUrlErrorDescriptor instead')
+const FetchUrlError$json = {
+  '1': 'FetchUrlError',
+  '2': [
+    {'1': 'FETCH_URL_ERROR_NONE', '2': 0},
+    {'1': 'FETCH_URL_ERROR_TIMEOUT', '2': 1},
+    {'1': 'FETCH_URL_ERROR_DNS', '2': 2},
+    {'1': 'FETCH_URL_ERROR_REFUSED', '2': 3},
+    {'1': 'FETCH_URL_ERROR_RESET', '2': 4},
+    {'1': 'FETCH_URL_ERROR_UNREACHABLE', '2': 5},
+    {'1': 'FETCH_URL_ERROR_TLS', '2': 6},
+    {'1': 'FETCH_URL_ERROR_CERTIFICATE', '2': 7},
+    {'1': 'FETCH_URL_ERROR_OTHER', '2': 8},
+    {'1': 'FETCH_URL_ERROR_TOO_LARGE', '2': 9},
+  ],
+};
+
+/// Descriptor for `FetchUrlError`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List fetchUrlErrorDescriptor = $convert.base64Decode(
+    'Cg1GZXRjaFVybEVycm9yEhgKFEZFVENIX1VSTF9FUlJPUl9OT05FEAASGwoXRkVUQ0hfVVJMX0'
+    'VSUk9SX1RJTUVPVVQQARIXChNGRVRDSF9VUkxfRVJST1JfRE5TEAISGwoXRkVUQ0hfVVJMX0VS'
+    'Uk9SX1JFRlVTRUQQAxIZChVGRVRDSF9VUkxfRVJST1JfUkVTRVQQBBIfChtGRVRDSF9VUkxfRV'
+    'JST1JfVU5SRUFDSEFCTEUQBRIXChNGRVRDSF9VUkxfRVJST1JfVExTEAYSHwobRkVUQ0hfVVJM'
+    'X0VSUk9SX0NFUlRJRklDQVRFEAcSGQoVRkVUQ0hfVVJMX0VSUk9SX09USEVSEAgSHQoZRkVUQ0'
+    'hfVVJMX0VSUk9SX1RPT19MQVJHRRAJ');
+
 @$core.Deprecated('Use coreInfoResponseDescriptor instead')
 const CoreInfoResponse$json = {
   '1': 'CoreInfoResponse',
@@ -322,6 +348,10 @@ const OutboundInfo$json = {
     {'1': 'upload_speed_cached', '3': 23, '4': 1, '5': 8, '10': 'uploadSpeedCached'},
     {'1': 'download_speed_cached', '3': 24, '4': 1, '5': 8, '10': 'downloadSpeedCached'},
     {'1': 'error', '3': 25, '4': 1, '5': 9, '10': 'error'},
+    {'1': 'sort_delay', '3': 26, '4': 1, '5': 5, '10': 'sortDelay'},
+    {'1': 'resting', '3': 27, '4': 1, '5': 8, '10': 'resting'},
+    {'1': 'insecure_reason', '3': 28, '4': 1, '5': 9, '10': 'insecureReason'},
+    {'1': 'deep_search_available', '3': 29, '4': 1, '5': 8, '10': 'deepSearchAvailable'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -348,8 +378,11 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'INZG93bmxvYWRTcGVlZBIpChBkb3dubG9hZF90ZXN0aW5nGBYgASgIUg9kb3dubG9hZFRlc3Rp'
     'bmcSLgoTdXBsb2FkX3NwZWVkX2NhY2hlZBgXIAEoCFIRdXBsb2FkU3BlZWRDYWNoZWQSMgoVZG'
     '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
-    'GBkgASgJUgVlcnJvckIJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3'
-    'VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
+    'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXkSGAoHcmVzdGluZx'
+    'gbIAEoCFIHcmVzdGluZxInCg9pbnNlY3VyZV9yZWFzb24YHCABKAlSDmluc2VjdXJlUmVhc29u'
+    'EjIKFWRlZXBfc2VhcmNoX2F2YWlsYWJsZRgdIAEoCFITZGVlcFNlYXJjaEF2YWlsYWJsZUIJCg'
+    'dfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3VwX3NlbGVjdGVkX3RhZ19k'
+    'aXNwbGF5');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
@@ -386,6 +419,7 @@ const OutboundGroup$json = {
     {'1': 'selectable', '3': 4, '4': 1, '5': 8, '10': 'selectable'},
     {'1': 'Is_expand', '3': 5, '4': 1, '5': 8, '10': 'IsExpand'},
     {'1': 'items', '3': 6, '4': 3, '5': 11, '6': '.hcore.OutboundInfo', '10': 'items'},
+    {'1': 'keep_top_picking', '3': 7, '4': 1, '5': 8, '10': 'keepTopPicking'},
   ],
 };
 
@@ -394,7 +428,8 @@ final $typed_data.Uint8List outboundGroupDescriptor = $convert.base64Decode(
     'Cg1PdXRib3VuZEdyb3VwEhAKA3RhZxgBIAEoCVIDdGFnEhIKBHR5cGUYAiABKAlSBHR5cGUSGg'
     'oIc2VsZWN0ZWQYAyABKAlSCHNlbGVjdGVkEh4KCnNlbGVjdGFibGUYBCABKAhSCnNlbGVjdGFi'
     'bGUSGwoJSXNfZXhwYW5kGAUgASgIUghJc0V4cGFuZBIpCgVpdGVtcxgGIAMoCzITLmhjb3JlLk'
-    '91dGJvdW5kSW5mb1IFaXRlbXM=');
+    '91dGJvdW5kSW5mb1IFaXRlbXMSKAoQa2VlcF90b3BfcGlja2luZxgHIAEoCFIOa2VlcFRvcFBp'
+    'Y2tpbmc=');
 
 @$core.Deprecated('Use outboundGroupListDescriptor instead')
 const OutboundGroupList$json = {
@@ -566,17 +601,30 @@ final $typed_data.Uint8List selectOutboundRequestDescriptor = $convert.base64Dec
     'ChVTZWxlY3RPdXRib3VuZFJlcXVlc3QSGwoJZ3JvdXBfdGFnGAEgASgJUghncm91cFRhZxIhCg'
     'xvdXRib3VuZF90YWcYAiABKAlSC291dGJvdW5kVGFn');
 
-@$core.Deprecated('Use urlTestRequestDescriptor instead')
-const UrlTestRequest$json = {
-  '1': 'UrlTestRequest',
+@$core.Deprecated('Use deepSearchRequestDescriptor instead')
+const DeepSearchRequest$json = {
+  '1': 'DeepSearchRequest',
   '2': [
     {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
   ],
 };
 
+/// Descriptor for `DeepSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deepSearchRequestDescriptor = $convert.base64Decode(
+    'ChFEZWVwU2VhcmNoUmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZw==');
+
+@$core.Deprecated('Use urlTestRequestDescriptor instead')
+const UrlTestRequest$json = {
+  '1': 'UrlTestRequest',
+  '2': [
+    {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
+    {'1': 'tags', '3': 2, '4': 3, '5': 9, '10': 'tags'},
+  ],
+};
+
 /// Descriptor for `UrlTestRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List urlTestRequestDescriptor = $convert.base64Decode(
-    'Cg5VcmxUZXN0UmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZw==');
+    'Cg5VcmxUZXN0UmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZxISCgR0YWdzGAIgAygJUgR0YWdz');
 
 @$core.Deprecated('Use speedTestRequestDescriptor instead')
 const SpeedTestRequest$json = {
@@ -613,13 +661,16 @@ const SetSystemProxyEnabledRequest$json = {
   '1': 'SetSystemProxyEnabledRequest',
   '2': [
     {'1': 'is_enabled', '3': 1, '4': 1, '5': 8, '10': 'isEnabled'},
+    {'1': 'address', '3': 2, '4': 1, '5': 9, '10': 'address'},
+    {'1': 'support_socks', '3': 3, '4': 1, '5': 8, '10': 'supportSocks'},
   ],
 };
 
 /// Descriptor for `SetSystemProxyEnabledRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setSystemProxyEnabledRequestDescriptor = $convert.base64Decode(
     'ChxTZXRTeXN0ZW1Qcm94eUVuYWJsZWRSZXF1ZXN0Eh0KCmlzX2VuYWJsZWQYASABKAhSCWlzRW'
-    '5hYmxlZA==');
+    '5hYmxlZBIYCgdhZGRyZXNzGAIgASgJUgdhZGRyZXNzEiMKDXN1cHBvcnRfc29ja3MYAyABKAhS'
+    'DHN1cHBvcnRTb2Nrcw==');
 
 @$core.Deprecated('Use logMessageDescriptor instead')
 const LogMessage$json = {
@@ -696,8 +747,10 @@ const ExportDiagnosticsRequest$json = {
     {'1': 'destination_path', '3': 1, '4': 1, '5': 9, '10': 'destinationPath'},
     {'1': 'extra_files', '3': 2, '4': 3, '5': 11, '6': '.hcore.ExportDiagnosticsRequest.ExtraFilesEntry', '10': 'extraFiles'},
     {'1': 'inline', '3': 3, '4': 1, '5': 8, '10': 'inline'},
+    {'1': 'unencrypted', '3': 4, '4': 1, '5': 8, '10': 'unencrypted'},
+    {'1': 'generic_files', '3': 5, '4': 3, '5': 11, '6': '.hcore.ExportDiagnosticsRequest.GenericFilesEntry', '10': 'genericFiles'},
   ],
-  '3': [ExportDiagnosticsRequest_ExtraFilesEntry$json],
+  '3': [ExportDiagnosticsRequest_ExtraFilesEntry$json, ExportDiagnosticsRequest_GenericFilesEntry$json],
 };
 
 @$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
@@ -710,13 +763,26 @@ const ExportDiagnosticsRequest_ExtraFilesEntry$json = {
   '7': {'7': true},
 };
 
+@$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
+const ExportDiagnosticsRequest_GenericFilesEntry$json = {
+  '1': 'GenericFilesEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
 /// Descriptor for `ExportDiagnosticsRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List exportDiagnosticsRequestDescriptor = $convert.base64Decode(
     'ChhFeHBvcnREaWFnbm9zdGljc1JlcXVlc3QSKQoQZGVzdGluYXRpb25fcGF0aBgBIAEoCVIPZG'
     'VzdGluYXRpb25QYXRoElAKC2V4dHJhX2ZpbGVzGAIgAygLMi8uaGNvcmUuRXhwb3J0RGlhZ25v'
     'c3RpY3NSZXF1ZXN0LkV4dHJhRmlsZXNFbnRyeVIKZXh0cmFGaWxlcxIWCgZpbmxpbmUYAyABKA'
-    'hSBmlubGluZRo9Cg9FeHRyYUZpbGVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUY'
-    'AiABKAxSBXZhbHVlOgI4AQ==');
+    'hSBmlubGluZRIgCgt1bmVuY3J5cHRlZBgEIAEoCFILdW5lbmNyeXB0ZWQSVgoNZ2VuZXJpY19m'
+    'aWxlcxgFIAMoCzIxLmhjb3JlLkV4cG9ydERpYWdub3N0aWNzUmVxdWVzdC5HZW5lcmljRmlsZX'
+    'NFbnRyeVIMZ2VuZXJpY0ZpbGVzGj0KD0V4dHJhRmlsZXNFbnRyeRIQCgNrZXkYASABKAlSA2tl'
+    'eRIUCgV2YWx1ZRgCIAEoDFIFdmFsdWU6AjgBGj8KEUdlbmVyaWNGaWxlc0VudHJ5EhAKA2tleR'
+    'gBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgMUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use exportDiagnosticsResponseDescriptor instead')
 const ExportDiagnosticsResponse$json = {
@@ -724,13 +790,14 @@ const ExportDiagnosticsResponse$json = {
   '2': [
     {'1': 'path', '3': 1, '4': 1, '5': 9, '10': 'path'},
     {'1': 'content', '3': 2, '4': 1, '5': 12, '10': 'content'},
+    {'1': 'encrypted', '3': 3, '4': 1, '5': 8, '10': 'encrypted'},
   ],
 };
 
 /// Descriptor for `ExportDiagnosticsResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List exportDiagnosticsResponseDescriptor = $convert.base64Decode(
     'ChlFeHBvcnREaWFnbm9zdGljc1Jlc3BvbnNlEhIKBHBhdGgYASABKAlSBHBhdGgSGAoHY29udG'
-    'VudBgCIAEoDFIHY29udGVudA==');
+    'VudBgCIAEoDFIHY29udGVudBIcCgllbmNyeXB0ZWQYAyABKAhSCWVuY3J5cHRlZA==');
 
 @$core.Deprecated('Use lANIPResponseDescriptor instead')
 const LANIPResponse$json = {
@@ -817,6 +884,7 @@ const EnsureAdminBgServiceRequest$json = {
     {'1': 'owner_pid', '3': 6, '4': 1, '5': 5, '10': 'ownerPid'},
     {'1': 'cli_path', '3': 7, '4': 1, '5': 9, '10': 'cliPath'},
     {'1': 'owner_user', '3': 8, '4': 1, '5': 9, '10': 'ownerUser'},
+    {'1': 'proxy_only', '3': 9, '4': 1, '5': 8, '10': 'proxyOnly'},
   ],
   '3': [EnsureAdminBgServiceRequest_ResourcesEntry$json],
 };
@@ -839,8 +907,9 @@ final $typed_data.Uint8List ensureAdminBgServiceRequestDescriptor = $convert.bas
     'Vuc3VyZUFkbWluQmdTZXJ2aWNlUmVxdWVzdC5SZXNvdXJjZXNFbnRyeVIJcmVzb3VyY2VzEjAK'
     'FGRpc2FibGVfbWVtb3J5X2xpbWl0GAUgASgIUhJkaXNhYmxlTWVtb3J5TGltaXQSGwoJb3duZX'
     'JfcGlkGAYgASgFUghvd25lclBpZBIZCghjbGlfcGF0aBgHIAEoCVIHY2xpUGF0aBIdCgpvd25l'
-    'cl91c2VyGAggASgJUglvd25lclVzZXIaPAoOUmVzb3VyY2VzRW50cnkSEAoDa2V5GAEgASgJUg'
-    'NrZXkSFAoFdmFsdWUYAiABKAxSBXZhbHVlOgI4AQ==');
+    'cl91c2VyGAggASgJUglvd25lclVzZXISHQoKcHJveHlfb25seRgJIAEoCFIJcHJveHlPbmx5Gj'
+    'wKDlJlc291cmNlc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgMUgV2YWx1'
+    'ZToCOAE=');
 
 @$core.Deprecated('Use ensureAdminBgServiceEventDescriptor instead')
 const EnsureAdminBgServiceEvent$json = {
@@ -857,4 +926,51 @@ final $typed_data.Uint8List ensureAdminBgServiceEventDescriptor = $convert.base6
     'ChlFbnN1cmVBZG1pbkJnU2VydmljZUV2ZW50Ej8KCHByb2dyZXNzGAEgASgOMiMuaGNvcmUuRW'
     '5zdXJlQWRtaW5CZ1NlcnZpY2VQcm9ncmVzc1IIcHJvZ3Jlc3MSGAoHbWVzc2FnZRgCIAEoCVIH'
     'bWVzc2FnZRIhCgxzZXJ2aWNlX3BvcnQYAyABKA1SC3NlcnZpY2VQb3J0');
+
+@$core.Deprecated('Use fetchUrlRequestDescriptor instead')
+const FetchUrlRequest$json = {
+  '1': 'FetchUrlRequest',
+  '2': [
+    {'1': 'url', '3': 1, '4': 1, '5': 9, '10': 'url'},
+    {'1': 'user_agent', '3': 2, '4': 1, '5': 9, '10': 'userAgent'},
+    {'1': 'timeout_ms', '3': 3, '4': 1, '5': 5, '10': 'timeoutMs'},
+  ],
+};
+
+/// Descriptor for `FetchUrlRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List fetchUrlRequestDescriptor = $convert.base64Decode(
+    'Cg9GZXRjaFVybFJlcXVlc3QSEAoDdXJsGAEgASgJUgN1cmwSHQoKdXNlcl9hZ2VudBgCIAEoCV'
+    'IJdXNlckFnZW50Eh0KCnRpbWVvdXRfbXMYAyABKAVSCXRpbWVvdXRNcw==');
+
+@$core.Deprecated('Use httpHeaderDescriptor instead')
+const HttpHeader$json = {
+  '1': 'HttpHeader',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+};
+
+/// Descriptor for `HttpHeader`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List httpHeaderDescriptor = $convert.base64Decode(
+    'CgpIdHRwSGVhZGVyEhIKBG5hbWUYASABKAlSBG5hbWUSFAoFdmFsdWUYAiABKAlSBXZhbHVl');
+
+@$core.Deprecated('Use fetchUrlResponseDescriptor instead')
+const FetchUrlResponse$json = {
+  '1': 'FetchUrlResponse',
+  '2': [
+    {'1': 'status_code', '3': 1, '4': 1, '5': 5, '10': 'statusCode'},
+    {'1': 'headers', '3': 2, '4': 3, '5': 11, '6': '.hcore.HttpHeader', '10': 'headers'},
+    {'1': 'body', '3': 3, '4': 1, '5': 12, '10': 'body'},
+    {'1': 'error', '3': 4, '4': 1, '5': 14, '6': '.hcore.FetchUrlError', '10': 'error'},
+    {'1': 'error_detail', '3': 5, '4': 1, '5': 9, '10': 'errorDetail'},
+  ],
+};
+
+/// Descriptor for `FetchUrlResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List fetchUrlResponseDescriptor = $convert.base64Decode(
+    'ChBGZXRjaFVybFJlc3BvbnNlEh8KC3N0YXR1c19jb2RlGAEgASgFUgpzdGF0dXNDb2RlEisKB2'
+    'hlYWRlcnMYAiADKAsyES5oY29yZS5IdHRwSGVhZGVyUgdoZWFkZXJzEhIKBGJvZHkYAyABKAxS'
+    'BGJvZHkSKgoFZXJyb3IYBCABKA4yFC5oY29yZS5GZXRjaFVybEVycm9yUgVlcnJvchIhCgxlcn'
+    'Jvcl9kZXRhaWwYBSABKAlSC2Vycm9yRGV0YWls');
 

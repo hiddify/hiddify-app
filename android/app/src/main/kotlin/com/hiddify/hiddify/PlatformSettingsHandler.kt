@@ -24,6 +24,8 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.StandardMethodCodec
+import com.hiddify.hiddify.utils.answer
+import com.hiddify.hiddify.utils.answerNow
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -33,7 +35,8 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
     PluginRegistry.ActivityResultListener {
     private var channel: MethodChannel? = null
     private var activity: Activity? = null
-    private lateinit var ignoreRequestResult: MethodChannel.Result
+    // the call that opened the battery optimization dialog, answered by onActivityResult
+    private var ignoreRequestResult: MethodChannel.Result? = null
 
     companion object {
         const val channelName = "com.hiddify.app/platform"
@@ -48,7 +51,9 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             GetPackagesIcon("get_package_icon"),
             IsTelevision("is_television"),
             SupportedAbis("supported_abis"),
+            OsVersion("os_version"),
             InstallApk("install_apk"),
+            CanInstallApks("can_install_apks"),
         }
     }
 
@@ -87,7 +92,8 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) {
-            ignoreRequestResult.success(resultCode == Activity.RESULT_OK)
+            ignoreRequestResult?.success(resultCode == Activity.RESULT_OK)
+            ignoreRequestResult = null
             return true
         }
         return false
@@ -103,14 +109,12 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             Trigger.IsIgnoringBatteryOptimizations.method -> {
-                result.runCatching {
-                    success(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
-                        } else {
-                            true
-                        }
-                    )
+                result.answerNow(call.method) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
+                    } else {
+                        true
+                    }
                 }
             }
 
@@ -122,13 +126,22 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                     android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
                     Uri.parse("package:${Application.application.packageName}")
                 )
+                val activity = activity
+                    ?: return result.error(call.method, "no activity to show the dialog", null)
+                // a request still open (its dialog never answered) is answered now, not dropped
+                ignoreRequestResult?.success(false)
                 ignoreRequestResult = result
-                activity?.startActivityForResult(intent, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                try {
+                    activity.startActivityForResult(intent, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                } catch (e: Exception) { // no activity on this ROM handles the request
+                    ignoreRequestResult = null
+                    result.error(call.method, e.message ?: e.toString(), null)
+                }
             }
 
             Trigger.GetInstalledPackages.method -> {
                 GlobalScope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
                         } else {
@@ -162,13 +175,13 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                             }
                         }
                         list.sortBy { it.name }
-                        success(gson.toJson(list))
+                        gson.toJson(list)
                     }
                 }
             }
 
             Trigger.GetPackagesIcon.method -> {
-                result.runCatching {
+                result.answerNow(call.method) {
                     val args = call.arguments as Map<*, *>
                     val packageName =
                         args["packageName"] as String
@@ -183,24 +196,34 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                     drawable.draw(canvas)
                     val byteArrayOutputStream = ByteArrayOutputStream()
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                    val base64: String =
-                        Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
-                    success(base64)
+                    Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
                 }
             }
 
             Trigger.IsTelevision.method -> {
-                result.runCatching {
+                result.answerNow(call.method) {
                     val uiMode = Application.application.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
-                    success(
-                        packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
-                            uiMode?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-                    )
+                    packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
+                        uiMode?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
                 }
             }
 
             Trigger.SupportedAbis.method -> {
-                result.runCatching { success(Build.SUPPORTED_ABIS.toList()) }
+                result.answerNow(call.method) { Build.SUPPORTED_ABIS.toList() }
+            }
+
+            // the release a person knows ("14"): Dart's operatingSystemVersion is the build id
+            Trigger.OsVersion.method -> {
+                result.answerNow(call.method) { Build.VERSION.RELEASE }
+            }
+
+            // Whether this app may start the system installer, without opening its settings page.
+            Trigger.CanInstallApks.method -> {
+                result.answerNow(call.method) {
+                    val context = activity ?: Application.application
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+                        context.packageManager.canRequestPackageInstalls()
+                }
             }
 
             // An update the app downloaded: the system installer asks the user to confirm it. Until
@@ -209,6 +232,11 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             Trigger.InstallApk.method -> {
                 result.runCatching {
                     val context = activity ?: Application.application
+                    // a copy Google Play installed is updated by Google Play only
+                    if (installedFromPlay(context)) {
+                        success("store")
+                        return@runCatching
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                         !context.packageManager.canRequestPackageInstalls()
                     ) {
@@ -233,10 +261,22 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                     success("started")
-                }
+                    // a failure is answered too: unanswered, the update stayed on "Starting the
+                    // installer..." for good (no installer on the ROM, a file it could not share)
+                }.onFailure { result.error("install_apk", it.message ?: it.toString(), null) }
             }
 
             else -> result.notImplemented()
         }
     }
+
+    private fun installedFromPlay(context: Context): Boolean = runCatching {
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getInstallerPackageName(context.packageName)
+        }
+        installer == "com.android.vending"
+    }.getOrDefault(false)
 }

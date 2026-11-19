@@ -41,13 +41,21 @@ SignTool=hiddifysign
 SignedUninstaller=yes
 #endif
 
+; Translations Inno Setup 6.7 ships only as "unofficial" (not in compiler:Languages) are
+; kept in windows/packaging/exe/languages. fastforge writes this script under dist\<version>\,
+; so the folder is found from SETUP_ICON_FILE, the one path it passes as absolute
+; (<repo>\windows\runner\resources\app_icon.ico).
+#define HiddifyLanguagesDir AddBackslash(ExtractFileDir("{{SETUP_ICON_FILE}}")) + "..\..\packaging\exe\languages\"
+
 [Languages]
 {% for locale in LOCALES %}
 {% if locale == 'en' %}Name: "english"; MessagesFile: "compiler:Default.isl"{% endif %}
+{% if locale == 'ar' %}Name: "arabic"; MessagesFile: "compiler:Languages\\Arabic.isl"{% endif %}
+{% if locale == 'fa' %}Name: "farsi"; MessagesFile: "{#HiddifyLanguagesDir}Farsi.isl"{% endif %}
 {% if locale == 'hy' %}Name: "armenian"; MessagesFile: "compiler:Languages\\Armenian.isl"{% endif %}
 {% if locale == 'bg' %}Name: "bulgarian"; MessagesFile: "compiler:Languages\\Bulgarian.isl"{% endif %}
 {% if locale == 'ca' %}Name: "catalan"; MessagesFile: "compiler:Languages\\Catalan.isl"{% endif %}
-{% if locale == 'zh' %}Name: "chinesesimplified"; MessagesFile: "compiler:Languages\\ChineseSimplified.isl"{% endif %}
+{% if locale == 'zh' %}Name: "chinesesimplified"; MessagesFile: "{#HiddifyLanguagesDir}ChineseSimplified.isl"{% endif %}
 {% if locale == 'co' %}Name: "corsican"; MessagesFile: "compiler:Languages\\Corsican.isl"{% endif %}
 {% if locale == 'cs' %}Name: "czech"; MessagesFile: "compiler:Languages\\Czech.isl"{% endif %}
 {% if locale == 'da' %}Name: "danish"; MessagesFile: "compiler:Languages\\Danish.isl"{% endif %}
@@ -73,6 +81,12 @@ SignedUninstaller=yes
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: {% if CREATE_DESKTOP_ICON != true %}unchecked{% else %}checkedonce{% endif %}
 Name: "launchAtStartup"; Description: "{cm:AutoStartProgram,{{DISPLAY_NAME}}}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: {% if LAUNCH_AT_STARTUP != true %}unchecked{% else %}checkedonce{% endif %}
+[InstallDelete]
+; Before 5.9.1 the core ran from core\Hiddify.exe; it is HiddifyCoreEngine.exe beside the app now.
+Type: filesandordirs; Name: "{app}\core"
+; The console launcher was HiddifyCli.exe before HiddifyCore.exe (a core that still ships it puts it back).
+Type: files; Name: "{app}\HiddifyCli.exe"
+
 [Files]
 Source: "{{SOURCE_DIR}}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -80,7 +94,9 @@ Source: "{{SOURCE_DIR}}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdir
 [Icons]
 Name: "{autoprograms}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"
 Name: "{autodesktop}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; Tasks: desktopicon
-Name: "{userstartup}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; WorkingDir: "{app}"; Tasks: launchAtStartup
+; --autostart: when the app's own autostart entry launched a copy first, this one exits without
+; showing that copy's window, which would undo a silent start.
+Name: "{userstartup}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; Parameters: "--autostart"; WorkingDir: "{app}"; Tasks: launchAtStartup
 [Registry]
 ; A "Run as administrator" compatibility layer left on the app's path by an older install (or set
 ; by hand) makes CreateProcess refuse the app with error 740, so the launch at the end of Setup

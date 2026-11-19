@@ -50,13 +50,29 @@ install_integration() {
     APP_VERSION=$(jq -r .version < "./data/flutter_assets/version.json" 2>/dev/null || grep -oP '"version":\s*"\K[^"]+' "./data/flutter_assets/version.json" 2>/dev/null || echo "1.0.0")
     mkdir -p "$(dirname "$TARGET_DESKTOP")"
 
+    # Exec quoting is decoded after desktop-entry string escapes. Escape both
+    # layers, and keep literal percent signs separate from the URI field code.
+    # Use env as the executable: GIO checks that path before expanding %%, so
+    # an AppImage name containing a percent sign must be passed as an argument.
+    local desktop_exec="$APPIMAGE"
+    desktop_exec=${desktop_exec//\\/\\\\}
+    desktop_exec=${desktop_exec//\"/\\\"}
+    desktop_exec=${desktop_exec//\`/\\\`}
+    desktop_exec=${desktop_exec//\$/\\\$}
+    desktop_exec=${desktop_exec//\\/\\\\}
+    desktop_exec=${desktop_exec//%/%%}
+    desktop_exec=${desktop_exec//$'\n'/\\n}
+    desktop_exec=${desktop_exec//$'\r'/\\r}
+    desktop_exec=${desktop_exec//$'\t'/\\t}
+
     cat > "$TARGET_DESKTOP" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Hiddify
 GenericName=Hiddify
 GenericName[fa]=هیدیفای
-Exec="$APPIMAGE"
+Exec=/usr/bin/env "$desktop_exec" %u
+MimeType=x-scheme-handler/hiddify;x-scheme-handler/v2ray;x-scheme-handler/v2rayn;x-scheme-handler/v2rayng;x-scheme-handler/clash;x-scheme-handler/clashmeta;x-scheme-handler/sing-box;
 Icon=hiddify
 Terminal=false
 StartupWMClass=app.hiddify.com
@@ -66,7 +82,7 @@ Keywords=Hiddify;Proxy;VPN;V2ray;Nekoray;Xray;Psiphon;OpenVPN;AntiCensorship;
 Keywords[fa]=هیدیفای;پروکسی;وی‌پی‌ان;وی۲ری;نکوباکس;ایکسری;سایفون;اوپن‌وی‌پی‌ان;فیلترشکن;
 X-AppImage-Name=Hiddify
 X-AppImage-Version=$APP_VERSION
-X-AppImage-Arch=x86_64
+X-AppImage-Arch=$(uname -m)
 X-AppImage-Homepage=https://github.com/hiddify/hiddify-app
 X-AppImage-UpdateURL=https://github.com/hiddify/hiddify-app
 EOF
@@ -94,7 +110,26 @@ OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
 
-# Filter out invalid environment arguments like %u before processing
+# Everything after "HiddifyCli" (and an optional "--") is passed as given, before the GUI's
+# field-code filtering: CLI arguments are literal values. The app starts its root VPN this way,
+# `pkexec "$APPIMAGE" HiddifyCli core-service ...`
+if [[ "${1-}" == "HiddifyCli" ]]; then
+    shift
+    if [[ "${1-}" == "--" ]]; then
+        shift
+    fi
+    if [[ "${1-}" == core-service ]]; then
+        # not exec'd: a service that crashed or was killed left its TUN's routing, and the
+        # host without network; undone here, while the image is still mounted
+        ./HiddifyCli "$@"
+        code=$?
+        ./HiddifyCli core-service --cleanup
+        exit $code
+    fi
+    exec ./HiddifyCli "$@"
+fi
+
+# Filter out invalid environment arguments like %u before processing GUI links
 CLEANED_ARGS=()
 for arg in "$@"; do
     case "$arg" in
@@ -112,10 +147,6 @@ else
 
 # Processing arguments
     case $1 in
-        HiddifyCli)  
-            exec ./HiddifyCli ${@:3}
-            exit 0
-            ;;
         h)
             show_help
             exit 0

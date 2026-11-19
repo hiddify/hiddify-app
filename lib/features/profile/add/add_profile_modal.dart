@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -71,6 +73,26 @@ class AddProfileModal extends HookConsumerWidget {
   }
 }
 
+/// The add profile sheet's sizes as fractions of [height]. [initial], [min]
+/// and [fullHeight] are in pixels, [max] is already a fraction.
+///
+/// On a low screen (a TV in landscape) the buttons alone can be taller than
+/// 85% of it, or than all of it, while DraggableScrollableSheet asserts
+/// min <= initial <= max <= 1. So the sheet may grow as far as the buttons
+/// need, and the other two sizes are kept inside that.
+@visibleForTesting
+({double initial, double min, double max}) addProfileSheetSizes({
+  required double initial,
+  required double min,
+  required double max,
+  required double fullHeight,
+  required double height,
+}) {
+  final maxSize = math.min(1.0, math.max(max, fullHeight / height));
+  final initialSize = math.min(initial / height, maxSize);
+  return (initial: initialSize, min: math.min(min / height, initialSize), max: maxSize);
+}
+
 class AddProfileOptions extends HookConsumerWidget {
   const AddProfileOptions({super.key});
   @override
@@ -80,6 +102,10 @@ class AddProfileOptions extends HookConsumerWidget {
     final isTv = ref.watch(isAndroidTvProvider).valueOrNull ?? false;
     // a TV has no camera to scan with, so it has the desktop's three buttons
     final threeButtons = PlatformUtils.isDesktop || isTv;
+    // A TV screen in landscape has room for the buttons and one panel below them: with the phone
+    // panel too, the free list got no height at all. So the free list takes the phone panel's
+    // place while it is on; the sheet keeps serving the phone page meanwhile.
+    final showPhonePanel = isTv && !freeSwitch;
     final isDesktop = PlatformUtils.isDesktop;
     final gapCount = threeButtons ? AddProfileModalConst.fixBtnsGapCountDesktop : AddProfileModalConst.fixBtnsGapCount;
     final itemCount = threeButtons
@@ -88,7 +114,7 @@ class AddProfileOptions extends HookConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final fixBtnsHeight = (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * gapCount) / itemCount;
-        final phoneHeight = isTv ? PhoneImportPanel.heightOf(context) + AddProfileModalConst.fixBtnsGap : 0;
+        final phoneHeight = showPhonePanel ? PhoneImportPanel.heightOf(context) + AddProfileModalConst.fixBtnsGap : 0;
         final fullHeight = fixBtnsHeight + phoneHeight + AddProfileModalConst.navBarHeight + 32;
         final initial = !freeSwitch ? fullHeight : fullHeight + 180;
         var min = !freeSwitch ? fullHeight : fullHeight + 100;
@@ -97,16 +123,23 @@ class AddProfileOptions extends HookConsumerWidget {
           min = initial;
           max = initial / constraints.maxHeight;
         }
+        final sizes = addProfileSheetSizes(
+          initial: initial,
+          min: min,
+          max: max,
+          fullHeight: fullHeight,
+          height: constraints.maxHeight,
+        );
         return DraggableScrollableSheet(
-          initialChildSize: initial / constraints.maxHeight,
-          minChildSize: min / constraints.maxHeight,
-          maxChildSize: max,
+          initialChildSize: sizes.initial,
+          minChildSize: sizes.min,
+          maxChildSize: sizes.max,
           expand: false,
           builder: (context, scrollController) => Column(
             children: [
               const Gap(AddProfileModalConst.fixBtnsGap),
               FixBtns(height: fixBtnsHeight, canScan: !isTv),
-              if (isTv) ...[const Gap(AddProfileModalConst.fixBtnsGap), const PhoneImportPanel()],
+              if (showPhonePanel) ...[const Gap(AddProfileModalConst.fixBtnsGap), const PhoneImportPanel()],
               if (freeSwitch) Expanded(child: FreeBtns(scrollController: scrollController)) else const Spacer(),
               const NavBar(),
             ],

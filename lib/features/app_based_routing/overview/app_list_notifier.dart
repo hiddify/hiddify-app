@@ -16,7 +16,7 @@ import 'package:hiddify/features/app_based_routing/overview/auto_selection_notif
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:installed_apps/index.dart';
+import 'package:installed_apps/installed_apps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_list_notifier.g.dart';
@@ -25,14 +25,14 @@ part 'app_list_notifier.g.dart';
 /// memory until the app closes, so this is for a few logos, like the routing page's apps row, not for whole lists.
 @Riverpod(keepAlive: true)
 Future<Uint8List?> appLogo(Ref ref, String packageName) async =>
-    (await InstalledApps.getAppInfo(packageName, BuiltWith.flutter))?.icon;
+    (await InstalledApps.getAppInfo(packageName))?.icon;
 
 @riverpod
 class AppList extends _$AppList with AppLogger {
   @override
   Stream<Map<String, int>> build(AppProxyMode? mode) {
     if (mode == null) return Stream.value({});
-    final appsInfo = InstalledApps.getInstalledApps(false);
+    final appsInfo = InstalledApps.getInstalledApps(excludeSystemApps: false, excludeNonLaunchableApps: false, detectPlatformType: false);
     return Stream.fromFuture(appsInfo).asyncExpand((appsInfo) {
       final phonePkgs = appsInfo.map((e) => e.packageName).toSet();
       return ref.watch(appProxyDataSourceProvider).watchFilterForDisplay(phonePkgs: phonePkgs, mode: mode).map((

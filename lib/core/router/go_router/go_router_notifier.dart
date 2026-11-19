@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
+import 'package:hiddify/core/widget/native_splash.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'go_router_notifier.g.dart';
@@ -14,7 +15,14 @@ class GoRouterNotifer extends _$GoRouterNotifer {
   static final rConfig = ValueNotifier<RoutingConfig>(loadingConfig);
   @override
   GoRouter build() {
-    ref.listen(routingConfigNotifierProvider, (_, next) => rConfig.value = next);
+    ref.listen(routingConfigNotifierProvider, (_, next) {
+      rConfig.value = next;
+      // the loading route is a blank page until the layout is known: the native splash stays over it, and
+      // goes after the first frame of the real routes
+      if (!identical(next, loadingConfig)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => NativeSplash.remove());
+      }
+    });
     return GoRouter.routingConfig(
       initialLocation: '/home',
       navigatorKey: rootNavKey,

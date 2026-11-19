@@ -1,0 +1,86 @@
+# Uploads the Play bundle (.github/scripts/google_play_upload.py): a draft or a .dev tag goes to open
+# testing and is sent for review, replacing a dev build still in review; a release tag goes to
+# production without being released (saved unsent, or a draft release), or to closed testing while
+# another release is in review. Called by build.yml for its own bundle, and by store-upload.yml
+# with the bundle of an earlier run. Play Console problems must not fail the run; they are
+# reported as a warning instead.
+name: Google Play
+
+on:
+  workflow_call:
+    inputs:
+      tag-name:
+        description: The version tag of the build, or `draft`.
+        type: string
+        required: true
+      channel:
+        description: dev or prod.
+        type: string
+        required: true
+      run-id:
+        description: The run whose android-aab artifact to upload. Empty - this run.
+        type: string
+        default: ''
+
+jobs:
+  upload:
+    name: google-play-upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    continue-on-error: true
+    permissions:
+      actions: read
+      # the android-build/<code> tags
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: android-aab
+          run-id: ${{ inputs.run-id || github.run_id }}
+          github-token: ${{ github.token }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Upload to Google Play
+        id: upload
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          KIND: ${{ (inputs.tag-name == 'draft' || inputs.channel == 'dev') && 'dev' || 'release' }}
+          # a draft is named after its version and commit: 5.5.6-draft.1a2b3c4
+          RELEASE_NAME: ${{ inputs.tag-name }}
+        run: |
+          set -euo pipefail
+          pip install --quiet google-api-python-client google-auth google-auth-httplib2
+          if [ "$RELEASE_NAME" = draft ]; then
+            RELEASE_NAME="$(sed -n 's/^version: *\([^+ ]*\)+.*/\1/p' pubspec.yaml)-draft.${GITHUB_SHA::7}"
+          fi
+          python3 .github/scripts/google_play_upload.py --aab hiddify-android-market.aab \
+            --package app.hiddify.com --kind "$KIND" --release-name "$RELEASE_NAME"
+
+      # Every version code Play took, or refused as used already, is recorded so the next bundle
+      # moves past it; only the newest tag is kept.
+      - name: Record the Play version code
+        if: ${{ !cancelled() && steps.upload.outputs.version_code != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CODE: ${{ steps.upload.outputs.version_code }}
+        run: |
+          set -euo pipefail
+          tag="android-build/$CODE"
+          if gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA" >/dev/null 2>"$RUNNER_TEMP/tag.err"; then
+            echo "Recorded $tag"
+          elif grep -q "Reference already exists" "$RUNNER_TEMP/tag.err"; then
+            echo "$tag was recorded already"
+          else
+            cat "$RUNNER_TEMP/tag.err"; exit 1
+          fi
+          gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/android-build/" --jq '.[].ref' \
+            | sed -n 's|^refs/tags/android-build/\([0-9][0-9]*\)$|\1|p' | sort -n | head -n -1 \
+            | while read -r old; do
+                gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/android-build/$old" >/dev/null
+                echo "Removed android-build/$old"
+              done

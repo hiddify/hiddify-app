@@ -8,6 +8,7 @@ import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/core/utils/json_converters.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
+import 'package:hiddify/features/crash_report/notifier/trace_session_notifier.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
@@ -49,7 +50,6 @@ abstract class ConfigOptions {
     mapFrom: Region.values.byName,
     mapTo: (value) => value.name,
   );
-  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>("use-xray-core-when-possible", false);
   static final useSystemTlsEngine = PreferencesNotifier.create<bool, bool>("use-system-tls-engine", true);
   // static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
@@ -476,7 +476,6 @@ abstract class ConfigOptions {
     "balancer-strategy": balancerStrategy,
     "default-proxy": defaultProxy,
     // "block-ads": blockAds,
-    "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "use-system-tls-engine": useSystemTlsEngine,
     "service-mode": serviceMode,
     "log-level": logLevel,
@@ -602,16 +601,23 @@ abstract class ConfigOptions {
     // };
 
     final mode = ref.watch(serviceMode);
+    final level = ref.watch(logLevel);
+    // a trace session's end goes with trace only: the session starts before the level changes and
+    // ends after it changes back, so each is one change of these options, one reconnect
+    final traceUntil = level == LogLevel.trace ? ref.watch(traceSessionProvider) : null;
+    final traceAfter = traceUntil == null ? null : ref.read(traceSessionProvider.notifier).levelBefore;
+    final traceEnds = traceUntil != null && traceAfter != null && traceAfter != LogLevel.trace;
     // final reg = ref.watch(Preferences.region.notifier).raw();
     return SingboxConfigOption(
       region: ref.watch(region).name,
       balancerStrategy: ref.watch(balancerStrategy),
       defaultProxy: ref.watch(defaultProxy),
       // blockAds: ref.watch(blockAds),
-      useXrayCoreWhenPossible: false, // the option is off and hidden; a stored true is ignored
       useSystemTlsEngine: ref.watch(useSystemTlsEngine),
       executeConfigAsIs: false,
-      logLevel: ref.watch(logLevel),
+      logLevel: level,
+      logLevelUntil: traceEnds ? traceUntil.toUtc() : null,
+      logLevelAfter: traceEnds ? traceAfter : null,
       resolveDestination: ref.watch(resolveDestination),
       ipv6Mode: ref.watch(ipv6Mode),
       remoteDnsAddress: ref.watch(remoteDnsAddress),
@@ -633,7 +639,8 @@ abstract class ConfigOptions {
       urlTestInterval: ref.watch(urlTestInterval),
       enableClashApi: ref.watch(enableClashApi),
       clashApiPort: ref.watch(clashApiPort),
-      enableTun: mode == ServiceMode.tun,
+      enableTun: mode == ServiceMode.tun || mode == ServiceMode.router,
+      routerMode: mode == ServiceMode.router,
       // enableTunService: mode == false, //ServiceMode.tunService,
       setSystemProxy: mode == ServiceMode.systemProxy,
       // bypassLan: ref.watch(bypassLan),

@@ -350,14 +350,20 @@ class _LockedNotice extends HookWidget {
       if (visible) controller.forward(from: 0);
       return null;
     }, [shake, visible]);
-    final offset = useAnimation(
-      TweenSequence<double>([
-        TweenSequenceItem(tween: Tween(begin: 0, end: -8), weight: 1),
-        TweenSequenceItem(tween: Tween(begin: -8, end: 8), weight: 2),
-        TweenSequenceItem(tween: Tween(begin: 8, end: -4), weight: 2),
-        TweenSequenceItem(tween: Tween(begin: -4, end: 0), weight: 1),
-      ]).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut)),
+    // made once: useAnimation rebuilds on every frame of the shake, and a CurvedAnimation made in
+    // build listens to the controller until it is disposed, one more on every frame
+    final shakeAnimation = useMemoized(
+      () => controller.drive(
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0, end: -8), weight: 1),
+          TweenSequenceItem(tween: Tween(begin: -8, end: 8), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 8, end: -4), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -4, end: 0), weight: 1),
+        ]).chain(CurveTween(curve: Curves.easeOut)),
+      ),
+      [controller],
     );
+    final offset = useAnimation(shakeAnimation);
     return AnimatedSize(
       duration: const Duration(milliseconds: 200),
       child: AnimatedOpacity(

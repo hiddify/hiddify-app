@@ -16,6 +16,9 @@ class RemoteVersionEntity with _$RemoteVersionEntity {
     required DateTime publishedAt,
     required Environment flavor,
     @Default(<ReleaseAsset>[]) List<ReleaseAsset> assets,
+
+    /// The "Change Logs" section of the release notes, in Markdown; null when they have none.
+    String? changelog,
   }) = _RemoteVersionEntity;
 
   String get presentVersion => flavor == Environment.prod ? version : "$version ${flavor.name}";
@@ -26,7 +29,7 @@ class RemoteVersionEntity with _$RemoteVersionEntity {
 
 /// A file of a release: an installer or a package.
 class ReleaseAsset {
-  const ReleaseAsset({required this.name, required this.url, required this.size});
+  const ReleaseAsset({required this.name, required this.url, required this.size, this.digest});
 
   final String name;
 
@@ -36,10 +39,14 @@ class ReleaseAsset {
   /// Bytes; 0 when the release does not say.
   final int size;
 
-  @override
-  bool operator ==(Object other) =>
-      other is ReleaseAsset && other.name == name && other.url == url && other.size == size;
+  /// GitHub's release-asset digest, such as `sha256:<hex>`.
+  /// This trusts the HTTPS release metadata; it is not a publisher signature.
+  final String? digest;
 
   @override
-  int get hashCode => Object.hash(name, url, size);
+  bool operator ==(Object other) =>
+      other is ReleaseAsset && other.name == name && other.url == url && other.size == size && other.digest == digest;
+
+  @override
+  int get hashCode => Object.hash(name, url, size, digest);
 }

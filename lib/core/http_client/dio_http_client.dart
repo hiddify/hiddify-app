@@ -139,6 +139,8 @@ class DioHttpClient with InfraLogger {
     ({String username, String password})? credentials,
     bool proxyOnly = false,
     ProgressCallback? onReceiveProgress,
+    // false: one attempt, so a failure is reported at once
+    bool retry = true,
   }) async {
     final mode = proxyOnly
         ? "proxy"
@@ -151,7 +153,7 @@ class DioHttpClient with InfraLogger {
       path,
       cancelToken: cancelToken,
       onReceiveProgress: onReceiveProgress,
-      options: _options(url, userAgent: userAgent, credentials: credentials),
+      options: _options(url, userAgent: userAgent, credentials: credentials)..disableRetry = !retry,
     );
   }
 

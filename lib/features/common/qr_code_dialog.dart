@@ -10,8 +10,11 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
+import 'package:hiddify/features/profile/add/phone_import/phone_import_notifier.dart';
+import 'package:hiddify/features/profile/add/phone_import/send_to_tv.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -81,10 +84,34 @@ class QrCodeDialog extends HookConsumerWidget {
 /// How a profile can be shared: its link as a QR code and to copy, when it has one (a remote
 /// profile), then its configuration to copy, share or save. The configuration is built when the
 /// dialog opens; copying is offered only when it fits the clipboard.
+///
+/// Also shares a single proxy ([title] and [configHint] then say so): it has no link, so its
+/// configuration itself is the QR code when it is small enough to scan.
 class ShareProfileDialog extends HookConsumerWidget {
-  const ShareProfileDialog({super.key, required this.name, required this.loadConfig, this.link});
+  const ShareProfileDialog({
+    super.key,
+    required this.name,
+    required this.loadConfig,
+    this.link,
+    this.title,
+    this.configHint,
+    this.configQr = false,
+  });
 
   final String name;
+
+  /// Above [name]; "Share profile" when null.
+  final String? title;
+
+  /// Under the configuration's heading; says it is the profile's full JSON when null.
+  final String? configHint;
+
+  /// Shows the configuration as a QR code, without its indentation, when it is at most
+  /// [maxQrChars] long: Hiddify's scanner imports it like a pasted config.
+  final bool configQr;
+
+  /// The most a QR code holds that a phone camera still reads well.
+  static const maxQrChars = 1000;
 
   /// The subscription link; null for a profile without one.
   final String? link;
@@ -104,94 +131,154 @@ class ShareProfileDialog extends HookConsumerWidget {
     final s = theme.colorScheme;
     final config = useFuture(useMemoized(loadConfig));
     final link = this.link;
+    final qrConfig = useMemoized(() {
+      if (!configQr || config.data == null) return null;
+      try {
+        final compact = jsonEncode(jsonDecode(config.data!));
+        return compact.length <= maxQrChars ? compact : null;
+      } catch (_) {
+        return null;
+      }
+    }, [config.data]);
+
+    // Smaller on short phones, so the whole dialog fits without scrolling.
+    final qrSize = (MediaQuery.sizeOf(context).height * 0.28).clamp(160.0, QrCodeDialogConst.qrBoxSize);
+    final json = config.data;
 
     return Dialog(
       child: SizedBox(
         width: 380,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 8, 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(color: s.primaryContainer, borderRadius: BorderRadius.circular(14)),
-                    child: Icon(Icons.ios_share_rounded, color: s.onPrimaryContainer),
-                  ),
-                  const Gap(14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(share.title, style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
+                        Text(
+                          title ?? share.title,
+                          style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant),
+                        ),
                         Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleLarge),
                       ],
                     ),
                   ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: MaterialLocalizations.of(context).closeButtonLabel,
+                    icon: const Icon(Icons.close_rounded),
+                  ),
                 ],
               ),
-              if (link != null) ...[
-                const Gap(20),
-                Center(child: _QrCode(link)),
-                const Gap(10),
-                Text(
-                  share.scanHint,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
-                ),
-                const Gap(14),
-                _CopyTile(
-                  label: share.link,
-                  value: _Value(link),
-                  copyText: link,
-                  action: Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8, end: 10),
-                    child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
-                  ),
-                ),
-              ],
-              const Gap(22),
-              Row(
-                children: [
-                  Icon(Icons.data_object_rounded, size: 18, color: s.primary),
-                  const Gap(8),
-                  Expanded(child: Text(share.config, style: theme.textTheme.titleSmall)),
-                  if (config.data case final json?)
-                    Text(
-                      _formatSize(utf8.encode(json).length),
-                      textDirection: TextDirection.ltr,
-                      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+              Padding(
+                // The outer end padding is smaller so the close button sits near the corner.
+                padding: const EdgeInsetsDirectional.only(end: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (link != null) ...[
+                      const Gap(12),
+                      Center(child: _QrCode(link, size: qrSize)),
+                      const Gap(8),
+                      Text(
+                        share.scanHint,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                      ),
+                      const Gap(12),
+                      _CopyTile(
+                        label: share.link,
+                        value: _Value(link),
+                        copyText: link,
+                        action: Padding(
+                          padding: const EdgeInsetsDirectional.only(start: 8, end: 10),
+                          child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
+                        ),
+                      ),
+                      if (_canSendToTv && ref.watch(isAndroidTvProvider).valueOrNull == false) ...[
+                        const Gap(8),
+                        _SendToTv(link),
+                      ],
+                    ],
+                    if (qrConfig != null) ...[
+                      const Gap(12),
+                      Center(child: _QrCode(qrConfig, size: qrSize)),
+                      const Gap(8),
+                      Text(
+                        share.scanHint,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                      ),
+                    ],
+                    const Gap(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                share.config,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall,
+                              ),
+                              if (json != null)
+                                Text(
+                                  _formatSize(utf8.encode(json).length),
+                                  textDirection: TextDirection.ltr,
+                                  style: theme.textTheme.labelSmall?.copyWith(color: s.onSurfaceVariant),
+                                ),
+                            ],
+                          ),
+                        ),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: switch (config) {
+                            AsyncSnapshot(hasError: true) => const SizedBox.shrink(),
+                            AsyncSnapshot(:final data?) => _ConfigActions(json: data, name: name),
+                            _ => const SizedBox.square(
+                              dimension: 40,
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          },
+                        ),
+                      ],
                     ),
-                ],
-              ),
-              const Gap(4),
-              Text(share.configHint, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant)),
-              const Gap(12),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                alignment: AlignmentDirectional.topCenter,
-                child: switch (config) {
-                  AsyncSnapshot(hasError: true) => Text(
-                    share.configFailed,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: s.error),
-                  ),
-                  AsyncSnapshot(:final data?) => _ConfigActions(json: data, name: name),
-                  _ => const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    child: LinearProgressIndicator(borderRadius: BorderRadius.all(Radius.circular(4))),
-                  ),
-                },
-              ),
-              const Gap(8),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                    const Gap(4),
+                    Text(
+                      configHint ?? share.configHint,
+                      style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                    ),
+                    if (config.hasError) ...[
+                      const Gap(8),
+                      Text(share.configFailed, style: theme.textTheme.bodyMedium?.copyWith(color: s.error)),
+                    ],
+                    if (json != null && json.length > maxClipboardChars) ...[
+                      const Gap(8),
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded, size: 16, color: s.onSurfaceVariant),
+                          const Gap(6),
+                          Expanded(
+                            child: Text(
+                              share.tooLargeToCopy,
+                              style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -201,6 +288,9 @@ class ShareProfileDialog extends HookConsumerWidget {
     );
   }
 
+  /// Phones only: they have the camera to scan the TV's code.
+  static bool get _canSendToTv => Platform.isAndroid || Platform.isIOS;
+
   static String _formatSize(int bytes) => switch (bytes) {
     < 1024 => '$bytes B',
     < 1024 * 1024 => '${(bytes / 1024).toStringAsFixed(1)} KB',
@@ -208,8 +298,58 @@ class ShareProfileDialog extends HookConsumerWidget {
   };
 }
 
-/// The configuration's actions, side by side: copy (when it fits the clipboard), share (where the
-/// platform has a share sheet for files) and save.
+/// Sends [link] to Hiddify on a TV on the same network: scans the code the TV shows in its add
+/// profile sheet, then sends the link to it, where the TV user imports it.
+class _SendToTv extends HookConsumerWidget {
+  const _SendToTv(this.link);
+
+  final String link;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final text = t.pages.profiles.share.toTv;
+    final sending = useState(false);
+
+    Future<void> send() async {
+      if (sending.value) return;
+      final scanned = await ref.read(dialogNotifierProvider.notifier).showQrScanner(hint: text.scanHint);
+      if (scanned == null || !context.mounted) return;
+      sending.value = true;
+      final result = await sendLinkToTv(scanned, link);
+      if (!context.mounted) return;
+      sending.value = false;
+      final notifications = ref.read(inAppNotificationControllerProvider);
+      switch (result) {
+        case SendToTvResult.sent:
+          notifications.showSuccessToast(text.sent);
+        case SendToTvResult.notTvCode:
+          notifications.showErrorToast(text.notTvCode);
+        case SendToTvResult.expired:
+          notifications.showErrorToast(text.expired);
+        case SendToTvResult.busy:
+          notifications.showErrorToast(text.busy);
+        case SendToTvResult.unreachable:
+          notifications.showErrorToast(text.unreachable);
+      }
+    }
+
+    return FilledButton.tonalIcon(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size.fromHeight(40),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: sending.value ? null : send,
+      icon: sending.value
+          ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+          : const Icon(Icons.tv_rounded),
+      label: Text(text.button),
+    );
+  }
+}
+
+/// The configuration's actions as icon buttons, side by side: copy (when it fits the clipboard),
+/// share (where the platform has a share sheet for files) and save.
 class _ConfigActions extends HookConsumerWidget {
   const _ConfigActions({required this.json, required this.name});
 
@@ -228,7 +368,6 @@ class _ConfigActions extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final share = t.pages.profiles.share;
-    final theme = Theme.of(context);
     final copied = _useCopiedFlag();
     final fits = json.length <= ShareProfileDialog.maxClipboardChars;
     final notifications = ref.read(inAppNotificationControllerProvider);
@@ -268,90 +407,37 @@ class _ConfigActions extends HookConsumerWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            if (fits) ...[
-              Expanded(
-                child: _ActionTile(
-                  icon: copied.value ? Icons.check_rounded : Icons.content_copy_rounded,
-                  label: _CopiedSwap(label: share.copy, copied: copied.value, alignment: Alignment.center),
-                  onTap: copy,
-                ),
+        if (fits)
+          IconButton.filledTonal(
+            visualDensity: VisualDensity.compact,
+            onPressed: copy,
+            tooltip: copied.value ? t.dialogs.qrCode.copied : share.copy,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                copied.value ? Icons.check_rounded : Icons.content_copy_rounded,
+                key: ValueKey(copied.value),
+                size: 20,
               ),
-              const Gap(8),
-            ],
-            if (_canShareFiles) ...[
-              Expanded(
-                child: _ActionTile(icon: Icons.share_rounded, label: Text(share.shareFile), onTap: shareFile),
-              ),
-              const Gap(8),
-            ],
-            Expanded(
-              child: _ActionTile(icon: Icons.save_alt_rounded, label: Text(share.saveFile), onTap: save),
             ),
-          ],
-        ),
-        if (!fits) ...[
-          const Gap(10),
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.onSurfaceVariant),
-              const Gap(6),
-              Expanded(
-                child: Text(
-                  share.tooLargeToCopy,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                ),
-              ),
-            ],
           ),
-        ],
+        if (_canShareFiles)
+          IconButton.filledTonal(
+            visualDensity: VisualDensity.compact,
+            onPressed: shareFile,
+            tooltip: share.shareFile,
+            icon: const Icon(Icons.share_rounded, size: 20),
+          ),
+        IconButton.filledTonal(
+          visualDensity: VisualDensity.compact,
+          onPressed: save,
+          tooltip: share.saveFile,
+          icon: const Icon(Icons.save_alt_rounded, size: 20),
+        ),
       ],
-    );
-  }
-}
-
-/// A tonal square for one action: its icon over its label.
-class _ActionTile extends StatelessWidget {
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
-
-  final IconData icon;
-  final Widget label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final s = theme.colorScheme;
-    return Material(
-      color: s.secondaryContainer,
-      borderRadius: BorderRadius.circular(16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
-          child: Column(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(icon, key: ValueKey(icon), color: s.onSecondaryContainer),
-              ),
-              const Gap(6),
-              DefaultTextStyle.merge(
-                style: theme.textTheme.labelLarge?.copyWith(color: s.onSecondaryContainer),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                child: label,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -369,7 +455,8 @@ class ProxyDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final other = useState(otherDevices);
-    if (ref.watch(ConfigOptions.serviceMode) == ServiceMode.tun) return const LanSharingQrDialog();
+    final mode = ref.watch(ConfigOptions.serviceMode);
+    if (mode == ServiceMode.tun || mode == ServiceMode.router) return const LanSharingQrDialog();
     final header = Consumer(
       builder: (context, ref, _) {
         final t = ref.watch(translationsProvider).requireValue;
@@ -510,6 +597,8 @@ class LocalProxyDialog extends ConsumerWidget {
           onPortSaved: ref.read(ConfigOptions.mixedPort.notifier).update,
           password: asked.isEmpty ? null : asked,
           onSetPassword: setPassword,
+          // the local port need not ask: the secret stays for the local network's port
+          onRemovePassword: () => ref.read(ConfigOptions.localProxyAuth.notifier).update(false),
         ),
       ],
     );
@@ -610,7 +699,8 @@ class _CopyLinkButton extends HookConsumerWidget {
 
 /// The copyable values of a proxy: [host] (null while it is looked up) and [port], then the user
 /// and [password], or, while no password is asked ([password] null), a warning with [onSetPassword].
-/// The port and the password are edited in place; the password is seen only while edited.
+/// The port and the password are edited in place; the password is seen only while edited. While it
+/// is edited, [onRemovePassword], when given, stops asking for it.
 class _ProxyFields extends HookConsumerWidget {
   const _ProxyFields({
     required this.hostLabel,
@@ -619,6 +709,7 @@ class _ProxyFields extends HookConsumerWidget {
     required this.onPortSaved,
     required this.password,
     required this.onSetPassword,
+    this.onRemovePassword,
   });
 
   final String hostLabel;
@@ -627,6 +718,7 @@ class _ProxyFields extends HookConsumerWidget {
   final Future<void> Function(int) onPortSaved;
   final String? password;
   final VoidCallback onSetPassword;
+  final Future<void> Function()? onRemovePassword;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -657,6 +749,16 @@ class _ProxyFields extends HookConsumerWidget {
         editing.value = null;
       },
       onCancel: () => editing.value = null,
+      remove: switch ((field, onRemovePassword)) {
+        (_Field.password, final remove?) => (
+          label: text.removePassword,
+          onRemove: () async {
+            await remove();
+            editing.value = null;
+          },
+        ),
+        _ => null,
+      },
     );
     Widget edit(_Field field) => _TileIcon(text.edit, Icons.edit_outlined, () => editing.value = field);
 
@@ -753,6 +855,7 @@ class _FieldEditor extends HookWidget {
     required this.onSave,
     required this.onCancel,
     this.mono = false,
+    this.remove,
   });
 
   final String label;
@@ -761,6 +864,9 @@ class _FieldEditor extends HookWidget {
   final ValueChanged<String> onSave;
   final VoidCallback onCancel;
   final bool mono;
+
+  /// An action under the field that clears the value instead of saving one.
+  final ({String label, VoidCallback onRemove})? remove;
 
   @override
   Widget build(BuildContext context) {
@@ -778,7 +884,7 @@ class _FieldEditor extends HookWidget {
       borderSide: BorderSide(color: error != null ? theme.colorScheme.error : theme.colorScheme.primary, width: 2),
     );
     final style = theme.textTheme.bodyLarge;
-    return TextField(
+    final field = TextField(
       controller: controller,
       autofocus: true,
       textDirection: TextDirection.ltr,
@@ -815,6 +921,23 @@ class _FieldEditor extends HookWidget {
           ],
         ),
       ),
+    );
+    final remove = this.remove;
+    if (remove == null) return field;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        field,
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            foregroundColor: theme.colorScheme.error,
+            visualDensity: VisualDensity.compact,
+          ),
+          onPressed: remove.onRemove,
+          icon: const Icon(Icons.lock_open_rounded, size: 18),
+          label: Text(remove.label),
+        ),
+      ],
     );
   }
 }
@@ -937,9 +1060,10 @@ Future<InternetAddress?> _findLanIp(WidgetRef ref) async {
 }
 
 class _QrCode extends StatelessWidget {
-  const _QrCode(this.data);
+  const _QrCode(this.data, {this.size = QrCodeDialogConst.qrBoxSize});
 
   final String data;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -948,8 +1072,8 @@ class _QrCode extends StatelessWidget {
     final colors = ColorScheme.fromSeed(seedColor: Theme.of(context).colorScheme.primary);
 
     return Container(
-      width: QrCodeDialogConst.qrBoxSize,
-      height: QrCodeDialogConst.qrBoxSize,
+      width: size,
+      height: size,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Stack(

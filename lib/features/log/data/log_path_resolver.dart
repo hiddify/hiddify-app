@@ -26,8 +26,7 @@ class LogPathResolver {
   File? coreCrashFile() {
     final archive = Directory(p.join(directory.path, "crash_reports"));
     if (archive.existsSync()) {
-      final reports = archive.listSync().whereType<Directory>().toList()
-        ..sort((a, b) => a.path.compareTo(b.path));
+      final reports = archive.listSync().whereType<Directory>().toList()..sort((a, b) => a.path.compareTo(b.path));
       for (final report in reports.reversed) {
         final log = File(p.join(report.path, "go.log"));
         if (log.existsSync()) return log;

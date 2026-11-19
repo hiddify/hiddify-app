@@ -7,6 +7,7 @@ import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/log/model/log_level.dart' as engine;
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
@@ -24,7 +25,7 @@ const _bottomSlack = 24.0;
 ///
 /// Window width, not the bar's own — that is how the rest of the app states a
 /// breakpoint, and the bar is narrower than the window by the nav rail.
-const _oneRowMinWindowWidth = 700.0;
+const _oneRowMinWindowWidth = 820.0;
 
 class LogsPage extends ConsumerStatefulWidget {
   const LogsPage({super.key});
@@ -107,11 +108,7 @@ class _LogsPageState extends ConsumerState<LogsPage> with PresLogger {
           const SizedBox(width: 4),
           IconButton(
             onPressed: state.paused ? notifier.resume : notifier.pause,
-            icon: Icon(
-              state.paused
-                  ? FluentIcons.play_20_regular
-                  : FluentIcons.pause_20_regular,
-            ),
+            icon: Icon(state.paused ? FluentIcons.play_20_regular : FluentIcons.pause_20_regular),
             tooltip: state.paused ? t.common.resume : t.common.pause,
             iconSize: 20,
           ),
@@ -122,8 +119,7 @@ class _LogsPageState extends ConsumerState<LogsPage> with PresLogger {
             iconSize: 20,
           ),
           IconButton(
-            onPressed: () =>
-                ref.read(bottomSheetsNotifierProvider.notifier).showLogsShare(),
+            onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showLogsShare(),
             icon: const Icon(FluentIcons.share_20_regular),
             tooltip: t.common.share,
             iconSize: 20,
@@ -135,7 +131,9 @@ class _LogsPageState extends ConsumerState<LogsPage> with PresLogger {
       // the oldest one, which is the end everybody watches.
       body: Column(
         children: [
-          Expanded(child: _LogList(logs: state.logs, controller: _scroll)),
+          Expanded(
+            child: _LogList(logs: state.logs, controller: _scroll),
+          ),
           const Divider(height: 1),
           LogFilterBar(
             category: state.category,
@@ -145,6 +143,18 @@ class _LogsPageState extends ConsumerState<LogsPage> with PresLogger {
             search: _search,
             onSearch: notifier.filterText,
             showCoreLevel: true,
+            // one tap to the developers: these logs with everything else that explains them
+            action: FilledButton.tonalIcon(
+              onPressed: () => ref.read(dialogNotifierProvider.notifier).showReportProblem(),
+              icon: const Icon(FluentIcons.chat_warning_20_regular, size: 16),
+              label: Text(t.pages.logs.fullReport),
+              style: FilledButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                textStyle: Theme.of(context).textTheme.labelMedium,
+              ),
+            ),
           ),
         ],
       ),
@@ -173,16 +183,12 @@ class _CoreLevelChip extends ConsumerWidget {
       onSelected: (value) async {
         if (value == null) return;
         // Read before the await: the status can change while it is in flight.
-        final connected =
-            !(ref.read(connectionNotifierProvider).value?.isDisconnected ??
-                true);
+        final connected = !(ref.read(connectionNotifierProvider).value?.isDisconnected ?? true);
         await ref.read(ConfigOptions.logLevel.notifier).update(value);
         // Nothing to reconnect while it is down — the next connection picks
         // this up on its own, so saying so would be noise.
         if (!connected) return;
-        ref
-            .read(inAppNotificationControllerProvider)
-            .showInfoToast(t.pages.logs.coreLogLevelMsg);
+        ref.read(inAppNotificationControllerProvider).showInfoToast(t.pages.logs.coreLogLevelMsg);
       },
     );
   }
@@ -216,9 +222,7 @@ class _BufferChip extends ConsumerWidget {
           children: [
             Text(
               t.pages.logs.buffer,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(width: 5),
             Text('$size', style: theme.textTheme.labelSmall),
@@ -255,6 +259,7 @@ class LogFilterBar extends ConsumerWidget {
     this.search,
     this.onSearch,
     this.showCoreLevel = false,
+    this.action,
   });
 
   final LogCategory? category;
@@ -270,6 +275,9 @@ class LogFilterBar extends ConsumerWidget {
   /// Also left out by the share sheet: it decides what to send from what has
   /// already been recorded, and cannot change what the core records.
   final bool showCoreLevel;
+
+  /// Shown between the search field and the chips: the page's way to the full report.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -295,10 +303,7 @@ class LogFilterBar extends ConsumerWidget {
         // already selects everything.
         onSelected: (value) => onLevel(value!),
       ),
-      if (showCoreLevel) ...[
-        const SizedBox(width: 6),
-        const _CoreLevelChip(),
-      ],
+      if (showCoreLevel) ...[const SizedBox(width: 6), const _CoreLevelChip()],
     ];
 
     // A window narrower than the breakpoint reaches this size a frame before
@@ -316,6 +321,7 @@ class LogFilterBar extends ConsumerWidget {
               children: [
                 Expanded(child: _search(theme, t)),
                 const SizedBox(width: 8),
+                if (action case final action?) ...[action, const SizedBox(width: 8)],
                 ...chips,
               ],
             )
@@ -327,7 +333,10 @@ class LogFilterBar extends ConsumerWidget {
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   runSpacing: 6,
-                  children: chips,
+                  children: [
+                    if (action case final action?) ...[action, const SizedBox(width: 6)],
+                    ...chips,
+                  ],
                 ),
               ],
             ),
@@ -347,20 +356,11 @@ class LogFilterBar extends ConsumerWidget {
         isDense: true,
         filled: true,
         fillColor: theme.colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
         hintText: t.common.filter,
-        hintStyle: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+        hintStyle: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         contentPadding: const EdgeInsets.only(right: 10, top: 9, bottom: 9),
-        prefixIcon: Icon(
-          FluentIcons.search_20_regular,
-          size: 15,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+        prefixIcon: Icon(FluentIcons.search_20_regular, size: 15, color: theme.colorScheme.onSurfaceVariant),
         prefixIconConstraints: const BoxConstraints(minWidth: 30),
       ),
     );
@@ -403,12 +403,10 @@ class _DropdownChip<T> extends StatelessWidget {
       tooltip: '',
       position: PopupMenuPosition.under,
       initialValue: current ?? _all,
-      onSelected: (picked) =>
-          onSelected(identical(picked, _all) ? null : picked as T),
+      onSelected: (picked) => onSelected(identical(picked, _all) ? null : picked as T),
       itemBuilder: (context) => [
         if (allLabel case final all?) PopupMenuItem(value: _all, child: Text(all)),
-        for (final option in options)
-          PopupMenuItem(value: option as Object, child: Text(nameOf(option))),
+        for (final option in options) PopupMenuItem(value: option as Object, child: Text(nameOf(option))),
       ],
       child: Container(
         padding: const EdgeInsets.only(left: 10, right: 4, top: 7, bottom: 7),
@@ -416,22 +414,10 @@ class _DropdownChip<T> extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             const SizedBox(width: 5),
-            Text(
-              current == null ? allLabel ?? '' : nameOf(current),
-              style: theme.textTheme.labelSmall,
-            ),
-            Icon(
-              Icons.arrow_drop_down_rounded,
-              size: 18,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            Text(current == null ? allLabel ?? '' : nameOf(current), style: theme.textTheme.labelSmall),
+            Icon(Icons.arrow_drop_down_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -451,19 +437,13 @@ class _LogList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (logs.isEmpty) {
       final t = ref.watch(translationsProvider).requireValue;
-      return Center(
-        child: Text(
-          t.common.empty,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      );
+      return Center(child: Text(t.common.empty, style: Theme.of(context).textTheme.bodySmall));
     }
 
     return ListView.separated(
       controller: controller,
       itemCount: logs.length,
-      separatorBuilder: (_, _) =>
-          const Divider(indent: 16, endIndent: 16, height: 1),
+      separatorBuilder: (_, _) => const Divider(indent: 16, endIndent: 16, height: 1),
       itemBuilder: (context, index) => _LogRow(record: logs[index]),
     );
   }
@@ -482,10 +462,7 @@ class _LogRow extends ConsumerWidget {
 
     final picked = await showMenu<bool>(
       context: context,
-      position: RelativeRect.fromRect(
-        at & const Size(1, 1),
-        Offset.zero & overlay.size,
-      ),
+      position: RelativeRect.fromRect(at & const Size(1, 1), Offset.zero & overlay.size),
       items: [
         PopupMenuItem(
           value: true,
@@ -502,9 +479,7 @@ class _LogRow extends ConsumerWidget {
     if (picked != true) return;
 
     await Clipboard.setData(ClipboardData(text: formatRecord(record)));
-    ref
-        .read(inAppNotificationControllerProvider)
-        .showSuccessToast(t.common.msg.export.clipboard.success);
+    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
   }
 
   @override
@@ -514,8 +489,7 @@ class _LogRow extends ConsumerWidget {
 
     return InkWell(
       onLongPress: () => _copy(context, ref, _center(context)),
-      onSecondaryTapDown: (details) =>
-          _copy(context, ref, details.globalPosition),
+      onSecondaryTapDown: (details) => _copy(context, ref, details.globalPosition),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Column(
@@ -532,11 +506,7 @@ class _LogRow extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    record.loggerName,
-                    style: theme.textTheme.labelSmall,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text(record.loggerName, style: theme.textTheme.labelSmall, overflow: TextOverflow.ellipsis),
                 ),
                 Text(time, style: theme.textTheme.labelSmall),
               ],

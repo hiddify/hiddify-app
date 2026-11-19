@@ -31,13 +31,25 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     await _initializeTray();
   }
 
+  // What the tray shows now, or was last asked to show. The active proxy changes many times a
+  // minute while proxies are tested, and each run of [_initializeTray] used to load the icon
+  // again, encode it and hand it, the tooltip and a new menu to the system, though nothing of
+  // them had changed. Each is noted before its call, so a run that starts while the call is on
+  // its way does not repeat it, and forgotten when the call fails, so the next run tries again.
+  DesktopBadgeStatus? _shownBadge;
+  (String, bool)? _shownIcon;
+  String? _shownTooltip;
+  String? _shownMenu;
+  bool _badgeLabelCleared = false;
+
   Future<void> _initializeTray() async {
     // Watch AsyncValues directly (not .future): after disconnect the proxy
     // provider used to error while still holding a previous delay, and awaiting
     // .future could leave the tray on the old green/error mark.
     final connection = ref.watch(connectionNotifierProvider).valueOrNull ?? const ConnectionStatus.disconnected();
+    // the ping alone, which the tooltip shows: the rest of the active proxy is not the tray's
     final urlTestDelay = connection is Connected
-        ? (ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0)
+        ? ref.watch(activeProxyNotifierProvider.select((proxy) => proxy.valueOrNull?.urlTestDelay ?? 0))
         : 0;
     // Dock/taskbar/tray mark: none when disconnected, error while the core waits for a ping,
     // green once the core reports connected.
@@ -48,25 +60,66 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     };
     // Update the Dock/taskbar mark before any other await so a cancelled rebuild
     // (or a slow tray API) cannot leave a green dot after disconnect.
-    await DesktopStatusBadge.setStatus(badge);
+    if (badge != _shownBadge) {
+      _shownBadge = badge;
+      await DesktopStatusBadge.setStatus(badge);
+    }
 
     final t = await ref.watch(translationsProvider.future);
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
 
-    await trayManager.setIcon(
+    final icon = (
       _trayIconPath(connection, badge: badge),
       // Template mode on macOS forces monochrome menu-bar tint and strips color.
       // Only use it for the idle (disconnected) icon.
-      isTemplate: PlatformUtils.isMacOS && badge == DesktopBadgeStatus.none && connection is Disconnected,
+      PlatformUtils.isMacOS && badge == DesktopBadgeStatus.none && connection is Disconnected,
     );
+    if (icon != _shownIcon) {
+      _shownIcon = icon;
+      try {
+        await trayManager.setIcon(icon.$1, isTemplate: icon.$2);
+      } catch (_) {
+        _shownIcon = null;
+        rethrow;
+      }
+    }
     if (!PlatformUtils.isLinux) {
-      if (Platform.isMacOS) {
+      if (Platform.isMacOS && !_badgeLabelCleared) {
+        _badgeLabelCleared = true;
         windowManager.setBadgeLabel('');
       }
-      await trayManager.setToolTip(_trayTooltip(connection, urlTestDelay, t, badge: badge));
+      final tooltip = _trayTooltip(connection, urlTestDelay, t, badge: badge);
+      if (tooltip != _shownTooltip) {
+        _shownTooltip = tooltip;
+        try {
+          await trayManager.setToolTip(tooltip);
+        } catch (_) {
+          _shownTooltip = null;
+          rethrow;
+        }
+      }
     }
-    await trayManager.setContextMenu(_trayMenu(connection, serviceMode, t));
+    final menu = _trayMenu(connection, serviceMode, t);
+    // what the menu says, which is all that tells two menus apart
+    final menuText = _menuText(menu);
+    if (menuText != _shownMenu) {
+      _shownMenu = menuText;
+      try {
+        await trayManager.setContextMenu(menu);
+      } catch (_) {
+        _shownMenu = null;
+        rethrow;
+      }
+    }
   }
+
+  /// The labels, checks and disabled states of [menu], submenus too, as one string.
+  static String _menuText(Menu menu) => (menu.items ?? const <MenuItem>[])
+      .map((item) {
+        final submenu = item.submenu == null ? '' : '{${_menuText(item.submenu!)}}';
+        return '${item.type}|${item.key}|${item.label}|${item.checked}|${item.disabled}$submenu';
+      })
+      .join(';');
 
   Menu _trayMenu(ConnectionStatus connection, ServiceMode serviceMode, Translations t) => Menu(
     items: [
@@ -87,7 +140,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
         icon: Assets.images.trayIconIco,
         submenu: Menu(
           items: [
-            ...ServiceMode.values.map(
+            ...ServiceMode.choices.map(
               (e) => MenuItem.checkbox(checked: e == serviceMode, key: e.name, label: e.present(t)),
             ),
           ],
@@ -177,7 +230,13 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   @override
   Future<void> onTrayIconRightMouseDown() async {
-    await trayManager.popUpContextMenu();
+    // Windows sends keys to a tray menu only when its owner is the foreground window. Without
+    // that, a menu opened from the keyboard (Win+B, then Shift+F10 or the menu key) left the
+    // focus on the taskbar: the arrow keys moved between tray icons and closed the menu, and a
+    // click elsewhere did not close it (#2570). tray_manager 0.5 activates the window only when
+    // asked; later versions always do, but need a newer Flutter.
+    // ignore: deprecated_member_use
+    await trayManager.popUpContextMenu(bringAppToFront: PlatformUtils.isWindows);
   }
 }
 

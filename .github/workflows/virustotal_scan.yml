@@ -35,13 +35,12 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       HAS_VT_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY != '' }}
+      TAG_NAME: ${{ inputs.release_tag }}
 
     steps:
-      - name: Set tag variable
-        run: echo "TAG_NAME=${{ inputs.release_tag }}" >> $GITHUB_ENV
-
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -75,7 +74,7 @@ jobs:
         id: vt
         # One rejected file must not leave the others without a report and badge.
         continue-on-error: true
-        uses: crazy-max/ghaction-virustotal@v5
+        uses: crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2 # v5.0.0
         with:
           vt_api_key: ${{ secrets.VIRUS_TOTAL_API_KEY }}
           files: |

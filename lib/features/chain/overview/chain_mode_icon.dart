@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -52,28 +53,26 @@ class _OrbitShield extends StatelessWidget {
   final Color light;
 
   @override
-  Widget build(BuildContext context) => Animate(
-    onPlay: (c) => c.repeat(),
-    effects: [
-      CustomEffect(
-        duration: 8000.ms,
-        builder: (context, v, child) {
-          Widget half({required bool front}) => CustomPaint(
-            size: const Size.square(22),
-            painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
-          );
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              half(front: false),
-              Icon(Icons.shield_rounded, size: 17, color: main),
-              half(front: true),
-            ],
-          );
-        },
-      ),
-    ],
-    child: const SizedBox.square(dimension: 22),
+  Widget build(BuildContext context) => AmbientLoop(
+    period: 8000.ms,
+    still: (context) => Icon(Icons.shield_rounded, size: 17, color: main),
+    builder: (context, phase) => ValueListenableBuilder<double>(
+      valueListenable: phase,
+      builder: (context, v, _) {
+        Widget half({required bool front}) => CustomPaint(
+          size: const Size.square(22),
+          painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
+        );
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            half(front: false),
+            Icon(Icons.shield_rounded, size: 17, color: main),
+            half(front: true),
+          ],
+        );
+      },
+    ),
   );
 }
 
@@ -143,7 +142,7 @@ class _OrbitPainter extends CustomPainter {
 /// The unblocker's double door, seen from above: three dots, the traffic, run into it while it is
 /// shut and wait; it opens, they drive through one after another, and it shuts again, over and over.
 /// The door gets the traffic through, where a lock would only guard it. With [animate] false, the
-/// door stands shut and empty.
+/// door stands open with the three dots lined up in front of it.
 class PassingDoor extends StatelessWidget {
   const PassingDoor({super.key, required this.size, required this.color, this.animate = true});
 
@@ -155,30 +154,27 @@ class PassingDoor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!animate) {
-      return CustomPaint(
-        size: Size.square(size),
-        painter: _DoorPainter(t: null, color: color),
-      );
-    }
-    return Animate(
-      onPlay: (c) => c.repeat(),
-      effects: [
-        CustomEffect(
-          duration: _run.ms,
-          builder: (context, v, child) => CustomPaint(
-            size: Size.square(size),
-            painter: _DoorPainter(t: v * _run / 1000, color: color),
-          ),
+    Widget still(BuildContext context) => CustomPaint(
+      size: Size.square(size),
+      painter: _DoorPainter(t: null, color: color),
+    );
+    if (!animate) return still(context);
+    return AmbientLoop(
+      period: _run.ms,
+      still: still,
+      builder: (context, phase) => ValueListenableBuilder<double>(
+        valueListenable: phase,
+        builder: (context, v, _) => CustomPaint(
+          size: Size.square(size),
+          painter: _DoorPainter(t: v * _run / 1000, color: color),
         ),
-      ],
-      child: SizedBox.square(dimension: size),
+      ),
     );
   }
 }
 
-/// The wall, its two leaves and the dots at [t] seconds into a run, on a 24 px grid; no dots and
-/// the door shut when [t] is null.
+/// The wall, its two leaves and the dots at [t] seconds into a run, on a 24 px grid; the door open
+/// and the dots waiting in front of it when [t] is null.
 class _DoorPainter extends CustomPainter {
   _DoorPainter({required this.t, required this.color});
   final double? t;
@@ -257,14 +253,15 @@ class _DoorPainter extends CustomPainter {
     canvas.drawLine(const Offset(12, _bottom), const Offset(12, 22), stroke);
     // the two leaves turn on their hinges, from along the wall to along the way through
     final s = t;
-    final a = s == null ? 0.0 : _open(s) * pi / 2;
+    // standing still, the door is open with the traffic lined up in front of it: shut and empty it
+    // was a bare line
+    final a = s == null ? pi / 2 : _open(s) * pi / 2;
     const half = (_bottom - _top) / 2;
     for (final (hinge, sign) in [(const Offset(12, _top), 1.0), (const Offset(12, _bottom), -1.0)]) {
       canvas.drawLine(hinge, hinge + Offset(sin(a), sign * cos(a)) * half, stroke);
     }
-    if (s == null) return;
     for (var i = 0; i < _waits.length; i++) {
-      final (x, squash, alpha) = _dotAt(s, i);
+      final (x, squash, alpha) = s == null ? (_waits[i], 1.0, 1.0) : _dotAt(s, i);
       if (alpha <= 0) continue;
       canvas.drawOval(
         Rect.fromCenter(

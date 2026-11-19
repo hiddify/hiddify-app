@@ -3,12 +3,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/insecure_proxy.dart';
 import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -26,6 +32,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     required this.onTap,
     this.testable = true,
     this.showPing = true,
+    this.testing = false,
+    this.quiet = false,
   });
 
   final OutboundInfo proxy;
@@ -38,6 +46,16 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
   /// Whether the ping shows: not for a proxy the core does not run, which no ping will reach.
   final bool showPing;
 
+  /// A ping asked for is on its way: the ping's place says so, also of a proxy at rest, whose
+  /// row otherwise does not move.
+  final bool testing;
+
+  /// The row is one of a list that changes all the time: a keep top pick going through hundreds
+  /// of proxies. Its values change in place: nothing pops, fades or loops. Every such animation
+  /// asked for a frame at each refresh of the screen, and with a row or two changing every
+  /// second the page drew frames without a pause for as long as the pick ran.
+  final bool quiet;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -46,11 +64,11 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     final state = proxy.rowState;
     // pops play when a value arrives in this row, not when the row is first built or scrolled in
     final previousState = usePrevious(state);
-    final arrived = previousState != null && previousState != state;
+    final arrived = !quiet && previousState != null && previousState != state;
     final previousHasIp = usePrevious(proxy.hasIp);
     final colors = _RowColors.of(context);
-    // the proxy gave up: the row fades, only the red word stays bright
-    final faded = state == ProxyRowState.failed;
+    // the proxy gave up, or rests: the row fades; of one that gave up the red word stays bright
+    final faded = state == ProxyRowState.failed || state == ProxyRowState.resting;
     // tested for its upload or download speed, or being tested: the speeds show under the ping
     // a proxy whose ping and both speeds failed shows the ping's cross alone
     final allFailed =
@@ -62,13 +80,29 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     final uploaded =
         !allFailed &&
         (proxy.uploadTesting || proxy.uploadSpeed != 0 || proxy.downloadTesting || proxy.downloadSpeed != 0);
+    // the user asked to keep this proxy loaded whatever its ping: the flag wears a pin
+    final pinned = ref.watch(
+      activeProfileProvider.select((profile) {
+        final p = profile.valueOrNull;
+        return p != null && p.keepsTop && p.keepTopPinned.contains(proxy.tag);
+      }),
+    );
     final word = switch (state) {
       ProxyRowState.connecting => t.pages.proxies.status.connecting,
       ProxyRowState.registering => t.pages.proxies.status.registering,
       _ => null,
     };
 
-    return ListTile(
+    final ping = KeyedSubtree(
+      key: ValueKey((state, style, testing)),
+      child: !showPing
+          ? const SizedBox.shrink()
+          : testing
+          ? _Signal(_Logo.loading(colors.accent))
+          : _ping(context, state, style, colors, t, arrived: arrived),
+    );
+
+    final tile = ListTile(
       title: Text(
         proxy.nameWithDetour,
         overflow: TextOverflow.ellipsis,
@@ -79,18 +113,32 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       ),
       leading: Padding(
         padding: const EdgeInsetsDirectional.only(end: 8),
-        child: Opacity(
-          opacity: faded ? _fadedAlpha : 1,
-          child: _FlagSlot(
-            proxy,
-            reconnectingBadge: state == ProxyRowState.reconnecting && style == ProxyPingStyle.number,
-            popIn: previousHasIp == false,
-          ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Opacity(
+              opacity: faded ? _fadedAlpha : 1,
+              child: _FlagSlot(
+                proxy,
+                reconnectingBadge: state == ProxyRowState.reconnecting && style == ProxyPingStyle.number,
+                popIn: !quiet && previousHasIp == false,
+              ),
+            ),
+            // the top corner, bright on a faded row; the reconnecting sync takes the bottom one
+            if (pinned)
+              PositionedDirectional(
+                start: -3,
+                top: -3,
+                child: Tooltip(message: t.dialogs.proxyInfo.keepLoaded, child: const _PinBadge()),
+              ),
+          ],
         ),
       ),
       // the state word stays whole; a long type gives way first
       subtitle: Row(
         children: [
+          // a proxy anyone on the way can read: the mark comes first, and a tap on it says why
+          if (proxy.isNotSecure) InsecureProxyBadge(proxy, faded: faded),
           Flexible(
             child: ProxyTypeLabel(
               proxy.typeWithoutStatus,
@@ -123,33 +171,28 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
                     : null,
                 child: Padding(
                   padding: uploaded ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2) : const EdgeInsets.all(6),
-                  child: AnimatedSwitcher(
-                    layoutBuilder: uniqueKeysLayout(),
-                    duration: const Duration(milliseconds: 250),
-                    child: KeyedSubtree(
-                      key: ValueKey((state, style)),
-                      child: showPing
-                          ? _ping(context, state, style, colors, t, arrived: arrived)
-                          : const SizedBox.shrink(),
-                    ),
-                  ),
+                  child: quiet ? ping : _switching(ping, const Duration(milliseconds: 250)),
                 ),
               ),
             ),
             if (uploaded)
               // a tap tests the upload again, a long press the download
-              IgnorePointer(
-                ignoring: !testable,
-                child: UploadSpeedChip(
-                  speed: proxy.uploadSpeed.toInt(),
-                  testing: proxy.uploadTesting,
-                  cached: proxy.uploadSpeedCached,
-                  onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
-                  downloadSpeed: proxy.downloadSpeed.toInt(),
-                  downloadTesting: proxy.downloadTesting,
-                  downloadCached: proxy.downloadSpeedCached,
-                  onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
-                  dense: true,
+              // of a proxy at rest, as dim as its ping
+              Opacity(
+                opacity: state == ProxyRowState.resting ? .55 : 1,
+                child: IgnorePointer(
+                  ignoring: !testable,
+                  child: UploadSpeedChip(
+                    speed: proxy.uploadSpeed.toInt(),
+                    testing: proxy.uploadTesting,
+                    cached: proxy.uploadSpeedCached,
+                    onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
+                    downloadSpeed: proxy.downloadSpeed.toInt(),
+                    downloadTesting: proxy.downloadTesting,
+                    downloadCached: proxy.downloadSpeedCached,
+                    onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
+                    dense: true,
+                  ),
                 ),
               ),
           ],
@@ -161,6 +204,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       onLongPress: () async => await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy),
       horizontalTitleGap: 4,
     );
+    return _Quiet(quiet: quiet, child: tile);
   }
 
   Widget _ping(
@@ -172,24 +216,45 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     required bool arrived,
   }) {
     final delay = proxy.urlTestDelay;
-    // value 1 starts a pop at its end: it only plays for a value that just arrived
     final number = style == ProxyPingStyle.number;
+    // a value that just arrived pops in (value 1 starts the pop at its end: it only plays for
+    // one that just arrived); in a quiet list it is just there
+    Widget pop(Widget child, Duration duration) => quiet
+        ? child
+        : child
+              .animate(value: arrived ? 0 : 1)
+              .scaleXY(begin: .5, end: 1, duration: duration, curve: Curves.easeOutBack)
+              .fadeIn(duration: 200.ms);
     return switch (state) {
-      ProxyRowState.ready =>
-        (number
-                ? _PingNumber(delay, color: delayColor(context, delay))
-                : _Signal(_Logo.lit(delayColor(context, delay), bars: delay < 300 ? 3 : (delay < 800 ? 2 : 1))))
-            .animate(value: arrived ? 0 : 1)
-            .scaleXY(begin: .5, end: 1, duration: 450.ms, curve: Curves.easeOutBack)
-            .fadeIn(duration: 200.ms),
-      ProxyRowState.pingFailed =>
-        (number
-                ? Icon(Icons.close_rounded, size: 18, color: colors.red)
-                : _Signal(_Logo.lit(colors.red, bars: 0), badge: _Badge(colors.red, Icons.close_rounded)))
-            .animate(value: arrived ? 0 : 1)
-            .scaleXY(begin: .5, end: 1, duration: 350.ms, curve: Curves.easeOutBack)
-            .fadeIn(duration: 200.ms),
+      ProxyRowState.ready => pop(
+        number
+            ? _PingNumber(delay, color: delayColor(context, delay))
+            : _Signal(_Logo.lit(delayColor(context, delay), bars: delay < 300 ? 3 : (delay < 800 ? 2 : 1))),
+        450.ms,
+      ),
+      ProxyRowState.pingFailed => pop(
+        number
+            ? Icon(Icons.close_rounded, size: 18, color: colors.red)
+            : _Signal(_Logo.lit(colors.red, bars: 0), badge: _Badge(colors.red, Icons.close_rounded)),
+        350.ms,
+      ),
       ProxyRowState.untested => _Signal(_Logo.loading(colors.wait)),
+      // asleep: nothing is coming, so nothing moves. Its last ping stays, dim, beside the moon
+      // icon: of this run, else of the one before; a tap on it wakes and tests it
+      ProxyRowState.resting => Tooltip(
+        message: t.pages.proxies.status.resting,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ConnectionConst.isValidDelay(_lastDelay))
+              Opacity(opacity: .55, child: _PingNumber(_lastDelay, color: delayColor(context, _lastDelay)))
+            else if (delay >= ConnectionConst.maxDelay)
+              Opacity(opacity: .55, child: Icon(Icons.close_rounded, size: 16, color: colors.red)),
+            const Gap(6),
+            Icon(Icons.bedtime_outlined, size: 16, color: colors.wait),
+          ],
+        ),
+      ),
       ProxyRowState.connecting || ProxyRowState.registering => _Signal(_Logo.loading(colors.accent)),
       ProxyRowState.searching => _Searching(colors.accent),
       // number style: the last ping stays, faded, while the flag wears the badge
@@ -198,16 +263,19 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             ? Opacity(opacity: .4, child: _PingNumber(delay, color: delayColor(context, delay)))
             : const SizedBox.shrink(),
       ProxyRowState.reconnecting => _Signal(_Logo.loading(colors.amber), badge: _Badge(colors.amber, null)),
-      ProxyRowState.failed =>
+      ProxyRowState.failed => pop(
         Text(
-              t.pages.proxies.status.failed,
-              style: TextStyle(fontSize: 12, color: colors.red, fontWeight: FontWeight.w600),
-            )
-            .animate(value: arrived ? 0 : 1)
-            .scaleXY(begin: .5, end: 1, duration: 400.ms, curve: Curves.easeOutBack)
-            .fadeIn(duration: 200.ms),
+          t.pages.proxies.status.failed,
+          style: TextStyle(fontSize: 12, color: colors.red, fontWeight: FontWeight.w600),
+        ),
+        400.ms,
+      ),
     };
   }
+
+  /// The last ping known of the proxy: of this run, else the one the core kept from the run
+  /// before, which it sends only to sort by.
+  int get _lastDelay => ConnectionConst.isValidDelay(proxy.urlTestDelay) ? proxy.urlTestDelay : proxy.sortDelay;
 
   Color delayColor(BuildContext context, int delay) {
     if (Theme.of(context).brightness == Brightness.dark) {
@@ -246,21 +314,42 @@ class _RowColors {
   }
 }
 
-/// Runs [builder] with 0..1 through a loop of [period], again and again.
-class _Looping extends HookWidget {
+/// Whether the row it is in is quiet (see [ProxyTile.quiet]): its loops stand still and nothing
+/// in it fades or pops.
+class _Quiet extends InheritedWidget {
+  const _Quiet({required this.quiet, required super.child});
+  final bool quiet;
+
+  static bool of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<_Quiet>()?.quiet ?? false;
+
+  @override
+  bool updateShouldNotify(_Quiet old) => old.quiet != quiet;
+}
+
+/// [child] in place of what was there, with a short cross-fade when its key changes.
+Widget _switching(Widget child, Duration duration) =>
+    AnimatedSwitcher(layoutBuilder: uniqueKeysLayout(), duration: duration, child: child);
+
+/// Runs [builder] with 0..1 through a loop of [period], again and again, on the shared
+/// [AmbientClock]: a page of waiting rows steps together, 20 times a second, and stands still
+/// (at 0) where the endless decoration does, and in a quiet row. On a ticker of its own, each
+/// waiting row asked for a frame at every refresh of the screen for as long as the test ran.
+class _Looping extends StatelessWidget {
   const _Looping({required this.period, required this.builder});
   final Duration period;
   final Widget Function(double t) builder;
 
   @override
-  Widget build(BuildContext context) {
-    final controller = useAnimationController(duration: period);
-    useEffect(() {
-      controller.repeat();
-      return null;
-    }, [controller]);
-    return AnimatedBuilder(animation: controller, builder: (_, _) => builder(controller.value));
-  }
+  Widget build(BuildContext context) => _Quiet.of(context)
+      ? builder(0)
+      : AmbientLoop(
+          period: period,
+          still: (_) => builder(0),
+          // each step repaints the little icon alone, not its row
+          builder: (context, phase) => RepaintBoundary(
+            child: ValueListenableBuilder<double>(valueListenable: phase, builder: (_, t, _) => builder(t)),
+          ),
+        );
 }
 
 double _ease(double v) => -(cos(pi * v.clamp(0.0, 1.0)) - 1) / 2;
@@ -325,6 +414,28 @@ class _Badge extends StatelessWidget {
         border: Border.all(color: bg, width: 1.5),
       ),
       child: icon == null ? _spinning(glyph) : glyph,
+    );
+  }
+}
+
+/// The pin of a proxy the user keeps loaded whatever its ping: a filled circle in the primary color,
+/// ringed in the surface color so it stands off any flag.
+class _PinBadge extends StatelessWidget {
+  const _PinBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    return Container(
+      width: 18,
+      height: 18,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: s.primary,
+        shape: BoxShape.circle,
+        border: Border.all(color: s.surface, width: 2),
+      ),
+      child: Icon(Icons.push_pin_rounded, size: 11, color: s.onPrimary),
     );
   }
 }
@@ -404,6 +515,44 @@ class _Searching extends StatelessWidget {
   );
 }
 
+/// [child] under a sweep of light in [color], every 1.3 s: something is on its way. With [breathe]
+/// it also fades in and out. It runs on the shared [AmbientClock] and stands still where the
+/// endless decoration does: no ticker of its own.
+class _WaitingShimmer extends StatelessWidget {
+  const _WaitingShimmer({required this.color, required this.child, this.breathe = false});
+  final Color color;
+  final Widget child;
+  final bool breathe;
+
+  @override
+  Widget build(BuildContext context) => AmbientLoop(
+    period: 1300.ms,
+    still: (_) => child,
+    // the sweep repaints the flag alone, not its row
+    builder: (context, phase) {
+      final sweep = child
+          .animate(adapter: ValueNotifierAdapter(phase))
+          .shimmer(duration: 1300.ms, color: color, angle: .6);
+      return RepaintBoundary(
+        child: !breathe
+            ? sweep
+            : ValueListenableBuilder<double>(
+                valueListenable: phase,
+                // in and out every 1.8 s, under the sweep
+                builder: (context, _, child) {
+                  final breath = AmbientClock.now % 1.8 / 1.8;
+                  return Opacity(
+                    opacity: .55 + .45 * Curves.easeInOut.transform(1 - (2 * breath - 1).abs()),
+                    child: child,
+                  );
+                },
+                child: sweep,
+              ),
+      );
+    },
+  );
+}
+
 /// The flag of [proxy]'s IP. This run's IP: the flag, popping in on arrival. Only the last run's
 /// IP: that flag, faded and shimmering. No IP while waiting: a shimmering placeholder; after a failure:
 /// the plain empty square. With [reconnectingBadge] the flag fades and wears the spinning sync.
@@ -425,6 +574,18 @@ class _FlagSlot extends StatelessWidget {
     final flag = IPCountryFlag(countryCode: ip.countryCode, organization: ip.org, size: size);
     final state = proxy.rowState;
     final gaveUp = state == ProxyRowState.pingFailed || state == ProxyRowState.failed;
+    // the shimmer says a result is on its way: only while the row is still being tested. A row
+    // with its ping, failed or at rest keeps its faded flag or bone still
+    final waiting = switch (state) {
+      ProxyRowState.untested ||
+      ProxyRowState.connecting ||
+      ProxyRowState.registering ||
+      ProxyRowState.searching ||
+      ProxyRowState.reconnecting => true,
+      _ => false,
+    };
+    final quiet = _Quiet.of(context);
+    final still = !waiting || quiet || MediaQuery.disableAnimationsOf(context);
 
     final (Object key, Widget child) = switch (proxy) {
       _ when reconnectingBadge && ip.countryCode.isNotEmpty => (
@@ -441,6 +602,8 @@ class _FlagSlot extends StatelessWidget {
           ],
         ),
       ),
+      // in a quiet row the flag is just there: no ring, no pop
+      OutboundInfo(hasIp: true) when quiet => ('flag', flag),
       OutboundInfo(hasIp: true) => (
         'flag',
         Stack(
@@ -464,30 +627,27 @@ class _FlagSlot extends StatelessWidget {
           ],
         ),
       ),
+      _ when ip.ip.isNotEmpty && still => ('cached', Opacity(opacity: .35, child: flag)),
       _ when ip.ip.isNotEmpty => (
         'cached',
-        Opacity(opacity: .35, child: flag)
-            .animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .5), angle: .6),
+        _WaitingShimmer(
+          color: s.primary.withValues(alpha: .5),
+          child: Opacity(opacity: .35, child: flag),
+        ),
       ),
       _ when gaveUp => ('empty', _square(s.onSurface.withValues(alpha: .07))),
+      _ when still => ('bone', _square(s.onSurface.withValues(alpha: .12))),
       _ => (
         'bone',
-        _square(s.onSurface.withValues(alpha: .12))
-            .animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+        _WaitingShimmer(
+          color: s.primary.withValues(alpha: .45),
+          breathe: true,
+          child: _square(s.onSurface.withValues(alpha: .12)),
+        ),
       ),
     };
-    return SizedBox.square(
-      dimension: size,
-      child: AnimatedSwitcher(
-        layoutBuilder: uniqueKeysLayout(),
-        duration: const Duration(milliseconds: 300),
-        child: KeyedSubtree(key: ValueKey(key), child: child),
-      ),
-    );
+    final slot = KeyedSubtree(key: ValueKey(key), child: child);
+    return SizedBox.square(dimension: size, child: quiet ? slot : _switching(slot, const Duration(milliseconds: 300)));
   }
 
   static Widget _square(Color color) => Center(

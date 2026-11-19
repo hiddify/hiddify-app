@@ -83,6 +83,11 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
+  /// Downloads [url] in the core, with the TLS handshake of Chrome; cancel the returned call to
+  /// stop it. A status other than 2xx is a response, not an error.
+  ResponseFuture<FetchUrlResponse> fetchUrl(String url, {required String userAgent, required Duration timeout}) =>
+      core.fgClient.fetchUrl(FetchUrlRequest(url: url, userAgent: userAgent, timeoutMs: timeout.inMilliseconds));
+
   TaskEither<String, String> generateFullConfigByPath(String path) {
     return TaskEither(() async {
       final response = await core.fgClient.parse(ParseRequest(configPath: path, debug: false));
@@ -358,14 +363,26 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> reload(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       loggy.debug("hot reloading");
-      try {
-        final res = await core.bgClient.hotReload(
-          StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
-        );
-        if (res.messageType == MessageType.EMPTY) return right(unit);
-        loggy.info("hot reload not applied, restarting: ${res.messageType} ${res.message}");
-      } on GrpcError catch (e) {
-        loggy.warning("hot reload failed, restarting: $e");
+      // a connection in the VPN service or a Network Extension reloads there: their control port
+      // refuses the core's own hot reload
+      final managed = await core.reloadManaged(path, name, disableMemoryLimit);
+      if (managed == true) {
+        // as after a restart, but the connection stays up: the listeners on the engine follow the
+        // reloaded config (its outbounds, its status)
+        await startListeningLogs('bg', core.bgClient);
+        ref.read(coreRestartSignalProvider.notifier).restart();
+        return right(unit);
+      }
+      if (managed == null) {
+        try {
+          final res = await core.bgClient.hotReload(
+            StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
+          );
+          if (res.messageType == MessageType.EMPTY) return right(unit);
+          loggy.info("hot reload not applied, restarting: ${res.messageType} ${res.message}");
+        } on GrpcError catch (e) {
+          loggy.warning("hot reload failed, restarting: $e");
+        }
       }
       return restart(path, name, disableMemoryLimit).run();
     });
@@ -376,7 +393,11 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("restarting");
       if (core.managesLifecycle) {
         try {
-          await core.startManaged(path, name, disableMemoryLimit);
+          // a connection in the VPN service restarts there, without being torn down and installed
+          // again; otherwise (or moving out of it) it starts anew
+          if (await core.restartManaged(path, name, disableMemoryLimit) != true) {
+            await core.startManaged(path, name, disableMemoryLimit);
+          }
           await startListeningLogs('bg', core.bgClient);
           ref.read(coreRestartSignalProvider.notifier).restart();
           return right(unit);
@@ -508,16 +529,36 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, Unit> urlTest(String tag) {
+  /// Tests [tag] (a proxy, or a group: the proxies it uses), or, when given, the proxies [tags]:
+  /// a few at a time, also the ones keep top left at rest.
+  TaskEither<String, Unit> urlTest(String tag, {List<String> tags = const []}) {
     return TaskEither(() async {
       loggy.debug("url test");
       try {
-        final res = await core.bgClient.urlTest(UrlTestRequest(tag: tag));
+        final res = await core.bgClient.urlTest(UrlTestRequest(tag: tag, tags: tags));
         if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
 
         return right(unit);
       } catch (e) {
         loggy.error("error in url test: $e");
+        rethrow;
+      }
+    });
+  }
+
+  /// Starts a deep search on [tag], a proxy whose search for a way through (WARP endpoint
+  /// scanner, Psiphon CDN edge scanner) found nothing in its time (deepSearchAvailable): it
+  /// searches on with no time limit and more workers, possibly for hours.
+  TaskEither<String, Unit> startDeepSearch(String tag) {
+    return TaskEither(() async {
+      loggy.debug("starting deep search");
+      try {
+        final res = await core.bgClient.startDeepSearch(DeepSearchRequest(tag: tag));
+        if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+
+        return right(unit);
+      } catch (e) {
+        loggy.error("error starting deep search: $e");
         rethrow;
       }
     });
@@ -597,12 +638,20 @@ class HiddifyCoreService with InfraLogger {
           // changes, so a stream that was open across a gap in the platform's status (the app
           // coming back to the foreground re-reads the VPN) has nothing to tell: a new one
           // answers with the state at once.
-          if (!wasStarted) _stopFollowingCore();
+          if (!wasStarted) {
+            _stopFollowingCore();
+            _coreFailure = null;
+          }
           _followCoreWhilePlatformStarted();
           status = _coreReported ?? const CoreStatus.starting();
         } else {
           _coreReported = null;
           _stopFollowingCore();
+          // the service stopped because the core failed: the failure is why, not a plain stop
+          if (_coreFailure case final failure? when status is CoreStopped && status.alert == null) {
+            status = failure;
+          }
+          if (status is CoreStopped) _coreFailure = null;
         }
         statusController.add(currentState = status);
       });
@@ -645,6 +694,10 @@ class HiddifyCoreService with InfraLogger {
 
   /// The last state the core reported while the platform said its service is up.
   CoreStatus? _coreReported;
+
+  /// The core stopped with an error while the platform's service was up: it failed to start, or
+  /// failed later. Reported in place of the plain stop of the service that follows.
+  CoreStopped? _coreFailure;
   StreamSubscription<CoreInfoResponse>? _coreInfoSubscription;
 
   /// The platform reports the tunnel up; waiting and started come from the core's own status
@@ -675,8 +728,22 @@ class HiddifyCoreService with InfraLogger {
                   CoreStates.HOT_RELOADING:
                 statusController.add(currentState = _coreReported = CoreStatus.fromCoreInfo(event));
               default:
-                // stopped and stopping are the platform's to report
-                break;
+                // stopped and stopping are the platform's to report, but the platform's service
+                // stays up when the core fails (a profile it can not start): the core's error is
+                // the outcome, and the service, carrying nothing, is taken down
+                if (CoreStatus.fromCoreInfo(event) case final CoreStopped failed when failed.alert != null) {
+                  loggy.warning("core stopped with an error while its service is up: ${failed.message}");
+                  _coreFailure = failed;
+                  statusController.add(currentState = failed);
+                  // the failure stays the status: a stop that fails too is only logged, not
+                  // left as an unhandled error (reported as an app crash)
+                  unawaited(
+                    core.stop().then<void>(
+                      (_) {},
+                      onError: (Object error) => loggy.warning("stopping the service of a failed core: $error"),
+                    ),
+                  );
+                }
             }
           },
           onError: (Object error) {

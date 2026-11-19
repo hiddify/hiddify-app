@@ -11,4 +11,14 @@ updates:
       interval: "daily"
     open-pull-requests-limit: 5
 
-
+  # The actions used by the workflows and the composite actions, third-party ones pinned to a
+  # commit: one grouped pull request a week.
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: ["*"]

@@ -10,11 +10,14 @@ import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/logger/sinks/file_sink.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/data/log_path_resolver.dart';
+import 'package:hiddify/features/log/overview/download_to_phone_dialog.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
+import 'package:hiddify/features/profile/add/phone_import/phone_import_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hiddify/utils/uri_utils.dart';
@@ -29,8 +32,8 @@ final _log = appLogger('LogsShare');
 /// Step one: what to share at all.
 ///
 /// The in-memory history is offered everywhere and can be filtered. A file is
-/// listed only when it exists and has something in it — the app keeps one on
-/// desktop only, and the core writes its own two beside it.
+/// listed only when it exists and has something in it — the app keeps one, and
+/// the core writes its own two beside it.
 class LogsShareModal extends ConsumerWidget {
   const LogsShareModal({super.key});
 
@@ -43,7 +46,7 @@ class LogsShareModal extends ConsumerWidget {
     final crash = paths.coreCrashFile();
 
     final files = <(String, String, File)>[
-      if (PlatformUtils.isDesktop) (t.pages.logs.errorLog, t.pages.logs.errorLogMsg, paths.appFile()),
+      (t.pages.logs.errorLog, t.pages.logs.errorLogMsg, paths.appFile()),
       (t.pages.logs.coreLog, t.pages.logs.coreLogMsg, paths.coreFile()),
       // Absent until the core actually crashes, which is the point of it.
       if (crash != null) (t.pages.logs.coreCrash, t.pages.logs.coreCrashMsg, crash),
@@ -73,15 +76,15 @@ class LogsShareModal extends ConsumerWidget {
                 await saveFileAs(file, t: t, notifications: notifications);
               },
             ),
-          // everything at once, as the crash dialog sends it: reports, logs, goroutines and the
-          // config without servers or secrets
+          // everything at once, as the crash dialog sends it: reports, logs, goroutines, the app's
+          // state and the config without servers or secrets, sent to the developers or saved
           ListTile(
             leading: const Icon(FluentIcons.folder_zip_20_regular),
             title: Text(t.pages.logs.diagnostics),
             subtitle: Text(t.pages.logs.diagnosticsMsg),
             onTap: () async {
               Navigator.of(context).pop();
-              await shareDiagnostics(ref);
+              await ref.read(dialogNotifierProvider.notifier).showReportProblem();
             },
           ),
         ],
@@ -217,29 +220,43 @@ Future<void> _exportLines(
   await saveFileAs(target, t: t, notifications: notifications);
 }
 
-/// Desktop gets a save dialog; a phone gets the share sheet, which is what
-/// "save this somewhere" means there.
-Future<void> saveFileAs(
+/// Desktop gets a save dialog; a phone gets the share sheet; a TV a QR code (DownloadToPhoneDialog), which is what
+/// "save this somewhere" means there. Whether the file was saved (or shared):
+/// false when the save dialog was closed or the copy failed.
+Future<bool> saveFileAs(
   File file, {
   required Translations t,
   required InAppNotificationController notifications,
 }) async {
+  // a TV has no share sheet to speak of: a phone on the same Wi-Fi downloads it from a QR code
+  if (await isAndroidTelevision()) {
+    final context = rootNavKey.currentContext;
+    if (context == null || !context.mounted) return false;
+    return await Navigator.of(context).push<bool>(
+          DialogRoute(
+            context: context,
+            builder: (_) => DownloadToPhoneDialog(file: file),
+          ),
+        ) ??
+        false;
+  }
   if (!PlatformUtils.isDesktop) {
-    await UriUtils.tryShareOrLaunchFile(Uri.parse(file.path));
-    return;
+    return UriUtils.tryShareOrLaunchFile(Uri.parse(file.path));
   }
 
   // saveFile only asks where to put it. On desktop it writes nothing and
   // ignores `bytes` — on macOS it throws when they are passed — so copying the
   // file over is ours to do. Reporting success without it was a lie.
   final saveTo = await FilePicker.platform.saveFile(fileName: file.uri.pathSegments.last);
-  if (saveTo == null) return;
+  if (saveTo == null) return false;
 
   try {
     await file.copy(saveTo);
     notifications.showSuccessToast(t.pages.logs.fileSaved);
+    return true;
   } catch (e, stack) {
     _log.error('saving logs to $saveTo failed', e, stack);
     notifications.showErrorToast(t.pages.logs.fileSaveFailed);
+    return false;
   }
 }

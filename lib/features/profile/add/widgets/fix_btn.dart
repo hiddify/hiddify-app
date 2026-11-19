@@ -24,7 +24,8 @@ class FixBtn extends ConsumerWidget {
         borderRadius: borderRadius,
         child: Container(
           alignment: Alignment.center,
-          height: height,
+          // a minimum: a language whose letters are taller (Chinese, Burmese) needs more than the square
+          constraints: BoxConstraints(minHeight: height),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
             borderRadius: borderRadius,

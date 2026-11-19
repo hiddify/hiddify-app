@@ -26,6 +26,14 @@ class HiddifyAdminBGClient extends $grpc.Client {
       '/adminbgservice.HiddifyAdminBG/Start',
       ($0.AdminBgStartRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.AdminBgResponse.fromBuffer(value));
+  static final _$reload = $grpc.ClientMethod<$0.AdminBgStartRequest, $0.AdminBgResponse>(
+      '/adminbgservice.HiddifyAdminBG/Reload',
+      ($0.AdminBgStartRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.AdminBgResponse.fromBuffer(value));
+  static final _$restart = $grpc.ClientMethod<$0.AdminBgStartRequest, $0.AdminBgResponse>(
+      '/adminbgservice.HiddifyAdminBG/Restart',
+      ($0.AdminBgStartRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.AdminBgResponse.fromBuffer(value));
   static final _$stop = $grpc.ClientMethod<$1.Empty, $0.AdminBgResponse>(
       '/adminbgservice.HiddifyAdminBG/Stop',
       ($1.Empty value) => value.writeToBuffer(),
@@ -49,6 +57,14 @@ class HiddifyAdminBGClient extends $grpc.Client {
     return $createUnaryCall(_$start, request, options: options);
   }
 
+  $grpc.ResponseFuture<$0.AdminBgResponse> reload($0.AdminBgStartRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$reload, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.AdminBgResponse> restart($0.AdminBgStartRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$restart, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.AdminBgResponse> stop($1.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$stop, request, options: options);
   }
@@ -70,6 +86,20 @@ abstract class HiddifyAdminBGServiceBase extends $grpc.Service {
     $addMethod($grpc.ServiceMethod<$0.AdminBgStartRequest, $0.AdminBgResponse>(
         'Start',
         start_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.AdminBgStartRequest.fromBuffer(value),
+        ($0.AdminBgResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.AdminBgStartRequest, $0.AdminBgResponse>(
+        'Reload',
+        reload_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.AdminBgStartRequest.fromBuffer(value),
+        ($0.AdminBgResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.AdminBgStartRequest, $0.AdminBgResponse>(
+        'Restart',
+        restart_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.AdminBgStartRequest.fromBuffer(value),
@@ -101,6 +131,14 @@ abstract class HiddifyAdminBGServiceBase extends $grpc.Service {
     return start(call, await request);
   }
 
+  $async.Future<$0.AdminBgResponse> reload_Pre($grpc.ServiceCall call, $async.Future<$0.AdminBgStartRequest> request) async {
+    return reload(call, await request);
+  }
+
+  $async.Future<$0.AdminBgResponse> restart_Pre($grpc.ServiceCall call, $async.Future<$0.AdminBgStartRequest> request) async {
+    return restart(call, await request);
+  }
+
   $async.Future<$0.AdminBgResponse> stop_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
     return stop(call, await request);
   }
@@ -114,6 +152,8 @@ abstract class HiddifyAdminBGServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.AdminBgResponse> start($grpc.ServiceCall call, $0.AdminBgStartRequest request);
+  $async.Future<$0.AdminBgResponse> reload($grpc.ServiceCall call, $0.AdminBgStartRequest request);
+  $async.Future<$0.AdminBgResponse> restart($grpc.ServiceCall call, $0.AdminBgStartRequest request);
   $async.Future<$0.AdminBgResponse> stop($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.AdminBgResponse> status($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.AdminBgResponse> exit($grpc.ServiceCall call, $1.Empty request);
