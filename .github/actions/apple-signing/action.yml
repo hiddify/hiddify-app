@@ -21,7 +21,7 @@ runs:
     # keychain-password output is often empty in the next step, which makes
     # `security unlock-keychain` fail with "passphrase is not correct".
     - name: Import the certificates
-      uses: apple-actions/import-codesign-certs@fe74d46e82474f87e1ba79832ad28a4013d0e33a # v6.1.0
+      uses: apple-actions/import-codesign-certs@288b8ec97b82c66b6f2a6baaf7acc8dfbcbe331c # v7.2.0
       with:
         p12-file-base64: ${{ inputs.p12-base64 }}
         p12-password: ${{ inputs.p12-password }}
