@@ -50,7 +50,7 @@ jobs:
             echo "TestFlight upload authenticates with ${UPLOAD_AUTH}"
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: env.UPLOAD_AUTH == 'apple-id'
         with:
           sparse-checkout: .github/scripts
@@ -59,7 +59,7 @@ jobs:
       - name: Download the iOS artifact
         if: inputs.ios
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ios
           path: out
@@ -69,7 +69,7 @@ jobs:
       - name: Download the Mac App Store artifact
         if: inputs.macos
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: macos-appstore
           path: out
