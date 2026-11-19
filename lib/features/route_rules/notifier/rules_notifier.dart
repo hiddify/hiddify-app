@@ -26,7 +26,8 @@ enum BuiltinRule {
   bypassLan(enabledByDefault: true),
   systemDirect(enabledByDefault: false),
   blockAds(enabledByDefault: false),
-  bypassRegion(enabledByDefault: true);
+  bypassRegion(enabledByDefault: true),
+  tailscale(enabledByDefault: false);
 
   const BuiltinRule({required this.enabledByDefault});
 
@@ -51,6 +52,7 @@ enum BuiltinRule {
     },
     blockAds => t.pages.settings.routing.builtinRules.blockAds,
     bypassRegion => t.pages.settings.routing.builtinRules.bypassRegion(region: region.presentName(t)),
+    tailscale => t.pages.settings.routing.builtinRules.tailscale,
   };
 
   Rule get rule => switch (this) {
@@ -150,6 +152,9 @@ enum BuiltinRule {
       outbound: Outbound.direct,
       ruleSets: ['$_geoUrl/country/geosite-{region}.srs', '$_geoUrl/country/geoip-{region}.srs'],
     ),
+    // Tailscale's nodes are in the CGNAT range and its MagicDNS names end in ts.net; through the proxy, the
+    // mesh breaks up.
+    tailscale => Rule(outbound: Outbound.direct, domainSuffixes: ['ts.net'], ipCidrs: ['100.64.0.0/10']),
   }..name = key;
 }
 
