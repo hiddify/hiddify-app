@@ -11,7 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const _space = 18.0;
-const _textStyle = TextStyle(fontSize: 16);
+const _codeFont = 'monospace';
+const _textStyle = TextStyle(fontFamily: _codeFont, fontSize: 16);
 const _options = Icon(Icons.more_horiz, size: 16);
 const _expandIconWidth = 10.0;
 const _rowHeight = 30.0;
@@ -791,7 +792,7 @@ class _JsonEditorState extends State<JsonEditor> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(_editor.name, style: _textStyle),
+                              Text(_editor.name, style: const TextStyle(fontSize: 16)),
                               const Icon(Icons.arrow_drop_down, size: 20),
                             ],
                           ),
@@ -1342,7 +1343,7 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
                 });
               },
               items: options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(value: value, child: Text(value));
+                return DropdownMenuItem<String>(value: value, child: Text(value, style: _textStyle));
               }).toList(),
             ),
           ),
@@ -1458,7 +1459,7 @@ class _Options<T> extends StatelessWidget {
                     children: [
                       const Icon(Icons.data_object),
                       const SizedBox(width: 10),
-                      Text(key, style: const TextStyle(fontSize: 14)),
+                      Text(key, style: const TextStyle(fontFamily: _codeFont, fontSize: 14)),
                     ],
                   ),
                 ),
@@ -1478,7 +1479,7 @@ class _Options<T> extends StatelessWidget {
                         children: [
                           const Icon(Icons.data_object),
                           const SizedBox(width: 10),
-                          Text(key2, style: const TextStyle(fontSize: 14)),
+                          Text(key2, style: const TextStyle(fontFamily: _codeFont, fontSize: 14)),
                         ],
                       ),
                     ),
@@ -1620,7 +1621,7 @@ class _SearchField extends StatelessWidget {
             autocorrect: false,
             autofocus: true,
             cursorWidth: 1,
-            // style: _textStyle,
+            style: const TextStyle(fontFamily: _codeFont),
             cursorHeight: 12,
             decoration: InputDecoration(
               hintText: "Search",
