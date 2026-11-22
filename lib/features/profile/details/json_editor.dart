@@ -1343,7 +1343,10 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
                 });
               },
               items: options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(value: value, child: Text(value, style: _textStyle));
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value, style: _textStyle),
+                );
               }).toList(),
             ),
           ),
