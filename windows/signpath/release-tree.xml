@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SignPath artifact configuration, slug "release-tree".
+     Input: the GitHub artifact built by windows/scripts/signpath_tree.ps1 -Mode Collect, i.e.
+     the unsigned PE files of the Flutter Release tree, flat (MSVC runtimes left out).
+     Paste into SignPath > project hiddify-app > Artifact configurations. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file-set>
+      <include path="*.exe" min-matches="1" max-matches="unbounded" />
+      <include path="*.dll" min-matches="1" max-matches="unbounded" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>

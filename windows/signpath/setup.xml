@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SignPath artifact configuration, slug "setup".
+     Input: the GitHub artifact holding only Hiddify-Windows-Setup-x64.exe (Inno Setup).
+     Its payload was signed before packing (release-tree), so only the installer itself
+     is signed here. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="Hiddify-Windows-Setup-x64.exe">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

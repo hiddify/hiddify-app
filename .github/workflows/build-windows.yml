@@ -3,6 +3,8 @@
 # Code signing: a publicly trusted certificate is what keeps the Go/Flutter binaries off the
 # VirusTotal "trojan" heuristics. See docs/windows-code-signing.md for the secrets and the
 # backend choice (Azure Artifact Signing preferred, CA-issued PFX as fallback).
+# SignPath takes over the PE files and Setup.exe when the repository variable
+# SIGNPATH_SIGNING_POLICY_SLUG is set (the MSIX stays on the PFX: the Store re-signs it).
 name: Build Windows
 
 on:
@@ -38,8 +40,12 @@ jobs:
     timeout-minutes: 60
     # A failed build does not stop the release of the other platforms.
     continue-on-error: true
+    env:
+      USE_SIGNPATH: ${{ inputs.release && vars.SIGNPATH_SIGNING_POLICY_SLUG != '' }}
     permissions:
       contents: read
+      # signpath/github-action-submit-signing-request reads the uploaded artifacts.
+      actions: read
       # Azure Artifact Signing (azure/login OIDC) and actions/attest-build-provenance
       id-token: write
       attestations: write
@@ -75,29 +81,72 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # The portable zip is a separate build (portable=true). fastforge runs the
-      # sign_release_tree.sh hook in it, so this step needs the signing credentials: the
-      # `&signing-env` block, which the other signing steps reuse as `*signing-env`.
-      - name: Build the portable zip
-        if: inputs.release
-        env: &signing-env
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: make windows-zip-release
-
       # The non-portable Release tree. Without `release` this is the whole check; with it, the
       # tree is Authenticode-signed *before* Inno/MSIX pack it, so the PE files an install drops
       # are signed (reduces Sysmon/AV "unsigned dropper" noise).
       - name: Build the Release tree
         run: make windows-validate
 
+      # SignPath signs on its servers from a GitHub artifact: the tree's unsigned PE files go up
+      # once, and the fastforge hook (sign_release_tree.sh) copies the signed ones back after
+      # every rebuild. Setup for it in SignPath: docs/windows-code-signing.md.
+      - name: Stage the Release tree for SignPath
+        if: env.USE_SIGNPATH == 'true'
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'signpath'
+          "SIGNPATH_STAGE_DIR=$root\stage" >> $env:GITHUB_ENV
+          "SIGNPATH_MANIFEST=$root\manifest.json" >> $env:GITHUB_ENV
+          & .\windows\scripts\signpath_tree.ps1 -Mode Collect -Stage "$root\stage" -Manifest "$root\manifest.json"
+
+      - name: Upload the unsigned Release tree
+        id: signpath-tree-upload
+        if: env.USE_SIGNPATH == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-unsigned-tree
+          path: ${{ env.SIGNPATH_STAGE_DIR }}
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Sign the Release tree (SignPath)
+        if: env.USE_SIGNPATH == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: release-tree
+          github-artifact-id: ${{ steps.signpath-tree-upload.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: ${{ runner.temp }}/signpath/signed
+
+      # From here on the fastforge hook applies the signed files instead of signing.
+      - name: Apply the signed Release tree
+        if: env.USE_SIGNPATH == 'true'
+        run: |
+          $signed = Join-Path $env:RUNNER_TEMP 'signpath\signed'
+          & .\windows\scripts\signpath_tree.ps1 -Mode Apply -Signed $signed
+          "SIGNPATH_SIGNED_DIR=$signed" >> $env:GITHUB_ENV
+
+      # The steps below that sign need the credentials: the `&signing-env` block, which the
+      # other signing steps reuse as `*signing-env`.
       - name: Sign the Release tree
-        if: inputs.release
-        env: *signing-env
+        if: inputs.release && env.USE_SIGNPATH != 'true'
+        env: &signing-env
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: |
           & .\windows\scripts\sign_windows_artifacts.ps1 -Path build\windows\x64\runner\Release
+
+      # The portable zip is a separate build (portable=true); fastforge runs the
+      # sign_release_tree.sh hook in it too.
+      - name: Build the portable zip
+        if: inputs.release
+        env: *signing-env
+        run: make windows-zip-release
 
       # fastforge runs `flutter build windows` again before packing, which re-copies unsigned
       # plugin DLLs; the Makefile passes a fastforge pre-package hook (WINDOWS_PACKAGE_HOOK) that
@@ -114,9 +163,10 @@ jobs:
         run: make windows-msix-release
 
       # Signs Setup.exe / MSIX and the PE files inside the portable zip. Skips files that already
-      # verify as signed (MSVC runtimes; pre-signed Release PE).
+      # verify as signed (MSVC runtimes; pre-signed Release PE). With SignPath the zip's PE files
+      # are signed already, the MSIX was signed by the msix tool and Setup.exe goes to SignPath.
       - name: Sign the packages
-        if: inputs.release
+        if: inputs.release && env.USE_SIGNPATH != 'true'
         env: *signing-env
         run: |
           & .\windows\scripts\sign_windows_artifacts.ps1 -Path dist
@@ -143,6 +193,39 @@ jobs:
             }
           }
           Get-ChildItem -Path out
+
+      - name: Upload the unsigned Setup.exe
+        id: signpath-setup-upload
+        if: env.USE_SIGNPATH == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-unsigned-setup
+          path: out/Hiddify-Windows-Setup-x64.exe
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Sign Setup.exe (SignPath)
+        if: env.USE_SIGNPATH == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: setup
+          github-artifact-id: ${{ steps.signpath-setup-upload.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: ${{ runner.temp }}/signpath/setup
+
+      - name: Replace Setup.exe with the signed one
+        if: env.USE_SIGNPATH == 'true'
+        run: |
+          $signed = Join-Path $env:RUNNER_TEMP 'signpath\setup\Hiddify-Windows-Setup-x64.exe'
+          $sig = Get-AuthenticodeSignature -LiteralPath $signed
+          if ($sig.Status -eq 'NotSigned') { throw 'SignPath returned Setup.exe unsigned' }
+          Write-Host "Setup.exe signer: $($sig.SignerCertificate.Subject) ($($sig.Status))"
+          Move-Item -LiteralPath $signed -Destination out\Hiddify-Windows-Setup-x64.exe -Force
 
       # SLSA build provenance for the Windows assets (verifiable with
       # `gh attestation verify <file> --repo hiddify/hiddify-app`). Lets users and AV vendors

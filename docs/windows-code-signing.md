@@ -43,6 +43,9 @@ decides the backend:
    certificate you can export as PFX.
 3. Otherwise the job fails: release builds must be signed.
 
+SignPath (option C) runs on top of the PFX backend when the
+`SIGNPATH_SIGNING_POLICY_SLUG` repository variable is set.
+
 `windows/scripts/sign_windows_artifacts.ps1` is the single signing entry point.
 It is called for the Flutter `Release` tree before packaging, by the Inno Setup
 compiler for `Setup.exe` and the uninstaller, and for `dist/` (MSIX, Setup,
@@ -122,14 +125,58 @@ their own signing client; wire them into `Invoke-PfxBackend` in
 EV certificates get SmartScreen reputation immediately; OV certificates build it
 over a few weeks of downloads.
 
-## Option C: SignPath Foundation
+## Option C: SignPath
 
-Free code signing for open-source projects (OSI license, public repository,
-free downloads). Signing happens on their side: the workflow uploads the
-unsigned artifact and `signpath/github-action-submit-signing-request` returns
-the signed one. It needs a project application and review first. If accepted,
-add a job after `build` that submits `out/*.exe`, `out/*.Msix` and the zip's PE
-files, then replace the assets.
+SignPath signs on its own servers. The workflow uploads the unsigned files as a
+GitHub artifact, `signpath/github-action-submit-signing-request` submits it and
+downloads the signed copy. SignPath verifies that the artifact was built by this
+repository's workflow on a GitHub-hosted runner, so signing only works in CI.
+
+It is switched on by the repository variable `SIGNPATH_SIGNING_POLICY_SLUG`;
+without it the job uses the backends above.
+
+| GitHub setting | Kind | Value |
+|---|---|---|
+| `SIGNPATH_API_TOKEN` | secret | API token of a SignPath user who is a *submitter* of the signing policy |
+| `SIGNPATH_ORGANIZATION_ID` | variable | `21074d17-8c3b-4cfd-9bf4-7348f99921fa` |
+| `SIGNPATH_PROJECT_SLUG` | variable | `hiddify-app` |
+| `SIGNPATH_SIGNING_POLICY_SLUG` | variable | `test-signing` now, the release policy once SignPath issues the production certificate |
+
+In SignPath, project `hiddify-app`:
+
+1. *Trusted build systems*: add the predefined **GitHub.com** system to the
+   organization and link it to the project. Set the project's repository URL to
+   `https://github.com/hiddify/hiddify-app`.
+2. *Artifact configurations*: create two, with exactly these slugs, from the
+   files in `windows/signpath/`:
+   - `release-tree` ← `release-tree.xml`
+   - `setup` ← `setup.xml`
+3. Signing policy: the API token's user must be a submitter. For the release
+   policy turn on *Verify origin* and allow the refs the builds run from: the
+   release tags (`v*`) and `main` (CI runs).
+
+What the job does with SignPath:
+
+1. Builds the Release tree, then `windows/scripts/signpath_tree.ps1 -Mode Collect`
+   copies its PE files that have no trusted signature (the MSVC runtimes are
+   Microsoft-signed and stay out) into a flat folder and records their SHA-256.
+2. SignPath signs them (`release-tree`), and `-Mode Apply` puts them back.
+3. fastforge rebuilds the tree before every package. The hook
+   (`sign_release_tree.sh`) runs `-Mode Apply` again instead of signing: each
+   rebuilt file must be byte-identical to the one SignPath signed, or the job
+   fails rather than ship it unsigned. The portable zip, Setup.exe and the MSIX
+   therefore carry the SignPath-signed PE files.
+4. SignPath signs `Hiddify-Windows-Setup-x64.exe` (`setup`), which replaces the
+   copy in `out/` before the provenance attestation.
+
+Still signed with the PFX (`WINDOWS_SIGNING_KEY` is still required):
+
+- The MSIX package signature. Its Publisher must equal the certificate Subject,
+  and it is the Partner Center identity; the Store re-signs the package anyway
+  ([microsoft-store.md](microsoft-store.md)).
+- The Inno Setup uninstaller `unins000.exe`. Inno signs it while it compiles,
+  and SignPath cannot be called from there with origin verification. Inno's
+  `SignedUninstallerDir` could take a SignPath-signed copy in a later change.
 
 ## Microsoft Store
 

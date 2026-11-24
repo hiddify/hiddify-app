@@ -140,6 +140,8 @@ jobs:
       # Azure Artifact Signing (OIDC) and the build provenance attestation
       id-token: write
       attestations: write
+      # SignPath reads the uploaded artifacts.
+      actions: read
     with: *build-inputs
 
   macos:
