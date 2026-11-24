@@ -145,7 +145,16 @@ else {
 }
 
 # --- Inno Setup Sign Tool (ISCC reads HKCU\Software\Jordan Russell\Inno Setup\SignTools) ---
-if (-not $SkipInnoSignTool) {
+if ($env:USE_SIGNPATH -eq 'true') {
+    # No Sign Tool: SignPath signs the uninstaller ahead of the compile (SignedUninstallerDir)
+    # and Setup.exe after it. See windows/packaging/exe/inno_setup.sas.
+    $uninstDir = Join-Path $(if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { (Get-Location).Path }) 'signpath\uninst'
+    New-Item -ItemType Directory -Path $uninstDir -Force | Out-Null
+    Set-CiEnv 'HIDDIFY_INNO_SIGNTOOL' 'signpath'
+    Set-CiEnv 'HIDDIFY_INNO_UNINST_DIR' $uninstDir
+    Write-Host "Inno Setup: signed uninstaller from $uninstDir (SignPath)"
+}
+elseif (-not $SkipInnoSignTool) {
     $pwsh = (Get-Command pwsh -ErrorAction SilentlyContinue).Source
     if (-not $pwsh) { $pwsh = (Get-Command powershell).Source }
     $script = (Resolve-Path -LiteralPath $SignScript).Path

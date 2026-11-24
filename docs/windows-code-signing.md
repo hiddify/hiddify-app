@@ -157,26 +157,34 @@ In SignPath, project `hiddify-app`:
 
 What the job does with SignPath:
 
-1. Builds the Release tree, then `windows/scripts/signpath_tree.ps1 -Mode Collect`
-   copies its PE files that have no trusted signature (the MSVC runtimes are
-   Microsoft-signed and stay out) into a flat folder and records their SHA-256.
-2. SignPath signs them (`release-tree`), and `-Mode Apply` puts them back.
-3. fastforge rebuilds the tree before every package. The hook
+1. Builds the Release tree, then runs the Setup.exe packaging once to get the
+   Inno Setup engine: with `SignedUninstaller=yes` and no Sign Tool, the Inno
+   compiler writes it unsigned to `SignedUninstallerDir` as
+   `uninst-<inno version>-<hash>.e32` and stops. That engine is what an install
+   runs as `Setup.tmp` and leaves behind as `unins000.exe`.
+2. `windows/scripts/signpath_tree.ps1 -Mode Collect` copies the tree's PE files
+   that have no trusted signature (the MSVC runtimes are Microsoft-signed and
+   stay out) into a flat folder and records their SHA-256; the engine goes in as
+   `uninst-….exe`, because SignPath recognises PE files by extension.
+3. SignPath signs them (`release-tree`). `-Mode Apply` puts the tree files back
+   and the signed engine replaces the `.e32`; the Inno compiler checks it is the
+   unsigned file plus a signature and embeds it.
+4. fastforge rebuilds the tree before every package. The hook
    (`sign_release_tree.sh`) runs `-Mode Apply` again instead of signing: each
    rebuilt file must be byte-identical to the one SignPath signed, or the job
    fails rather than ship it unsigned. The portable zip, Setup.exe and the MSIX
    therefore carry the SignPath-signed PE files.
-4. SignPath signs `Hiddify-Windows-Setup-x64.exe` (`setup`), which replaces the
+5. SignPath signs `Hiddify-Windows-Setup-x64.exe` (`setup`), which replaces the
    copy in `out/` before the provenance attestation.
 
-Still signed with the PFX (`WINDOWS_SIGNING_KEY` is still required):
+Every PE file in Setup.exe is then SignPath-signed or Microsoft-signed: the app
+files, the setup engine / uninstaller and Setup.exe itself.
 
-- The MSIX package signature. Its Publisher must equal the certificate Subject,
-  and it is the Partner Center identity; the Store re-signs the package anyway
-  ([microsoft-store.md](microsoft-store.md)).
-- The Inno Setup uninstaller `unins000.exe`. Inno signs it while it compiles,
-  and SignPath cannot be called from there with origin verification. Inno's
-  `SignedUninstallerDir` could take a SignPath-signed copy in a later change.
+Still signed with the PFX (`WINDOWS_SIGNING_KEY` is still required): the MSIX
+package signature. Its Publisher must equal the certificate Subject, and it is
+the Partner Center identity; the Store re-signs the package anyway
+([microsoft-store.md](microsoft-store.md)). The PE files inside it are
+SignPath-signed.
 
 ## Microsoft Store
 

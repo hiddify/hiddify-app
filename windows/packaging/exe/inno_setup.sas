@@ -36,9 +36,16 @@ UninstallDisplayIcon={app}\{{EXECUTABLE_NAME}}
 ; Sign Tool and sets HIDDIFY_INNO_SIGNTOOL, so the compiler signs Setup.exe *and*
 ; unins000.exe. An unsigned uninstaller dropped into Program Files is one of the
 ; VirusTotal sandbox hits ("Sysmon File Executable Creation" Sigma rule).
+; With SignPath there is no Sign Tool: the compiler writes the unsigned setup engine
+; (Setup.tmp and unins000.exe at install time) to SignedUninstallerDir as
+; uninst-<version>-<hash>.e32 and stops; the workflow has SignPath sign it and the
+; next compile embeds the signed copy. Setup.exe itself is signed by SignPath afterwards.
 #if GetEnv("HIDDIFY_INNO_SIGNTOOL") == "hiddifysign"
 SignTool=hiddifysign
 SignedUninstaller=yes
+#elif GetEnv("HIDDIFY_INNO_SIGNTOOL") == "signpath"
+SignedUninstaller=yes
+SignedUninstallerDir={#GetEnv("HIDDIFY_INNO_UNINST_DIR")}
 #endif
 
 ; Translations Inno Setup 6.7 ships only as "unofficial" (not in compiler:Languages) are

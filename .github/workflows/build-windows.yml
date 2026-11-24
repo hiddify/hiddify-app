@@ -87,9 +87,23 @@ jobs:
       - name: Build the Release tree
         run: make windows-validate
 
-      # SignPath signs on its servers from a GitHub artifact: the tree's unsigned PE files go up
-      # once, and the fastforge hook (sign_release_tree.sh) copies the signed ones back after
-      # every rebuild. Setup for it in SignPath: docs/windows-code-signing.md.
+      # Inno Setup's setup engine (Setup.tmp while installing, unins000.exe afterwards) must be
+      # signed before Setup.exe is compiled. Without a Sign Tool the compiler writes it unsigned to
+      # HIDDIFY_INNO_UNINST_DIR and stops (inno_setup.sas), so this packaging run is expected to
+      # fail; the file goes to SignPath with the Release tree.
+      - name: Produce the Inno Setup engine for SignPath
+        if: env.USE_SIGNPATH == 'true'
+        run: |
+          make windows-exe-release
+          $engine = Get-ChildItem -Path $env:HIDDIFY_INNO_UNINST_DIR -Filter 'uninst-*.e32' -File
+          if (@($engine).Count -ne 1) { throw "Expected one uninst-*.e32 in $env:HIDDIFY_INNO_UNINST_DIR, found $(@($engine).Count)" }
+          Write-Host "Inno Setup engine to sign: $($engine.Name)"
+          Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue
+          exit 0
+
+      # SignPath signs on its servers from a GitHub artifact: the tree's unsigned PE files and the
+      # Inno engine go up once, and the fastforge hook (sign_release_tree.sh) copies the signed
+      # files back after every rebuild. Setup for it in SignPath: docs/windows-code-signing.md.
       - name: Stage the Release tree for SignPath
         if: env.USE_SIGNPATH == 'true'
         run: |
@@ -97,6 +111,9 @@ jobs:
           "SIGNPATH_STAGE_DIR=$root\stage" >> $env:GITHUB_ENV
           "SIGNPATH_MANIFEST=$root\manifest.json" >> $env:GITHUB_ENV
           & .\windows\scripts\signpath_tree.ps1 -Mode Collect -Stage "$root\stage" -Manifest "$root\manifest.json"
+          # The engine is a PE file named .e32; SignPath only takes PE files by their extension.
+          $engine = Get-Item -Path (Join-Path $env:HIDDIFY_INNO_UNINST_DIR 'uninst-*.e32')
+          Copy-Item -LiteralPath $engine.FullName -Destination (Join-Path "$root\stage" ($engine.BaseName + '.exe'))
 
       - name: Upload the unsigned Release tree
         id: signpath-tree-upload
@@ -127,6 +144,11 @@ jobs:
         run: |
           $signed = Join-Path $env:RUNNER_TEMP 'signpath\signed'
           & .\windows\scripts\signpath_tree.ps1 -Mode Apply -Signed $signed
+          # Inno checks that the signed engine is the unsigned one plus a signature, then embeds it.
+          $engine = Get-Item -Path (Join-Path $env:HIDDIFY_INNO_UNINST_DIR 'uninst-*.e32')
+          $signedEngine = Join-Path $signed ($engine.BaseName + '.exe')
+          if ((Get-AuthenticodeSignature -LiteralPath $signedEngine).Status -eq 'NotSigned') { throw 'SignPath returned the Inno engine unsigned' }
+          Copy-Item -LiteralPath $signedEngine -Destination $engine.FullName -Force
           "SIGNPATH_SIGNED_DIR=$signed" >> $env:GITHUB_ENV
 
       # The steps below that sign need the credentials: the `&signing-env` block, which the
