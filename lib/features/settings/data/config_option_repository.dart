@@ -180,6 +180,22 @@ abstract class ConfigOptions {
     mapTo: const IntervalInSecondsConverter().toJson,
   );
 
+  /// Kilobytes each URL test also downloads through the proxy, which fails unless they keep
+  /// coming: a proxy frozen after its first kilobytes passes the test's few bytes otherwise. 0 is
+  /// off. Only [urlTestDownloadSizes]: each test of each proxy moves it, on mobile data too.
+  static final urlTestDownloadSize = PreferencesNotifier.create<int, int>(
+    "url-test-download-size",
+    0,
+    validator: urlTestDownloadSizes.contains,
+  );
+
+  /// The sizes [urlTestDownloadSize] offers, in kilobytes.
+  static const urlTestDownloadSizes = [0, 32, 64, 128];
+
+  /// The size the slider starts at while the download is off: above the 16–20 KB at which censors
+  /// freeze a connection, with room to spare, at little cost.
+  static const urlTestDownloadRecommended = 32;
+
   /// How many megabytes an upload test sends through each proxy.
   static final uploadTestSize = PreferencesNotifier.create<int, int>("upload-test-size", 1);
 
@@ -498,6 +514,7 @@ abstract class ConfigOptions {
     "strict-route": strictRoute,
     "connection-test-url": connectionTestUrl,
     "url-test-interval": urlTestInterval,
+    "url-test-download-size": urlTestDownloadSize,
     "upload-test-size": uploadTestSize,
     "upload-test-limit": uploadTestLimit,
     "speed-test-direction": speedTestDirection,
@@ -637,6 +654,7 @@ abstract class ConfigOptions {
       strictRoute: ref.watch(strictRoute),
       connectionTestUrl: ref.watch(connectionTestUrl),
       urlTestInterval: ref.watch(urlTestInterval),
+      urlTestDownloadSize: ref.watch(urlTestDownloadSize),
       enableClashApi: ref.watch(enableClashApi),
       clashApiPort: ref.watch(clashApiPort),
       enableTun: mode == ServiceMode.tun || mode == ServiceMode.router,

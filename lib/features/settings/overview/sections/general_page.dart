@@ -122,6 +122,28 @@ class GeneralPage extends HookConsumerWidget {
                   await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: value.toInt()));
                 }),
           ),
+          ListTile(
+            title: Text(t.pages.settings.general.urlTestDownloadSize),
+            subtitle: Text(urlTestDownloadSizeLabel(t, ref.watch(ConfigOptions.urlTestDownloadSize))),
+            leading: const Icon(Icons.download_rounded),
+            onTap: () async {
+              const sizes = ConfigOptions.urlTestDownloadSizes;
+              final size = ref.read(ConfigOptions.urlTestDownloadSize);
+              final value = await ref
+                  .read(dialogNotifierProvider.notifier)
+                  .showSettingSlider(
+                    title: t.pages.settings.general.urlTestDownloadSize,
+                    // off, it starts at the recommended size: what most will pick
+                    initialValue: sizes.indexOf(size == 0 ? ConfigOptions.urlTestDownloadRecommended : size).toDouble(),
+                    onReset: ref.read(ConfigOptions.urlTestDownloadSize.notifier).reset,
+                    max: sizes.length - 1,
+                    divisions: sizes.length - 1,
+                    labelGen: (value) => urlTestDownloadSizeLabel(t, sizes[value.toInt()]),
+                  );
+              if (value == null) return;
+              await ref.read(ConfigOptions.urlTestDownloadSize.notifier).update(sizes[value.toInt()]);
+            },
+          ),
           // how a speed test of the proxy list runs: download or upload, how much, how many proxies
           ListTile(
             title: Text(t.pages.settings.general.speedTest),
@@ -164,3 +186,10 @@ class GeneralPage extends HookConsumerWidget {
     );
   }
 }
+
+/// How the general page names a size of [ConfigOptions.urlTestDownloadSize].
+String urlTestDownloadSizeLabel(Translations t, int size) => switch (size) {
+  0 => t.pages.settings.general.urlTestDownloadSizeOff,
+  ConfigOptions.urlTestDownloadRecommended => t.pages.settings.general.kilobytesPerTestRecommended(n: size),
+  _ => t.pages.settings.general.kilobytesPerTest(n: size),
+};

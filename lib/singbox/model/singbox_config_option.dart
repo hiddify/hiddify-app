@@ -65,6 +65,9 @@ class SingboxConfigOption with _$SingboxConfigOption {
     /// The profile's proxies the user chose to run, and only them (`keep-tags`).
     @Default(<String>[]) List<String> keepTags,
     @IntervalInSecondsConverter() required Duration urlTestInterval,
+
+    /// Kilobytes each URL test also downloads through the proxy; 0 for none.
+    @Default(0) int urlTestDownloadSize,
     required bool enableClashApi,
     required int clashApiPort,
     required bool enableTun,
