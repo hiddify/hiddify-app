@@ -472,7 +472,10 @@
         "useSystemTlsEngineMsg": "Connections without a TLS fingerprint use the TLS of macOS, iOS, or Windows once it passes a check on this device; otherwise they look like Chrome.",
         "uploadTestSize": "Upload test size",
         "megabytes": "$n MB",
-        "speedTest": "Speed test"
+        "speedTest": "Speed test",
+        "rootRouteAllUsers": "Route all users through VPN",
+        "rootRouteAllUsersDesc": "Route apps from other user/clone profile, need root",
+        "rootRouteNoRoot": "No root access. Grant root in KernelSU/Magisk, then toggle \"Route all users through VPN\" again."
       },
       "routing": {
         "title": "Routing",

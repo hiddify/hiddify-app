@@ -100,6 +100,10 @@ abstract class Preferences {
   // iOS only: kept in step with the native side, which applies it (see VPNManager.setAlwaysOn).
   static final alwaysOnVpn = PreferencesNotifier.create<bool, bool>("always_on_vpn", false);
 
+  /// Android only: with root, route every other user through the VPN. The key is read natively
+  /// by the VPN service as `flutter.root-route-all-users`; the app never maps it into sing-box.
+  static final rootRouteAllUsers = PreferencesNotifier.create<bool, bool>("root-route-all-users", false);
+
   static final perAppProxyEnabled = PreferencesNotifier.create<bool, bool>("per_app_proxy_enabled", false);
 
   // Kept while App-based routing is off, for when it is turned on again.

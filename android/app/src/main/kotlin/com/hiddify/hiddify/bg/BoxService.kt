@@ -466,6 +466,8 @@ class BoxService(
 
     /** Called by VPNService.openTun after the TUN fd exists. */
     fun onTunEstablished(addresses: List<String>, dnsServers: List<String>) {
+        Log.i(TAG, "TUN established: ${addresses.size} address(es), ${dnsServers.size} DNS, " +
+            "rootAllUsers=${Settings.rootRouteAllUsers}")
         rootRouter.onTunUp(addresses, dnsServers)
     }
 

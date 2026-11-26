@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -16,10 +17,10 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/root_route.dart';
 import 'package:hiddify/hiddifycore/core_interface/admin_permission_refused.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop_tun.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_macos.dart';
-import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pbenum.dart' as hcore;
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
@@ -108,15 +109,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
     (_) => TaskEither(() async {
-      if (Platform.isAndroid && ref.read(ConfigOptions.rootRouteAllUsers)) {
-        final granted = await CoreInterfaceMobile.methodChannel.invokeMethod<bool>('check_root') ?? false;
-        if (!granted) {
-          ref.read(inAppNotificationControllerProvider).showErrorToast(
-                'No root access. Grant root in KernelSU/Magisk, then toggle '
-                '"Route all users through VPN" again.',
-              );
-        }
-      }
+      // Diagnostics, not a precondition: a root prompt must not stall the tunnel start.
+      unawaited(_warnIfRootMissing());
       while (true) {
         _vpnChoiceShown = false;
         _adminRefused = false;
@@ -126,6 +120,17 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       }
     }),
   );
+
+  /// Best-effort: warns when the other-user routing is on but root is missing. Never awaited by
+  /// connect() and never throws; the native side caches the answer.
+  Future<void> _warnIfRootMissing() async {
+    if (!Platform.isAndroid) return;
+    if (!ref.read(Preferences.rootRouteAllUsers)) return;
+    if (ref.read(ConfigOptions.serviceMode) != ServiceMode.tun) return;
+    if (await checkRootAccess()) return;
+    final t = ref.read(translationsProvider).requireValue;
+    ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.settings.general.rootRouteNoRoot);
+  }
 
   TaskEither<ConnectionFailure, Unit> _connectOnce(ProfileEntity activeProfile, bool disableMemoryLimit) =>
       applyConfigOption(activeProfile).flatMap(

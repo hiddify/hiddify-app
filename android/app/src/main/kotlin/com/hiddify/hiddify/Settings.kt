@@ -160,7 +160,11 @@ object Settings {
      */
     var rootRouteApplied: Boolean
         get() = preferences.getBoolean(SettingsKey.ROOT_ROUTE_APPLIED, false)
-        set(value) = preferences.edit().putBoolean(SettingsKey.ROOT_ROUTE_APPLIED, value).apply()
+        // Synchronous on purpose: this flag is what authorises the next cleanup, so it must be on
+        // disk before the root commands it describes can run (or before the process dies).
+        set(value) {
+            preferences.edit().putBoolean(SettingsKey.ROOT_ROUTE_APPLIED, value).commit()
+        }
 
 }
 

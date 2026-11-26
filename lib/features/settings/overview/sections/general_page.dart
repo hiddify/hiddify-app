@@ -13,6 +13,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/root_route.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -20,28 +21,28 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
 
-Future<bool> _hasRoot() async =>
-    await CoreInterfaceMobile.methodChannel.invokeMethod<bool>('check_root') ?? false;
-
 class GeneralPage extends HookConsumerWidget {
   const GeneralPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
 
+    final mode = ref.watch(ConfigOptions.serviceMode);
+
     // Root can be lost after an app update (KernelSU unmounts the grant), so re-check
-    // whenever the page opens while the feature is on.
+    // whenever the page opens in VPN mode while the feature is on. The native side caches
+    // the answer, so this does not prompt again for every visit.
     useEffect(() {
-      if (!PlatformUtils.isAndroid || !ref.read(ConfigOptions.rootRouteAllUsers)) return null;
+      if (!PlatformUtils.isAndroid || mode != ServiceMode.tun) return null;
+      if (!ref.read(Preferences.rootRouteAllUsers)) return null;
       unawaited(() async {
-        if (await _hasRoot() || !context.mounted) return;
+        if (await checkRootAccess() || !context.mounted) return;
         ref.read(inAppNotificationControllerProvider).showErrorToast(
-              'No root access. Grant root in KernelSU/Magisk, then toggle '
-              '"Route all users through VPN" again.',
+              ref.read(translationsProvider).requireValue.pages.settings.general.rootRouteNoRoot,
             );
       }());
       return null;
-    }, const []);
+    }, [mode]);
 
     return Scaffold(
       appBar: AppBar(title: Text(t.pages.settings.general.title)),
@@ -63,20 +64,21 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.flag_rounded),
             onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
           ),
-          if (PlatformUtils.isAndroid && Release.read() != Release.googlePlay) ...[
-            // Root-only and Android-only; not in the translation catalog yet.
+          if (PlatformUtils.isAndroid && Release.read() != Release.googlePlay && mode == ServiceMode.tun) ...[
+            // Root-only and Android-only; in system-proxy mode there is no TUN to route.
             SwitchListTile.adaptive(
-              title: const Text('Route all users through VPN'),
-              subtitle: const Text('Route apps from other user/clone profile, need root'),
+              title: Text(t.pages.settings.general.rootRouteAllUsers),
+              subtitle: Text(t.pages.settings.general.rootRouteAllUsersDesc),
               secondary: const Icon(Icons.groups_rounded),
-              value: ref.watch(ConfigOptions.rootRouteAllUsers),
+              value: ref.watch(Preferences.rootRouteAllUsers),
               onChanged: (value) async {
-                await ref.read(ConfigOptions.rootRouteAllUsers.notifier).update(value);
-                await CoreInterfaceMobile.methodChannel.invokeMethod('reapply_root_routing');
-                if (!value || await _hasRoot() || !context.mounted) return;
+                await ref.read(Preferences.rootRouteAllUsers.notifier).update(value);
+                try {
+                  await CoreInterfaceMobile.methodChannel.invokeMethod('reapply_root_routing');
+                } catch (_) {}
+                if (!value || await checkRootAccess() || !context.mounted) return;
                 ref.read(inAppNotificationControllerProvider).showErrorToast(
-                      'No root access. Grant root in KernelSU/Magisk, then toggle '
-                      '"Route all users through VPN" again.',
+                      t.pages.settings.general.rootRouteNoRoot,
                     );
               },
             ),
