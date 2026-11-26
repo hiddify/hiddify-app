@@ -149,7 +149,18 @@ object Settings {
         get() = preferences.getInt(SettingsKey.GRPC_PORT, 17078)!!
         set(value) = preferences.edit().putInt(SettingsKey.GRPC_PORT, value).apply()
 
+    /** Android-only: with root, route every other user through the VPN. */
+    var rootRouteAllUsers: Boolean
+        get() = preferences.getBoolean(SettingsKey.ROOT_ROUTE_ALL_USERS, false)
+        set(value) = preferences.edit().putBoolean(SettingsKey.ROOT_ROUTE_ALL_USERS, value).apply()
 
+    /**
+     * Whether this app may have left root routing rules installed. Cleanup is attempted only
+     * when this is true, so a build that never used the feature does not ask for root on boot.
+     */
+    var rootRouteApplied: Boolean
+        get() = preferences.getBoolean(SettingsKey.ROOT_ROUTE_APPLIED, false)
+        set(value) = preferences.edit().putBoolean(SettingsKey.ROOT_ROUTE_APPLIED, value).apply()
 
 }
 

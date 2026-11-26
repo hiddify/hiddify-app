@@ -51,6 +51,10 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
   static final useSystemTlsEngine = PreferencesNotifier.create<bool, bool>("use-system-tls-engine", true);
+
+  /// Android only: with root, route every other user through the VPN. The VPN service reads the
+  /// same shared preference natively (`flutter.root-route-all-users`).
+  static final rootRouteAllUsers = PreferencesNotifier.create<bool, bool>("root-route-all-users", false);
   // static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
     "log-level",

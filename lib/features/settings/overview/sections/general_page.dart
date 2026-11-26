@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
@@ -16,11 +20,28 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
 
+Future<bool> _hasRoot() async =>
+    await CoreInterfaceMobile.methodChannel.invokeMethod<bool>('check_root') ?? false;
+
 class GeneralPage extends HookConsumerWidget {
   const GeneralPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+
+    // Root can be lost after an app update (KernelSU unmounts the grant), so re-check
+    // whenever the page opens while the feature is on.
+    useEffect(() {
+      if (!PlatformUtils.isAndroid || !ref.read(ConfigOptions.rootRouteAllUsers)) return null;
+      unawaited(() async {
+        if (await _hasRoot() || !context.mounted) return;
+        ref.read(inAppNotificationControllerProvider).showErrorToast(
+              'No root access. Grant root in KernelSU/Magisk, then toggle '
+              '"Route all users through VPN" again.',
+            );
+      }());
+      return null;
+    }, const []);
 
     return Scaffold(
       appBar: AppBar(title: Text(t.pages.settings.general.title)),
@@ -42,7 +63,23 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.flag_rounded),
             onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
           ),
-          if (PlatformUtils.isAndroid) ...[
+          if (PlatformUtils.isAndroid && Release.read() != Release.googlePlay) ...[
+            // Root-only and Android-only; not in the translation catalog yet.
+            SwitchListTile.adaptive(
+              title: const Text('Route all users through VPN'),
+              subtitle: const Text('Route apps from other user/clone profile, need root'),
+              secondary: const Icon(Icons.groups_rounded),
+              value: ref.watch(ConfigOptions.rootRouteAllUsers),
+              onChanged: (value) async {
+                await ref.read(ConfigOptions.rootRouteAllUsers.notifier).update(value);
+                await CoreInterfaceMobile.methodChannel.invokeMethod('reapply_root_routing');
+                if (!value || await _hasRoot() || !context.mounted) return;
+                ref.read(inAppNotificationControllerProvider).showErrorToast(
+                      'No root access. Grant root in KernelSU/Magisk, then toggle '
+                      '"Route all users through VPN" again.',
+                    );
+              },
+            ),
             SwitchListTile.adaptive(
               title: Text(t.pages.settings.general.dynamicNotification),
               secondary: const Icon(Icons.speed_rounded),

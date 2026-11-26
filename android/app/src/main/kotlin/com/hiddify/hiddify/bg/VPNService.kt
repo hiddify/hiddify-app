@@ -113,15 +113,20 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
             builder.setMetered(false)
         }
 
+        val tunAddresses = mutableListOf<String>()
+        val dnsServers = mutableListOf<String>()
+
         val inet4Address = options.inet4Address
         while (inet4Address.hasNext()) {
             val address = inet4Address.next()
+            tunAddresses.add(address.address())
             builder.addAddress(address.address(), address.prefix())
         }
 
         val inet6Address = options.inet6Address
         while (inet6Address.hasNext()) {
             val address = inet6Address.next()
+            tunAddresses.add(address.address())
             builder.addAddress(address.address(), address.prefix())
         }
 
@@ -129,7 +134,9 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
             if (options.dnsMode.value != Libbox.DNSModeDisabled) {
                 val dnsServerAddress = options.dnsServerAddress
                 while (dnsServerAddress.hasNext()) {
-                    builder.addDnsServer(dnsServerAddress.next())
+                    val dns = dnsServerAddress.next()
+                    dnsServers.add(dns)
+                    builder.addDnsServer(dns)
                 }
             }
 
@@ -228,6 +235,9 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
         val pfd = builder.establish() ?: error("android: the application is not prepared or is revoked")
         service.fileDescriptor = pfd
+        // Root-only: route other Android users into this tun. Split tunnels have no default route
+        // and are skipped by RootRouter.
+        if (options.autoRoute) service.onTunEstablished(tunAddresses, dnsServers)
         return pfd.fd
     }
 

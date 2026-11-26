@@ -28,4 +28,10 @@ object SettingsKey {
     const val TMP_DIR = "tmp_dir"
 
     const val GRPC_PORT = "grpc_port"
+
+    // Android-only: route every other user through the VPN with root (written by Flutter).
+    const val ROOT_ROUTE_ALL_USERS = "${KEY_PREFIX}root-route-all-users"
+
+    // Native-only flag: our root rules may still be installed (for cleanup after a crash).
+    const val ROOT_ROUTE_APPLIED = "root_route_applied"
 }
