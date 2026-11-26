@@ -33,15 +33,15 @@ jobs:
       # the android-build/<code> tags
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: android-aab
           run-id: ${{ inputs.run-id || github.run_id }}
           github-token: ${{ github.token }}
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 

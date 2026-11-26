@@ -50,7 +50,7 @@ jobs:
     outputs:
       build-number: ${{ steps.build-number.outputs.build }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # One build number for the store builds of this run (Android, iOS, macOS), found here once
       # so the platforms cannot disagree: one more than the highest number a store took.
@@ -76,7 +76,7 @@ jobs:
           test -s "$RUNNER_TEMP/generated-files.txt"
           tar -czf generated-code.tar.gz -T "$RUNNER_TEMP/generated-files.txt"
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: generated-code
           path: generated-code.tar.gz
@@ -93,7 +93,7 @@ jobs:
     env:
       CHANNEL: ${{ inputs.channel }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-flutter
         with:
@@ -170,7 +170,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # The MSIX ships CI-signed; windows-store-sync.yml replaces it with the Store-signed
       # copy once the version uploaded in Partner Center is live.
@@ -192,7 +192,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Warn about failed builds
         if: contains(needs.*.result, 'failure')
