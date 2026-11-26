@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -16,6 +17,7 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/root_route.dart';
 import 'package:hiddify/hiddifycore/core_interface/admin_permission_refused.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop_tun.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_macos.dart';
@@ -107,6 +109,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
     (_) => TaskEither(() async {
+      // Diagnostics, not a precondition: a root prompt must not stall the tunnel start.
+      unawaited(_warnIfRootMissing());
       while (true) {
         _vpnChoiceShown = false;
         _adminRefused = false;
@@ -116,6 +120,17 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       }
     }),
   );
+
+  /// Best-effort: warns when the other-user routing is on but root is missing. Never awaited by
+  /// connect() and never throws; the native side caches the answer.
+  Future<void> _warnIfRootMissing() async {
+    if (!Platform.isAndroid) return;
+    if (!ref.read(Preferences.rootRouteAllUsers)) return;
+    if (ref.read(ConfigOptions.serviceMode) != ServiceMode.tun) return;
+    if (await checkRootAccess()) return;
+    final t = ref.read(translationsProvider).requireValue;
+    ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.settings.general.rootRouteNoRoot);
+  }
 
   TaskEither<ConnectionFailure, Unit> _connectOnce(ProfileEntity activeProfile, bool disableMemoryLimit) =>
       applyConfigOption(activeProfile).flatMap(

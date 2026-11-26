@@ -1,14 +1,19 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/root_route.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -21,6 +26,23 @@ class GeneralPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+
+    final mode = ref.watch(ConfigOptions.serviceMode);
+
+    // Root can be lost after an app update (KernelSU unmounts the grant), so re-check
+    // whenever the page opens in VPN mode while the feature is on. The native side caches
+    // the answer, so this does not prompt again for every visit.
+    useEffect(() {
+      if (!PlatformUtils.isAndroid || mode != ServiceMode.tun) return null;
+      if (!ref.read(Preferences.rootRouteAllUsers)) return null;
+      unawaited(() async {
+        if (await checkRootAccess() || !context.mounted) return;
+        ref.read(inAppNotificationControllerProvider).showErrorToast(
+              ref.read(translationsProvider).requireValue.pages.settings.general.rootRouteNoRoot,
+            );
+      }());
+      return null;
+    }, [mode]);
 
     return Scaffold(
       appBar: AppBar(title: Text(t.pages.settings.general.title)),
@@ -42,7 +64,24 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.flag_rounded),
             onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
           ),
-          if (PlatformUtils.isAndroid) ...[
+          if (PlatformUtils.isAndroid && Release.read() != Release.googlePlay && mode == ServiceMode.tun) ...[
+            // Root-only and Android-only; in system-proxy mode there is no TUN to route.
+            SwitchListTile.adaptive(
+              title: Text(t.pages.settings.general.rootRouteAllUsers),
+              subtitle: Text(t.pages.settings.general.rootRouteAllUsersDesc),
+              secondary: const Icon(Icons.groups_rounded),
+              value: ref.watch(Preferences.rootRouteAllUsers),
+              onChanged: (value) async {
+                await ref.read(Preferences.rootRouteAllUsers.notifier).update(value);
+                try {
+                  await CoreInterfaceMobile.methodChannel.invokeMethod('reapply_root_routing');
+                } catch (_) {}
+                if (!value || await checkRootAccess() || !context.mounted) return;
+                ref.read(inAppNotificationControllerProvider).showErrorToast(
+                      t.pages.settings.general.rootRouteNoRoot,
+                    );
+              },
+            ),
             SwitchListTile.adaptive(
               title: Text(t.pages.settings.general.dynamicNotification),
               secondary: const Icon(Icons.speed_rounded),

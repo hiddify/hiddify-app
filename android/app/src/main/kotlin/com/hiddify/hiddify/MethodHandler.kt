@@ -2,6 +2,7 @@ package com.hiddify.hiddify
 
 import android.util.Log
 import com.hiddify.hiddify.bg.BoxService
+import com.hiddify.hiddify.bg.RootShell
 //import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
 import com.hiddify.hiddify.constant.Status
 import com.hiddify.hiddify.utils.DeviceMemory
@@ -35,6 +36,8 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Stop("stop"),
             Restart("restart"),
             GetGrpcServerPublicKey("get_grpc_server_public_key"),
+            ReapplyRootRouting("reapply_root_routing"),
+            CheckRoot("check_root"),
 
         }
     }
@@ -56,6 +59,21 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
                     result.answer(call.method) { Mobile.getServerPublicKey() }
+                }
+            }
+
+            Trigger.CheckRoot.method -> {
+                GlobalScope.launch {
+                    result.answer(call.method) { RootShell.available() }
+                }
+            }
+
+            Trigger.ReapplyRootRouting.method -> {
+                GlobalScope.launch {
+                    result.answer(call.method) {
+                        BoxService.activeRootRouter?.onSettingChanged()
+                        ""
+                    }
                 }
             }
 

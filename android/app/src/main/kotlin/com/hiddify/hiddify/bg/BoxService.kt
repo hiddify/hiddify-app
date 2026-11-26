@@ -71,6 +71,11 @@ class BoxService(
         var activePlatformInterface: PlatformInterface? = null
             private set
 
+        /** The running service's router, so the settings toggle can re-apply without reconnecting. */
+        @Volatile
+        var activeRootRouter: RootRouter? = null
+            private set
+
         private var initializeOnce = false
         private lateinit var workingDir: File
         private fun initialize() {
@@ -142,6 +147,7 @@ class BoxService(
 
     var fileDescriptor: ParcelFileDescriptor? = null
 
+    private val rootRouter = RootRouter().also { activeRootRouter = it }
     private val status = MutableLiveData(Status.Stopped)
     private val binder = ServiceBinder(status)
     private val notification = ServiceNotification(status, service)
@@ -182,6 +188,8 @@ class BoxService(
      * no longer gets Started, a started core and a polling notification after it.
      */
     private suspend fun startService(startCore: Boolean): StartFailure? {
+        // A killed process may have left root routes behind; clear them before the next session.
+        rootRouter.onServiceStarting()
         try {
             // Starting is set by who started this (onStartCommand, a reload), on the main thread:
             // posted from here it could land after a stop's Stopping
@@ -360,6 +368,12 @@ class BoxService(
             }
             notification.close()
         }
+        // Remove the root routing before the TUN goes away: rules pointing at a dead tun leave
+        // every other user without network.
+        try {
+            rootRouter.stop()
+        } catch (_: Exception) {
+        }
         fileDescriptor?.let {
             it.close()
             fileDescriptor = null
@@ -450,9 +464,24 @@ class BoxService(
         return binder
     }
 
+    /** Called by VPNService.openTun after the TUN fd exists. */
+    fun onTunEstablished(addresses: List<String>, dnsServers: List<String>) {
+        Log.i(TAG, "TUN established: ${addresses.size} address(es), ${dnsServers.size} DNS, " +
+            "rootAllUsers=${Settings.rootRouteAllUsers}")
+        rootRouter.onTunUp(addresses, dnsServers)
+    }
+
     fun onDestroy() {
         if (activePlatformInterface === platformInterface) activePlatformInterface = null
+        if (activeRootRouter === rootRouter) activeRootRouter = null
         binder.close()
+        // teardown normally removed the rules already; this covers a service destroyed without it.
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                rootRouter.stop()
+            } catch (_: Exception) {
+            }
+        }
     }
 
     fun onRevoke() {

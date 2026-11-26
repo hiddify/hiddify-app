@@ -51,6 +51,7 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
   static final useSystemTlsEngine = PreferencesNotifier.create<bool, bool>("use-system-tls-engine", true);
+
   // static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
     "log-level",
